@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --grain-opacity: 0.09;
+  --grain-photo-opacity: 0.22;
+  --logo-height: 2.5rem;
+  --logo-clear-min: calc(var(--logo-height) * 0.5);
+  --logo-clear-std: var(--logo-height);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+  }
+  body {
+    @apply overflow-x-hidden bg-j-black font-serif font-normal text-j-offwhite antialiased;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+}
+
+.lf-canvas-clip {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Hero / silhouette: portrait phones crop `object-cover` differently — shift focal point vs desktop comp */
+.lf-photo-responsive-focus .lf-photo-img {
+  object-position: var(--lf-img-object-narrow);
+}
+
+/* Match “full desktop comp” hero (absolute layout) — xl breakpoint */
+@media (min-width: 1280px) {
+  .lf-photo-responsive-focus .lf-photo-img {
+    object-position: var(--lf-img-object-desktop);
+  }
+}
+
+/* Skip navigation: visible on keyboard focus only */
+.j-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100000;
+  padding: 0.75rem 1rem;
+  background: var(--color-j-offwhite, #e1e6ea);
+  color: var(--color-j-charcoal, #313e44);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.j-skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  outline: 2px solid #313e44;
+  outline-offset: 2px;
+}
+
+/* Editorial stills: punchy monochrome */
+.j-img-editorial {
+  @apply grayscale contrast-[1.15] brightness-[0.92] saturate-0;
+}
+
+/* Global page grain */
+.j-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Extra texture on photography (Look & Feel–style treatment) */
+.j-photo-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--grain-photo-opacity);
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --grain-opacity: 0.04;
+    --grain-photo-opacity: 0.1;
+  }
+  .j-grow-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .j-grow-in {
+    animation: j-grow-in 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--grow-delay, 0ms);
+    transform-origin: left center;
+  }
+
+  .j-grow-in-stagger > *:nth-child(1) {
+    --grow-delay: 0ms;
+  }
+  .j-grow-in-stagger > *:nth-child(2) {
+    --grow-delay: 90ms;
+  }
+  .j-grow-in-stagger > *:nth-child(3) {
+    --grow-delay: 180ms;
+  }
+  .j-grow-in-stagger > *:nth-child(4) {
+    --grow-delay: 270ms;
+  }
+  .j-grow-in-stagger > *:nth-child(5) {
+    --grow-delay: 360ms;
+  }
+}
+
+@keyframes j-grow-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 1023px) {
+  .j-footer-wordmark-grow.j-grow-in {
+    transform-origin: center center;
+  }
+}
+
+.j-logo {
+  filter: none !important;
+  object-fit: contain;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Micro-label caps used in comps */
+.j-label-caps {
+  @apply text-[0.625rem] font-medium uppercase tracking-[0.4em] text-j-slate;
+}
