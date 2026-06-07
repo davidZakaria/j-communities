@@ -3,9 +3,9 @@
  */
 
 export const PILLAR_CATEGORIES = [
-  { num: "01", label: "Residential communities", to: "/#projects" as const },
-  { num: "02", label: "Commercial developments", to: "/#projects" as const },
-  { num: "03", label: "Mixed-use destinations", to: "/#projects" as const },
+  { num: "01", label: "Jura Sokhna", to: "/projects/jura-sokhna" as const },
+  { num: "02", label: "Jamila North Coast", to: "/projects/jamila-north-coast" as const },
+  { num: "03", label: "Coastal living", to: "/#projects" as const },
 ] as const;
 
 export const COPY = {
@@ -79,7 +79,7 @@ export const COPY = {
     kicker: "Portfolio",
     title: "Our projects",
     lead:
-      "From luxury residences to innovative commercial and mixed-use addresses — one standard for excellence across every destination.",
+      "Two flagship coastal destinations — Jura Sokhna on the Red Sea and Jamila on the North Coast — each with its own character, amenities, and immersive 3D experience.",
   },
 
   footer: {

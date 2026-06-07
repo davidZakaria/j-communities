@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import { projects, type ProjectCategory } from "../data/projects";
 import { COPY } from "../content/siteCopy";
 import { LF, LF_TYPE } from "../config/lookFeel";
 import { GrowSection } from "./GrowSection";
+import { ProjectLink } from "./ProjectLink";
 
 function categoryStyle(cat: ProjectCategory): string {
   const map: Record<ProjectCategory, string> = {
@@ -34,10 +34,20 @@ export function ProjectsGrid() {
         <h2 className={`mb-5 text-j-charcoal ${LF_TYPE.projectsTitle}`}>{COPY.projects.title}</h2>
         <p className={`mb-14 max-w-[640px] ${LF_TYPE.projectsLead}`}>{COPY.projects.lead}</p>
       </GrowSection>
-      <ul className="grid w-full grid-cols-1 gap-px bg-j-slate/20 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid w-full grid-cols-1 gap-px bg-j-slate/20 sm:grid-cols-2">
         {projects.map((p) => {
           const card = (
             <>
+              {p.cardImage ? (
+                <div className="mb-5 overflow-hidden rounded-sm">
+                  <img
+                    src={p.cardImage}
+                    alt=""
+                    className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                </div>
+              ) : null}
               <span
                 className={`mb-5 inline-flex w-fit border px-2 py-1 ${LF_TYPE.cardTag} ${categoryStyle(p.category)}`}
               >
@@ -65,11 +75,11 @@ export function ProjectsGrid() {
               </article>
             </a>
           ) : (
-            <Link to={`/projects/${p.slug}`} className="group block h-full text-inherit no-underline">
+            <ProjectLink slug={p.slug} className="group block h-full text-inherit no-underline">
               <article className="flex h-full flex-col p-6 transition-colors hover:bg-j-black/[0.03] sm:p-8 xl:p-9">
                 {card}
               </article>
-            </Link>
+            </ProjectLink>
           );
 
           return (

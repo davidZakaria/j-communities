@@ -3,6 +3,7 @@ import { PILLAR_CATEGORIES, COPY } from "../content/siteCopy";
 import { LF, LF_TYPE } from "../config/lookFeel";
 import { GrowSection } from "./GrowSection";
 import { CtaArrow } from "./CtaArrow";
+import { ProjectRouteLink } from "./ProjectLink";
 
 export function Pillars() {
   const { heightPx, padX, padY } = LF.pillars;
@@ -30,14 +31,25 @@ export function Pillars() {
               key={item.label}
               className={`flex border-b border-j-charcoal/15 py-3 last:border-b-0 lg:border-b-0 lg:py-0 ${align}`}
             >
-              <Link
-                to={item.to}
-                className={`inline-flex min-h-[44px] items-center gap-2 py-2 text-j-charcoal transition-opacity hover:opacity-80 lg:items-baseline lg:min-h-0 lg:py-0 ${LF_TYPE.pillarsCategory}`}
-              >
-                <span className="text-j-slate">{item.num}.</span>
-                <span className="font-semibold uppercase">{item.label}</span>
-                <CtaArrow />
-              </Link>
+              {item.to.startsWith("/projects/") ? (
+                <ProjectRouteLink
+                  to={item.to}
+                  className={`inline-flex min-h-[44px] items-center gap-2 py-2 text-j-charcoal transition-opacity hover:opacity-80 lg:items-baseline lg:min-h-0 lg:py-0 ${LF_TYPE.pillarsCategory}`}
+                >
+                  <span className="text-j-slate">{item.num}.</span>
+                  <span className="font-semibold uppercase">{item.label}</span>
+                  <CtaArrow />
+                </ProjectRouteLink>
+              ) : (
+                <Link
+                  to={item.to}
+                  className={`inline-flex min-h-[44px] items-center gap-2 py-2 text-j-charcoal transition-opacity hover:opacity-80 lg:items-baseline lg:min-h-0 lg:py-0 ${LF_TYPE.pillarsCategory}`}
+                >
+                  <span className="text-j-slate">{item.num}.</span>
+                  <span className="font-semibold uppercase">{item.label}</span>
+                  <CtaArrow />
+                </Link>
+              )}
             </div>
           );
         })}

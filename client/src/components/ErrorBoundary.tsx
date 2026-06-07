@@ -23,14 +23,11 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-j-black px-6 py-16 text-j-offwhite">
-          <p className="font-serif text-lg">Something went wrong.</p>
-          <button
-            type="button"
-            className="mt-4 border-b border-j-offwhite font-sans text-sm"
-            onClick={() => this.setState({ hasError: false })}
-          >
-            Try again
-          </button>
+          <p className="font-serif text-lg">Something went wrong loading this page.</p>
+          <p className="mt-2 font-sans text-sm text-j-slate">Try a hard refresh (Ctrl+Shift+R) or return home.</p>
+          <a href="/" className="mt-4 inline-block border-b border-j-offwhite font-sans text-sm">
+            Go to homepage
+          </a>
         </div>
       );
     }

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { COPY } from "../content/siteCopy";
 import { LF, LF_TYPE } from "../config/lookFeel";
 import { GrowSection } from "./GrowSection";
+import { Logo } from "./Logo";
 
 export function Footer() {
   const { wordmarkPadT } = LF.footer;
@@ -12,7 +13,7 @@ export function Footer() {
       id="footer-contact"
       className="w-full border-t border-j-charcoal/10 bg-j-footer px-6 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 xl:pb-12 xl:pl-20 xl:pr-20 xl:pt-[4.5rem]"
     >
-      <div className="mb-14 grid w-full grid-cols-12 gap-10 lg:gap-12">
+      <div className="mb-10 grid w-full grid-cols-12 gap-10 lg:mb-12 lg:gap-12">
         <div className="col-span-12 lg:col-span-4">
           <GrowSection>
             <p className={`${LF_TYPE.footerJourney}`}>{f.journey}</p>
@@ -68,19 +69,14 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="flex w-full justify-center" style={{ paddingTop: wordmarkPadT }}>
+      <div className="w-full leading-none" style={{ paddingTop: wordmarkPadT }}>
         <GrowSection className="j-footer-wordmark-grow w-full">
-          <p
-            className={`mx-auto block w-full select-none text-center text-balance text-j-muted ${LF_TYPE.footerWordmark}`}
-            aria-label="J Communities wordmark"
-          >
-            J COMMUNITIES
-          </p>
+          <Logo variant="dark" centered heightClass={LF_TYPE.footerWordmarkLogo} />
         </GrowSection>
       </div>
 
       <div
-        className={`mt-10 flex w-full flex-col items-center justify-between gap-4 border-t border-j-charcoal/15 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] pt-6 sm:flex-row ${LF_TYPE.footerLegal}`}
+        className={`mt-6 flex w-full flex-col items-center justify-between gap-4 border-t border-j-charcoal/15 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] pt-6 sm:flex-row ${LF_TYPE.footerLegal}`}
       >
         <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
           <a href="#" className="border-b border-transparent hover:border-j-slate">

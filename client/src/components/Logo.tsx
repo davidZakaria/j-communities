@@ -6,6 +6,8 @@ interface LogoProps {
   heightClass?: string;
   /** Tighter mark for small headers (e.g. mobile hero). */
   compact?: boolean;
+  /** Center the mark (footer display). */
+  centered?: boolean;
 }
 
 /**
@@ -16,24 +18,31 @@ export function Logo({
   className = "",
   heightClass = "h-[var(--logo-height)]",
   compact = false,
+  centered = false,
 }: LogoProps) {
   const src = brandLogoUrl(variant);
   const text = variant === "dark" ? "text-j-black" : "text-j-offwhite";
-  const pad = compact ? "0.25rem 0.375rem" : `var(--logo-clear-min) var(--logo-clear-std)`;
+  const pad = src
+    ? "0"
+    : compact
+      ? "0.25rem 0.375rem"
+      : centered
+        ? "0"
+        : `var(--logo-clear-min) var(--logo-clear-std)`;
+  const objectPos = centered ? "object-center" : "object-left";
 
   if (src) {
+    const isUtilityClass = heightClass.startsWith("j-");
+    const imgClass = isUtilityClass
+      ? heightClass
+      : `j-logo ${heightClass} w-auto max-w-full object-contain ${objectPos}`;
+
     return (
       <div
-        className={`inline-flex items-center ${className}`}
-        style={{
-          padding: pad,
-        }}
+        className={`${centered ? "block w-full min-w-0" : "inline-flex min-w-0 max-w-full items-center"} ${className}`.trim()}
+        style={{ padding: pad }}
       >
-        <img
-          src={src}
-          alt="J Communities"
-          className={`j-logo ${heightClass} w-auto max-w-none object-contain object-left`}
-        />
+        <img src={src} alt="J Communities" className={imgClass} />
       </div>
     );
   }

@@ -3,9 +3,8 @@
  * Leave empty strings to use the text marks in `Logo.tsx`.
  */
 export const brand = {
-  logoDarkUrl: "",
-  /** Empty = text-only mark on the hero (recommended until final logo is ready). */
-  logoLightUrl: "",
+  logoDarkUrl: "/brand/logo-black.png",
+  logoLightUrl: "/brand/logo-white.png",
 } as const;
 
 export function brandLogoUrl(variant: "dark" | "light"): string | undefined {

@@ -46,19 +46,19 @@ export function Hero() {
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
-        <header className="relative z-30 shrink-0 space-y-5 px-5 pt-[max(1rem,env(safe-area-inset-top,0px))] sm:px-6">
-          <div className="flex items-start justify-between gap-3">
+        <header className="relative z-30 shrink-0 px-5 pt-[max(1rem,env(safe-area-inset-top,0px))] sm:px-6">
+          <div className="flex items-start justify-between gap-4">
             <Link
               to="/"
-              className="-m-1 inline-block rounded-sm p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              className="min-w-0 max-w-[min(46vw,17.5rem)] shrink-0 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
             >
-              <Logo variant="light" compact heightClass="h-8 sm:h-9" />
+              <Logo variant="light" heightClass={LF_TYPE.heroHeaderLogo} />
             </Link>
+            <HeroNav
+              className="relative z-40 j-hero-nav-scroll flex min-w-0 flex-1 flex-nowrap justify-end gap-x-5 gap-y-2 overflow-x-auto overflow-y-visible overscroll-x-contain pb-1 pt-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-6 [&::-webkit-scrollbar]:hidden"
+              linkClassName="shrink-0 whitespace-nowrap py-2 text-[10px] font-sans font-medium uppercase tracking-[0.2em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_0_20px_rgba(0,0,0,0.45)]"
+            />
           </div>
-          <HeroNav
-            className="relative z-30 j-hero-nav-scroll flex max-w-full flex-nowrap gap-x-6 gap-y-2 overflow-x-auto overflow-y-visible overscroll-x-contain pb-1 pt-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            linkClassName="shrink-0 whitespace-nowrap py-2 text-[10px] font-sans font-medium uppercase tracking-[0.2em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_0_20px_rgba(0,0,0,0.45)]"
-          />
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col justify-center px-5 py-12 sm:px-6 sm:py-14">
@@ -94,7 +94,7 @@ export function Hero() {
       {/* xl+ wide desktop: absolute comp layout; padding follows viewport with clamp */}
       <div className="pointer-events-auto absolute inset-0 z-10 hidden xl:block">
         <header
-          className="pointer-events-auto absolute left-0 right-0 top-0 z-30 flex items-start justify-between gap-4"
+          className="pointer-events-auto absolute left-0 right-0 top-0 z-30 flex items-center justify-between gap-6"
           style={{
             paddingTop: `max(clamp(12px, 2.2vw, ${pad.t}px), env(safe-area-inset-top, 0px))`,
             paddingLeft: `max(clamp(16px, 3.8vw, ${pad.l}px), env(safe-area-inset-left, 0px))`,
@@ -103,12 +103,12 @@ export function Hero() {
         >
           <Link
             to="/"
-            className="-m-[var(--logo-clear-min)] inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            className="min-w-0 max-w-[min(46vw,17.5rem)] shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           >
-            <Logo variant="light" />
+            <Logo variant="light" heightClass={LF_TYPE.heroHeaderLogo} />
           </Link>
           <HeroNav
-            className={`flex max-w-[min(840px,55%)] flex-wrap justify-end gap-x-8 gap-y-2 text-white ${LF_TYPE.heroNav}`}
+            className={`relative z-40 flex min-w-0 flex-1 flex-wrap justify-end gap-x-8 gap-y-2 text-white ${LF_TYPE.heroNav}`}
             linkClassName={`${LF_TYPE.heroNav} py-px`}
           />
         </header>

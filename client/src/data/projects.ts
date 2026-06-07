@@ -1,4 +1,7 @@
+import { jamilaImages, juraBrochure, juraImages, jamilaBrochure } from "../config/projectAssets";
+
 export type ProjectCategory = "coastal" | "residential" | "mixed-use";
+export type ProjectThemeId = "jura" | "jamila";
 
 export interface Project {
   slug: string;
@@ -6,6 +9,12 @@ export interface Project {
   category: ProjectCategory;
   location?: string;
   summary: string;
+  themeId: ProjectThemeId;
+  tour3dUrl: string;
+  cardImage: string;
+  heroImage: string;
+  brochureUrl?: string;
+  contactEmail?: string;
   /** If set, the portfolio card opens this URL in a new tab instead of the on-site detail view. */
   externalUrl?: string;
 }
@@ -16,49 +25,28 @@ export const projects: Project[] = [
     name: "Jura Sokhna",
     category: "coastal",
     location: "Ain Sokhna, Egypt",
-    summary: "A waterfront rhythm of terraces, sea air, and calmer day-to-day living along the Red Sea coast.",
+    summary:
+      "A seaside resort on 10 acres with 200 meters of sandy beach — fully finished, furnished units with direct sea views in Galala City.",
+    themeId: "jura",
+    tour3dUrl: "https://logica-itech.com/JURA/index.htm",
+    cardImage: juraImages.hero,
+    heroImage: juraImages.hero,
+    brochureUrl: juraBrochure,
+    contactEmail: "info@j-communities.com",
   },
   {
     slug: "jamila-north-coast",
     name: "Jamila North Coast",
     category: "coastal",
     location: "North Coast, Egypt",
-    summary: "Summer-residence energy with generous setbacks, club conveniences, and long Mediterranean views.",
-  },
-  {
-    slug: "reiki-beach",
-    name: "Reiki Beach",
-    category: "coastal",
-    location: "Egypt",
-    summary: "Low, layered architecture and soft landscaping designed to keep the shoreline in focus.",
-  },
-  {
-    slug: "green-avenue",
-    name: "Green Avenue",
-    category: "residential",
-    location: "Egypt",
-    summary: "Tree-lined avenues, walkable blocks, and family-scaled homes within one coherent community fabric.",
-  },
-  {
-    slug: "soul-nasr-city",
-    name: "Soul Nasr City",
-    category: "residential",
-    location: "Nasr City, Cairo",
-    summary: "Urban residential calibrated for proximity to work, schools, and daily rituals without losing quiet.",
-  },
-  {
-    slug: "green-icon",
-    name: "Green Icon",
-    category: "mixed-use",
-    location: "Egypt",
-    summary: "Retail frontage, office daylight, and residences stacked with clear circulation and shared amenity.",
-  },
-  {
-    slug: "genesis-tower",
-    name: "Genesis Tower",
-    category: "mixed-use",
-    location: "Egypt",
-    summary: "A vertical address mixing hospitality cues, workspace, and residences above a lively arrival base.",
+    summary:
+      "A breathtaking coastal retreat with direct sea views, 700 meters of beach front, and holistic living across 130 acres.",
+    themeId: "jamila",
+    tour3dUrl: "https://njdegypt.com/jamila360/HQ",
+    cardImage: jamilaImages.hero,
+    heroImage: jamilaImages.hero,
+    brochureUrl: jamilaBrochure,
+    contactEmail: "info@j-communities.com",
   },
 ];
 

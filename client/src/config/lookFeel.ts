@@ -43,7 +43,7 @@ export const LF = {
   pillars: { heightPx: 920, padX: 56, padY: 40 },
   value: { heightPx: 1000, pad: { t: 72, r: 72, b: 72, l: 72 } },
   projects: { padX: 80, padY: 72, rowMinH: 168 },
-  footer: { padX: 80, padT: 72, padB: 48, wordmarkPadT: 56 },
+  footer: { padX: 80, padT: 72, padB: 48, wordmarkPadT: 24 },
 } as const;
 
 export const imageObjectPosition: Record<keyof typeof lookFeelImages, string> = {
@@ -64,6 +64,8 @@ export const imageObjectPositionNarrow: Partial<Record<keyof typeof lookFeelImag
 
 export const LF_TYPE = {
   heroNav: "font-sans text-[10px] font-medium uppercase tracking-[0.22em]",
+  /** Hero header lockup — sized via `.j-hero-header-logo` (see index.css). */
+  heroHeaderLogo: "j-hero-header-logo",
   heroLabels: "font-sans text-[10px] font-medium uppercase tracking-[0.32em]",
   heroCenter:
     "font-serif text-[13px] font-normal uppercase leading-[1.75] tracking-[0.14em] text-white/95 sm:text-[14px]",
@@ -108,5 +110,7 @@ export const LF_TYPE = {
   footerLink: "font-sans text-[13px] font-normal uppercase leading-[1.85] tracking-[0.12em] text-j-charcoal",
   footerWordmark:
     "font-serif text-[clamp(4rem,12vw,8.25rem)] font-medium uppercase leading-[0.95] tracking-[0.06em]",
+  /** Footer lockup — width-led so the wide PNG has no empty vertical bands. */
+  footerWordmarkLogo: "j-footer-wordmark-logo",
   footerLegal: "font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-j-slate",
 } as const;

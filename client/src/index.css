@@ -5,7 +5,7 @@
 :root {
   --grain-opacity: 0.09;
   --grain-photo-opacity: 0.22;
-  --logo-height: 2.5rem;
+  --logo-height: 3rem;
   --logo-clear-min: calc(var(--logo-height) * 0.5);
   --logo-clear-std: var(--logo-height);
 }
@@ -15,12 +15,14 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     overflow-x: hidden;
+    overflow-anchor: none;
   }
   body {
     @apply overflow-x-hidden bg-j-black font-serif font-normal text-j-offwhite antialiased;
     min-height: 100vh;
     min-height: 100dvh;
     font-feature-settings: "kern" 1, "liga" 1;
+    overflow-anchor: none;
   }
 }
 
@@ -102,6 +104,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .j-grow-in {
+    opacity: 1;
     animation: j-grow-in 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--grow-delay, 0ms);
     transform-origin: left center;
@@ -126,11 +129,9 @@
 
 @keyframes j-grow-in {
   from {
-    opacity: 0;
     transform: translateY(1.5rem) scale(0.985);
   }
   to {
-    opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
@@ -144,8 +145,24 @@
 .j-logo {
   filter: none !important;
   object-fit: contain;
-  max-width: 100%;
+}
+
+/* Hero nav lockup — explicit height; do not use `.j-logo` here (it breaks sizing). */
+.j-hero-header-logo {
+  display: block;
+  height: clamp(2.125rem, 2.8vw, 2.875rem);
+  width: auto;
+  max-width: min(46vw, 17.5rem);
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* Footer wordmark: wide lockup, tight to content */
+.j-footer-wordmark-logo {
+  display: block;
+  width: min(94vw, 52rem);
   height: auto;
+  margin-inline: auto;
 }
 
 /* Micro-label caps used in comps */
