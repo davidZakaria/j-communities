@@ -1,20 +1,21 @@
 import { Link } from "react-router-dom";
 import { COPY } from "../content/siteCopy";
 import { LF, LF_TYPE } from "../config/lookFeel";
+import { AnimatedMobileMenu } from "./AnimatedMobileMenu";
 import { GrowSection } from "./GrowSection";
 import { Logo } from "./Logo";
 import { LookFeelPhoto } from "./LookFeelPhoto";
 import { CtaArrow } from "./CtaArrow";
 
-function HeroNav({
-  className,
+function HeroNavLinks({
   linkClassName,
+  layoutClassName,
 }: {
-  className?: string;
   linkClassName: string;
+  layoutClassName: string;
 }) {
   return (
-    <nav className={className} aria-label="Primary">
+    <nav className={layoutClassName} aria-label="Primary">
       {COPY.hero.nav.map((item) => (
         <Link
           key={item.label}
@@ -46,17 +47,24 @@ export function Hero() {
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
-        <header className="relative z-30 shrink-0 px-5 pt-[max(1rem,env(safe-area-inset-top,0px))] sm:px-6">
-          <div className="flex items-start justify-between gap-4">
+        <header className="relative z-30 shrink-0 px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-6 sm:pt-[max(1rem,env(safe-area-inset-top,0px))]">
+          <div className="flex items-center justify-between gap-3">
             <Link
               to="/"
-              className="min-w-0 max-w-[min(46vw,17.5rem)] shrink-0 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              className="min-w-0 max-w-[min(58vw,11rem)] shrink-0 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:max-w-[min(46vw,17.5rem)]"
             >
               <Logo variant="light" heightClass={LF_TYPE.heroHeaderLogo} />
             </Link>
-            <HeroNav
-              className="relative z-40 j-hero-nav-scroll flex min-w-0 flex-1 flex-nowrap justify-end gap-x-5 gap-y-2 overflow-x-auto overflow-y-visible overscroll-x-contain pb-1 pt-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-6 [&::-webkit-scrollbar]:hidden"
-              linkClassName="shrink-0 whitespace-nowrap py-2 text-[10px] font-sans font-medium uppercase tracking-[0.2em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_0_20px_rgba(0,0,0,0.45)]"
+            <AnimatedMobileMenu
+              className="md:hidden"
+              variant="hero"
+              usePortal
+              ariaLabel="Primary"
+              items={COPY.hero.nav.map((item) => ({ label: item.label, to: item.to }))}
+            />
+            <HeroNavLinks
+              linkClassName="shrink-0 whitespace-nowrap py-2 text-[10px] font-sans font-medium uppercase tracking-[0.18em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_0_20px_rgba(0,0,0,0.45)]"
+              layoutClassName="relative z-40 j-hero-nav-scroll hidden min-w-0 flex-1 flex-nowrap justify-end gap-x-5 overflow-x-auto overflow-y-visible overscroll-x-contain pb-1 pt-0.5 [-ms-overflow-style:none] [scrollbar-width:none] md:flex md:gap-x-6 [&::-webkit-scrollbar]:hidden"
             />
           </div>
         </header>
@@ -107,9 +115,9 @@ export function Hero() {
           >
             <Logo variant="light" heightClass={LF_TYPE.heroHeaderLogo} />
           </Link>
-          <HeroNav
-            className={`relative z-40 flex min-w-0 flex-1 flex-wrap justify-end gap-x-8 gap-y-2 text-white ${LF_TYPE.heroNav}`}
+          <HeroNavLinks
             linkClassName={`${LF_TYPE.heroNav} py-px`}
+            layoutClassName={`relative z-40 flex min-w-0 flex-1 flex-wrap justify-end gap-x-8 gap-y-2 text-white ${LF_TYPE.heroNav}`}
           />
         </header>
 
