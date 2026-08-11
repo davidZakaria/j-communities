@@ -6,9 +6,7 @@ interface GrowSectionProps {
   style?: CSSProperties;
 }
 
-/**
- * Scroll-reveal wrapper. Content stays visible; motion is transform-only (see `.j-grow-in`).
- */
+/** Hero / above-fold blocks — always visible, uses legacy grow-in animation. */
 export function GrowSection({ children, className = "", style }: GrowSectionProps) {
   return (
     <div className={`j-grow-in opacity-100 ${className}`.trim()} style={style}>

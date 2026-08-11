@@ -38,22 +38,21 @@ export function ValueProp() {
           </ul>
         </GrowSection>
       </div>
-      <div className="relative min-h-[min(560px,85vw)] bg-j-black lg:min-h-0 lg:h-full">
+      <div className="relative min-h-[min(560px,85vw)] bg-j-charcoal lg:min-h-0 lg:h-full">
         <LookFeelPhoto which="silhouette" alt="J Communities — why us" />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[min(55%,420px)] bg-gradient-to-t from-black/85 via-black/45 to-transparent lg:hidden"
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/88 via-black/40 to-black/10"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-[1] hidden w-[46%] bg-gradient-to-r from-white/25 to-transparent lg:block"
+          className="pointer-events-none absolute bottom-0 right-0 z-[1] h-[min(72%,520px)] w-full max-w-[min(520px,100%)] bg-gradient-to-tl from-black/92 via-black/55 to-transparent sm:max-w-[88%] lg:max-w-[72%]"
           aria-hidden
         />
         <div
-          className="absolute bottom-0 right-0 z-10 max-w-[min(420px,92%)] max-lg:rounded-sm max-lg:bg-black/35 max-lg:px-3 max-lg:py-4 max-lg:backdrop-blur-[2px] sm:max-w-[min(420px,88%)]"
+          className="absolute bottom-0 right-0 z-10 max-w-[min(420px,92%)] rounded-sm bg-black/45 px-4 py-4 backdrop-blur-[3px] sm:max-w-[min(420px,88%)] sm:px-5 sm:py-5 lg:px-8 lg:py-6"
           style={{
-            paddingRight: `clamp(1.25rem, 4vw, ${Math.max(pad.r, 56)}px)`,
-            paddingLeft: `clamp(1.25rem, 4vw, ${pad.l}px)`,
-            paddingBottom: `max(clamp(1.25rem, 4vw, ${pad.b}px), env(safe-area-inset-bottom, 0px))`,
+            marginRight: `clamp(1rem, 4vw, ${Math.max(pad.r, 56)}px)`,
+            marginBottom: `max(clamp(1rem, 4vw, ${pad.b}px), env(safe-area-inset-bottom, 0px))`,
           }}
         >
           <GrowSection>

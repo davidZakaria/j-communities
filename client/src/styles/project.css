@@ -37,6 +37,11 @@
   color: var(--project-accent-contrast);
 }
 
+.project-theme[data-project-theme="jamila"] .project-btn-primary {
+  background-color: var(--project-accent-alt, var(--project-accent));
+  border-color: var(--project-accent-alt, var(--project-accent));
+}
+
 .project-theme .project-btn-primary:hover {
   background-color: var(--project-accent-hover);
   border-color: var(--project-accent-hover);
@@ -66,13 +71,63 @@
   background: var(--project-hero-overlay);
 }
 
-/* Jamila — coastal blue accent */
+.project-theme[data-project-theme="jura"] .project-header {
+  background-color: color-mix(in srgb, var(--project-bg) 94%, transparent);
+  border-bottom-color: rgba(232, 145, 48, 0.18);
+}
+
+.project-theme[data-project-theme="jura"] .project-stat-value {
+  color: var(--project-accent);
+}
+
+.project-theme[data-project-theme="jura"] .project-heading {
+  color: var(--project-text);
+}
+
+.project-theme[data-project-theme="jura"] .project-surface-alt {
+  background-color: var(--project-surface-alt);
+}
+
+/* Jamila — Yale Blue header + Lemon Glacier logo (CI recommended use) */
 .project-theme[data-project-theme="jamila"] .project-hero-overlay {
   background: var(--project-hero-overlay);
 }
 
 .project-theme[data-project-theme="jamila"] .project-header {
-  background-color: color-mix(in srgb, var(--project-surface) 95%, transparent);
+  background-color: #1a4284;
+  border-bottom: 2px solid #ddff00;
+  backdrop-filter: none;
+}
+
+.project-theme[data-project-theme="jamila"] .project-header a,
+.project-theme[data-project-theme="jamila"] .project-header .j-mobile-nav-trigger--project {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.project-theme[data-project-theme="jamila"] .project-header a:hover,
+.project-theme[data-project-theme="jamila"] .project-header .j-mobile-nav-trigger--project:hover {
+  color: #ddff00;
+}
+
+.project-theme[data-project-theme="jamila"] .project-header .h-4.w-px {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+.j-project-logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.j-project-logo--jura {
+  height: clamp(3rem, 9vw, 4.5rem);
+  max-width: min(22rem, 58vw);
+}
+
+.j-project-logo--jamila {
+  height: clamp(2.25rem, 6vw, 3rem);
+  max-width: min(15rem, 42vw);
 }
 
 /* Hide main-site grain on project pages */

@@ -37,7 +37,7 @@ describe("App render", () => {
 
   it("renders Jamila project page without crashing", () => {
     render(
-      <MemoryRouter initialEntries={["/projects/jamila-north-coast"]}>
+      <MemoryRouter initialEntries={["/projects/jamila"]}>
         <App />
       </MemoryRouter>,
     );

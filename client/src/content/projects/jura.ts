@@ -1,4 +1,4 @@
-import { juraBrochure, juraImages } from "../../config/projectAssets";
+import { juraBrochure, juraGalleryImages, juraImages } from "../../config/projectAssets";
 import type { ProjectPageContent } from "./types";
 
 export const juraContent: ProjectPageContent = {
@@ -131,11 +131,8 @@ export const juraContent: ProjectPageContent = {
     {
       type: "gallery",
       id: "gallery",
-      title: "Gallery",
-      images: juraImages.gallery.map((src, i) => ({
-        src,
-        alt: `Jura Sokhna — view ${i + 1}`,
-      })),
+      title: "Gallery preview",
+      images: juraGalleryImages.map((item) => ({ src: item.src, alt: item.alt })),
     },
     {
       type: "tour3d",

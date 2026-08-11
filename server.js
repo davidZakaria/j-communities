@@ -1,19 +1,12 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
+import "dotenv/config";
+import { createApp } from "./server/app.js";
+import { config } from "./server/config.js";
+import { assertSecureStartup } from "./server/validateEnv.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
-const dist = path.join(__dirname, "client", "dist");
-const PORT = Number(process.env.PORT) || 3000;
+assertSecureStartup();
 
-app.use(express.static(dist));
+const app = createApp();
 
-app.get("*", (req, res, next) => {
-  if (req.path.includes(".")) return next();
-  res.sendFile(path.join(dist, "index.html"));
-});
-
-app.listen(PORT, () => {
-  console.log(`J Communities server listening on port ${PORT}`);
+app.listen(config.port, () => {
+  console.log(`J Communities server listening on port ${config.port}`);
 });

@@ -3,6 +3,7 @@ import { COPY } from "../content/siteCopy";
 import { LF, LF_TYPE } from "../config/lookFeel";
 import { AnimatedMobileMenu } from "./AnimatedMobileMenu";
 import { GrowSection } from "./GrowSection";
+import { HeroExperienceShell } from "./HeroExperienceShell";
 import { Logo } from "./Logo";
 import { LookFeelPhoto } from "./LookFeelPhoto";
 import { CtaArrow } from "./CtaArrow";
@@ -33,16 +34,20 @@ export function Hero() {
   const { pad } = LF.hero;
 
   return (
-    <section className="relative w-full min-h-[100svh] overflow-hidden bg-j-black xl:h-[1080px] xl:min-h-0">
-      <LookFeelPhoto which="hero" alt="J Communities — hero" />
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/38 to-black/[0.72] xl:from-black/52 xl:via-black/30 xl:to-black/[0.58]"
-        aria-hidden
-      />
-
+    <HeroExperienceShell
+      scene="home"
+      className="min-h-[100svh] bg-j-black xl:h-[1080px] xl:min-h-0"
+      poster={<LookFeelPhoto which="hero" alt="J Communities — hero" />}
+      overlay={
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/38 to-black/[0.72] xl:from-black/52 xl:via-black/30 xl:to-black/[0.58]"
+          aria-hidden
+        />
+      }
+    >
       {/* Stacked hero: phones, tablets, and small / medium desktop until xl */}
       <div
-        className="relative z-20 flex min-h-[100svh] flex-col xl:hidden"
+        className="relative flex min-h-[100svh] flex-col xl:hidden"
         style={{
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
@@ -160,6 +165,6 @@ export function Hero() {
           </GrowSection>
         </div>
       </div>
-    </section>
+    </HeroExperienceShell>
   );
 }

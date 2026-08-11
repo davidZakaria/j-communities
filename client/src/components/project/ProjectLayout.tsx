@@ -2,14 +2,18 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AnimatedMobileMenu } from "../AnimatedMobileMenu";
 import type { ProjectNavItem } from "../../content/projects/types";
+import { ProjectLeadPopup } from "./ProjectLeadPopup";
+import { ProjectLogo } from "./ProjectLogo";
 
 export interface ProjectLayoutProps {
   projectName: string;
+  projectSlug: string;
+  projectThemeId: "jura" | "jamila";
   nav: ProjectNavItem[];
   children: ReactNode;
 }
 
-export function ProjectLayout({ projectName, nav, children }: ProjectLayoutProps) {
+export function ProjectLayout({ projectName, projectSlug, projectThemeId, nav, children }: ProjectLayoutProps) {
 
   return (
     <div className="project-layout">
@@ -24,9 +28,7 @@ export function ProjectLayout({ projectName, nav, children }: ProjectLayoutProps
               <span className="hidden sm:inline">&larr; J Communities</span>
             </Link>
             <span className="hidden h-4 w-px shrink-0 bg-[var(--project-border)] sm:block" aria-hidden />
-            <span className="project-heading min-w-0 truncate text-xs font-medium uppercase tracking-[0.12em] text-[var(--project-accent)] sm:text-base sm:tracking-[0.14em]">
-              {projectName}
-            </span>
+            <ProjectLogo themeId={projectThemeId} className="shrink-0" />
           </div>
           <nav className="hidden shrink-0 items-center gap-5 lg:flex" aria-label={`${projectName} sections`}>
             {nav.map((item) => (
@@ -61,6 +63,7 @@ export function ProjectLayout({ projectName, nav, children }: ProjectLayoutProps
           </p>
         </div>
       </footer>
+      <ProjectLeadPopup projectName={projectName} projectSlug={projectSlug} themeId={projectThemeId} />
     </div>
   );
 }

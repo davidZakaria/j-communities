@@ -3,6 +3,9 @@
   RewriteEngine On
   RewriteBase /
 
+  # Campaign-friendly short URL: old Jamila slug → /projects/jamila
+  RewriteRule ^projects/jamila-north-coast/?$ /projects/jamila [R=301,L]
+
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]

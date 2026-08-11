@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { ScrollReveal } from "../../features/motion/ScrollReveal";
 import type { ProjectGallerySection } from "../../content/projects/types";
 
 export function ProjectGallery({ section }: { section: ProjectGallerySection }) {
@@ -26,20 +27,24 @@ export function ProjectGallery({ section }: { section: ProjectGallerySection }) 
   return (
     <section id={section.id} className="project-surface px-5 py-14 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-7xl">
-        <h2 className="project-heading mb-8 text-center text-[clamp(1.4rem,3vw,2rem)] font-medium uppercase tracking-[0.06em]">
-          {section.title}
-        </h2>
+        <ScrollReveal>
+          <h2 className="project-heading mb-8 text-center text-[clamp(1.4rem,3vw,2rem)] font-medium uppercase tracking-[0.06em]">
+            {section.title}
+          </h2>
+        </ScrollReveal>
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
           {section.images.map((img, i) => (
             <li key={img.src}>
-              <button type="button" className="group block w-full overflow-hidden rounded-sm" onClick={() => setLightbox(i)}>
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  loading="lazy"
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                />
-              </button>
+              <ScrollReveal staggerIndex={i % 6}>
+                <button type="button" className="group block w-full overflow-hidden rounded-sm" onClick={() => setLightbox(i)}>
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    loading="lazy"
+                    className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                </button>
+              </ScrollReveal>
             </li>
           ))}
         </ul>

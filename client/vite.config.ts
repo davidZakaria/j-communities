@@ -18,9 +18,24 @@ export default defineConfig({
   build: {
     outDir: path.join(__dirname, "dist"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/three")) return "three";
+          if (id.includes("@react-three/fiber") || id.includes("@react-three/drei")) return "r3f";
+          if (id.includes("features/three/scenes")) return "hero-scenes";
+        },
+      },
+    },
   },
   server: {
     port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
   },
   test: {
     environment: "jsdom",

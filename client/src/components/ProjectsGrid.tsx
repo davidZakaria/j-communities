@@ -48,11 +48,16 @@ export function ProjectsGrid() {
                   />
                 </div>
               ) : null}
-              <span
-                className={`mb-5 inline-flex w-fit border px-2 py-1 ${LF_TYPE.cardTag} ${categoryStyle(p.category)}`}
-              >
-                {categoryShort(p.category)}
-              </span>
+              <div className="mb-5 flex flex-wrap gap-2">
+                {(p.cardTags ?? [categoryShort(p.category)]).map((tag) => (
+                  <span
+                    key={tag}
+                    className={`inline-flex w-fit border px-2 py-1 ${LF_TYPE.cardTag} ${categoryStyle(p.category)}`}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
               <h3 className={`text-j-charcoal ${LF_TYPE.cardTitle}`}>{p.name}</h3>
               {p.location ? (
                 <p className="mt-3 font-sans text-[13px] uppercase tracking-[0.14em] text-j-slate">{p.location}</p>

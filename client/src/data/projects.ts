@@ -7,6 +7,8 @@ export interface Project {
   slug: string;
   name: string;
   category: ProjectCategory;
+  /** Tags shown on the homepage portfolio card (defaults to category label). */
+  cardTags?: string[];
   location?: string;
   summary: string;
   themeId: ProjectThemeId;
@@ -24,26 +26,28 @@ export const projects: Project[] = [
     slug: "jura-sokhna",
     name: "Jura Sokhna",
     category: "coastal",
+    cardTags: ["Coastal", "Construction"],
     location: "Ain Sokhna, Egypt",
     summary:
       "A seaside resort on 10 acres with 200 meters of sandy beach — fully finished, furnished units with direct sea views in Galala City.",
     themeId: "jura",
     tour3dUrl: "https://logica-itech.com/JURA/index.htm",
-    cardImage: juraImages.hero,
+    cardImage: juraImages.card,
     heroImage: juraImages.hero,
     brochureUrl: juraBrochure,
     contactEmail: "info@j-communities.com",
   },
   {
-    slug: "jamila-north-coast",
+    slug: "jamila",
     name: "Jamila North Coast",
     category: "coastal",
+    cardTags: ["Coastal", "Construction"],
     location: "North Coast, Egypt",
     summary:
       "A breathtaking coastal retreat with direct sea views, 700 meters of beach front, and holistic living across 130 acres.",
     themeId: "jamila",
     tour3dUrl: "https://njdegypt.com/jamila360/HQ",
-    cardImage: jamilaImages.hero,
+    cardImage: jamilaImages.card,
     heroImage: jamilaImages.hero,
     brochureUrl: jamilaBrochure,
     contactEmail: "info@j-communities.com",

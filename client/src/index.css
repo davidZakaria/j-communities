@@ -313,6 +313,74 @@
     opacity: 1 !important;
     transform: none !important;
   }
+  .j-scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Scroll reveal — tier-aware section motion */
+.j-scroll-reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--j-reveal-stagger, 0s);
+}
+
+.j-scroll-reveal--visible,
+.j-scroll-reveal--static {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.j-scroll-reveal--light {
+  transform: translateY(0.5rem);
+}
+
+.j-scroll-reveal--light.j-scroll-reveal--visible {
+  transform: translateY(0);
+}
+
+.j-scroll-reveal--full {
+  transform: translateY(1.25rem);
+}
+
+.j-hero-canvas {
+  pointer-events: none;
+  touch-action: pan-y;
+  opacity: 0.55;
+}
+
+.j-parallax-layer__inner {
+  transform: scale(1.1);
+  transform-origin: center center;
+}
+
+.j-parallax-layer img,
+.j-parallax-layer .lf-photo-img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.j-hero-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.j-hero-experience[data-motion-tier="static"] .j-hero-canvas {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .j-hero-experience [class*="Parallax"],
+  .j-hero-experience .j-scroll-reveal {
+    transform: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

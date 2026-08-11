@@ -15,22 +15,28 @@ export function ProjectThemeProvider({ themeId, children }: ProjectThemeProvider
     document.body.style.setProperty("--project-bg", theme.colors.bg);
     document.body.style.setProperty("--project-text", theme.colors.text);
 
-    const linkId = `project-font-${themeId}`;
-    let link = document.getElementById(linkId) as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement("link");
-      link.id = linkId;
-      link.rel = "stylesheet";
-      document.head.appendChild(link);
-    }
-    link.href = theme.fonts.googleUrl;
+    const linkIds = theme.fonts.stylesheetUrls.map((_, i) => `project-font-${themeId}-${i}`);
+    const links: HTMLLinkElement[] = [];
+
+    theme.fonts.stylesheetUrls.forEach((url, i) => {
+      const linkId = linkIds[i];
+      let link = document.getElementById(linkId) as HTMLLinkElement | null;
+      if (!link) {
+        link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+      }
+      link.href = url;
+      links.push(link);
+    });
 
     return () => {
       document.body.classList.remove("project-page-active");
       document.body.style.removeProperty("--project-bg");
       document.body.style.removeProperty("--project-text");
     };
-  }, [themeId, theme.colors.bg, theme.colors.text, theme.fonts.googleUrl]);
+  }, [themeId, theme.colors.bg, theme.colors.text, theme.fonts.stylesheetUrls]);
 
   return (
     <div
@@ -55,6 +61,7 @@ function themeVars(theme: ProjectTheme): React.CSSProperties {
     ["--project-accent-contrast" as string]: theme.colors.accentContrast,
     ["--project-border" as string]: theme.colors.border,
     ["--project-hero-overlay" as string]: theme.colors.heroOverlay,
+    ["--project-accent-alt" as string]: theme.colors.accentAlt ?? theme.colors.accent,
     ["--project-font-heading" as string]: theme.fonts.heading,
     ["--project-font-body" as string]: theme.fonts.body,
     backgroundColor: theme.colors.bg,

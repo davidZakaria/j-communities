@@ -4,7 +4,7 @@
 
 export const PILLAR_CATEGORIES = [
   { num: "01", label: "Jura Sokhna", to: "/projects/jura-sokhna" as const },
-  { num: "02", label: "Jamila North Coast", to: "/projects/jamila-north-coast" as const },
+  { num: "02", label: "Jamila North Coast", to: "/projects/jamila" as const },
   { num: "03", label: "Coastal living", to: "/#projects" as const },
 ] as const;
 

@@ -1,4 +1,4 @@
-import { jamilaBrochure, jamilaImages } from "../../config/projectAssets";
+import { jamilaBrochure, jamilaGalleryImages, jamilaImages } from "../../config/projectAssets";
 import type { ProjectPageContent } from "./types";
 
 export const jamilaContent: ProjectPageContent = {
@@ -90,10 +90,7 @@ export const jamilaContent: ProjectPageContent = {
       type: "gallery",
       id: "gallery",
       title: "Gallery preview",
-      images: jamilaImages.gallery.map((src, i) => ({
-        src,
-        alt: `Jamila North Coast — view ${i + 1}`,
-      })),
+      images: jamilaGalleryImages.map((item) => ({ src: item.src, alt: item.alt })),
     },
     {
       type: "floorPlans",

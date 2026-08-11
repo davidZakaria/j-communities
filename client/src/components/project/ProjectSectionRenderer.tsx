@@ -1,3 +1,4 @@
+import type { ProjectThemeId } from "../../data/projects";
 import type { ProjectSection } from "../../content/projects/types";
 import { ProjectAmenities } from "./ProjectAmenities";
 import { ProjectContactForm } from "./ProjectContactForm";
@@ -15,12 +16,14 @@ import { ProjectTour3D } from "./ProjectTour3D";
 interface ProjectSectionRendererProps {
   section: ProjectSection;
   projectName: string;
+  projectSlug: string;
+  themeId: ProjectThemeId;
 }
 
-export function ProjectSectionRenderer({ section, projectName }: ProjectSectionRendererProps) {
+export function ProjectSectionRenderer({ section, projectName, projectSlug, themeId }: ProjectSectionRendererProps) {
   switch (section.type) {
     case "hero":
-      return <ProjectHero section={section} />;
+      return <ProjectHero section={section} themeId={themeId} />;
     case "stats":
       return <ProjectStats section={section} />;
     case "text":
@@ -44,7 +47,14 @@ export function ProjectSectionRenderer({ section, projectName }: ProjectSectionR
     case "partners":
       return <ProjectPartners section={section} />;
     case "contact":
-      return <ProjectContactForm section={section} />;
+      return (
+        <ProjectContactForm
+          section={section}
+          projectName={projectName}
+          projectSlug={projectSlug}
+          themeId={themeId}
+        />
+      );
     default:
       return null;
   }

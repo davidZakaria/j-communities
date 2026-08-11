@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadSource {
+  contact
+  popup
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  closed
+  spam
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  name        String
+  phone       String
+  message     String?
+  projectName String
+  projectSlug String
+  themeId     String
+  source      LeadSource
+  pageUrl     String?
+  userAgent   String?
+  ipHash      String?
+  status      LeadStatus @default(new)
+  notes       String?
+
+  @@index([createdAt])
+  @@index([projectSlug])
+  @@index([status])
+}

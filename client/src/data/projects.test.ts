@@ -4,14 +4,14 @@ import { getProjectBySlug, projects, projectsByCategory } from "./projects";
 describe("projects", () => {
   it("finds by slug", () => {
     expect(getProjectBySlug("jura-sokhna")?.name).toBe("Jura Sokhna");
-    expect(getProjectBySlug("jamila-north-coast")?.name).toBe("Jamila North Coast");
+    expect(getProjectBySlug("jamila")?.name).toBe("Jamila North Coast");
     expect(getProjectBySlug("missing")).toBeUndefined();
     expect(getProjectBySlug(undefined)).toBeUndefined();
   });
 
   it("has only Jura and Jamila", () => {
     expect(projects).toHaveLength(2);
-    expect(projects.map((p) => p.slug)).toEqual(["jura-sokhna", "jamila-north-coast"]);
+    expect(projects.map((p) => p.slug)).toEqual(["jura-sokhna", "jamila"]);
   });
 
   it("filters by category", () => {

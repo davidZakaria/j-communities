@@ -1,20 +1,33 @@
+import type { ProjectThemeId } from "../../data/projects";
 import type { ProjectHeroSection } from "../../content/projects/types";
+import { HeroExperienceShell } from "../HeroExperienceShell";
 
 interface ProjectHeroProps {
   section: ProjectHeroSection;
+  themeId: ProjectThemeId;
 }
 
-export function ProjectHero({ section }: ProjectHeroProps) {
+export function ProjectHero({ section, themeId }: ProjectHeroProps) {
   return (
-    <section id="project-hero" className="relative min-h-[72svh] overflow-hidden scroll-mt-0">
-      <img
-        src={section.image}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        fetchPriority="high"
-      />
-      <div className="project-hero-overlay absolute inset-0" aria-hidden />
-      <div className="relative z-10 mx-auto flex min-h-[72svh] max-w-7xl flex-col justify-center px-5 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-28">
+    <HeroExperienceShell
+      scene={themeId}
+      enableScene3D={false}
+      className="min-h-[72svh] scroll-mt-0"
+      poster={
+        <img
+          src={section.image}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+          decoding="async"
+        />
+      }
+      overlay={<div className="project-hero-overlay absolute inset-0 z-[1]" aria-hidden />}
+    >
+      <div
+        id="project-hero"
+        className="relative mx-auto flex min-h-[72svh] max-w-7xl flex-col justify-center px-5 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-28"
+      >
         {section.kicker ? (
           <p className="project-body-font mb-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-white/85">
             {section.kicker}
@@ -54,6 +67,6 @@ export function ProjectHero({ section }: ProjectHeroProps) {
           </div>
         ) : null}
       </div>
-    </section>
+    </HeroExperienceShell>
   );
 }

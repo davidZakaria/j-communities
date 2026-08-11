@@ -1,5 +1,12 @@
 node_modules/
 client/dist/
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+prisma/data/
+*.db
+*.db-journal
 .DS_Store
 *.log
 .env

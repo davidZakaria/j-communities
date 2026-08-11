@@ -66,12 +66,19 @@ export function ProjectPage() {
   return (
     <main id="main-content">
       <ProjectThemeProvider themeId={project.themeId}>
-        <ProjectLayout projectName={project.name} nav={content.nav}>
+        <ProjectLayout
+          projectName={project.name}
+          projectSlug={project.slug}
+          projectThemeId={project.themeId}
+          nav={content.nav}
+        >
           {content.sections.map((section, i) => (
             <ProjectSectionRenderer
               key={`${section.type}-${"id" in section && section.id ? section.id : i}`}
               section={section}
               projectName={project.name}
+              projectSlug={project.slug}
+              themeId={project.themeId}
             />
           ))}
         </ProjectLayout>
