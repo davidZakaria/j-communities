@@ -46,4 +46,6 @@ export const config = {
   honeypotField: "_gotcha",
   allowedProjectSlugs: new Set(["jura-sokhna", "jamila"]),
   allowedThemeIds: new Set(["jura", "jamila"]),
+  /** Same phone + project within this window is stored as duplicate spam. */
+  duplicateWindowMs: Number(process.env.DUPLICATE_WINDOW_HOURS || 24) * 60 * 60 * 1000,
 };

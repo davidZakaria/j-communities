@@ -17,6 +17,7 @@ export interface Lead {
   ipHash: string | null;
   status: LeadStatus;
   notes: string | null;
+  duplicateOfId: string | null;
 }
 
 export interface LeadsResponse {
@@ -27,6 +28,7 @@ export interface LeadsResponse {
     limit: number;
     total: number;
     pages: number;
+    spamHidden?: number;
   };
 }
 
@@ -36,6 +38,7 @@ export interface LeadFilters {
   projectSlug?: string;
   status?: LeadStatus | "";
   source?: LeadSource | "";
+  includeSpam?: boolean;
 }
 
 export const LEAD_STATUSES: LeadStatus[] = ["new", "contacted", "qualified", "closed", "spam"];

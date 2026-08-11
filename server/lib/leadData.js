@@ -29,7 +29,7 @@ export function decryptLeadRecords(leads) {
 
 /** Strip internal fields from public API responses. */
 export function sanitizeLeadForAdmin(lead) {
-  const { ipHash, userAgent, ...rest } = decryptLeadRecord(lead);
+  const { ipHash, userAgent, phoneFingerprint, ...rest } = decryptLeadRecord(lead);
   return rest;
 }
 

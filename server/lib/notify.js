@@ -64,7 +64,7 @@ async function sendViaResend(subject, text) {
 }
 
 export async function notifyNewLead(lead) {
-  if (!config.notifyEmail) return;
+  if (!config.notifyEmail || lead.status === "spam") return;
 
   const { subject, text } = buildLeadEmail(lead);
   const hasSmtp = config.smtp.host && config.smtp.user && config.smtp.pass;

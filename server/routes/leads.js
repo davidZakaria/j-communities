@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { getClientIp, hashIp } from "../lib/ipHash.js";
+import { assessLeadSubmission, duplicateNote, findDuplicateLead, spamNote } from "../lib/leadDedup.js";
 import { encryptLeadPayload } from "../lib/leadData.js";
+import { encryptField } from "../lib/leadCrypto.js";
 import { notifyNewLead } from "../lib/notify.js";
 import { validateLeadInput } from "../lib/validateLead.js";
 import { requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
@@ -27,15 +29,46 @@ leadsRouter.post(
       }
 
       const ip = getClientIp(req);
+      const ipHash = hashIp(ip);
+      const assessment = assessLeadSubmission(parsed.data);
+
+      let status = "new";
+      let duplicateOfId = null;
+      let notes = null;
+
+      if (assessment.isLikelySpam) {
+        status = "spam";
+        notes = spamNote(assessment.spamReason);
+        console.warn("Lead flagged as spam:", assessment.spamReason, req.get("referer") || req.ip);
+      } else {
+        const prior = await findDuplicateLead({
+          phoneFingerprint: assessment.phoneFingerprint,
+          projectSlug: parsed.data.projectSlug,
+        });
+
+        if (prior) {
+          status = "spam";
+          duplicateOfId = prior.duplicateOfId ?? prior.id;
+          notes = duplicateNote();
+          console.warn("Lead duplicate rejected:", parsed.data.projectSlug, req.get("referer") || req.ip);
+        }
+      }
+
       const lead = await prisma.lead.create({
         data: encryptLeadPayload({
           ...parsed.data,
+          status,
+          duplicateOfId,
+          notes,
+          phoneFingerprint: assessment.phoneFingerprint,
           userAgent: req.headers["user-agent"]?.slice(0, 512) ?? null,
-          ipHash: hashIp(ip),
+          ipHash,
         }),
       });
 
-      notifyNewLead(lead).catch(() => {});
+      if (status !== "spam") {
+        notifyNewLead(lead).catch(() => {});
+      }
 
       return res.status(201).json({ ok: true });
     } catch (err) {

@@ -12,10 +12,11 @@ function formatDate(iso: string) {
 }
 
 export function AdminDashboardPage() {
-  const [filters, setFilters] = useState<LeadFilters>({ page: 1, limit: 50 });
+  const [filters, setFilters] = useState<LeadFilters>({ page: 1, limit: 50, includeSpam: false });
   const [leads, setLeads] = useState<Lead[]>([]);
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(1);
+  const [spamHidden, setSpamHidden] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export function AdminDashboardPage() {
       setLeads(res.leads);
       setTotal(res.pagination.total);
       setPages(res.pagination.pages);
+      setSpamHidden(res.pagination.spamHidden ?? 0);
       setDraftNotes(
         Object.fromEntries(res.leads.map((lead) => [lead.id, lead.notes ?? ""])),
       );
@@ -131,7 +133,7 @@ export function AdminDashboardPage() {
               }
               className="min-w-[140px] border border-neutral-300 px-2 py-2 text-sm normal-case"
             >
-              <option value="">All</option>
+              <option value="">Active only</option>
               {LEAD_STATUSES.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -160,8 +162,22 @@ export function AdminDashboardPage() {
               ))}
             </select>
           </label>
+          <label className="flex items-end gap-2 pb-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={Boolean(filters.includeSpam)}
+              onChange={(e) => setFilters((f) => ({ ...f, page: 1, includeSpam: e.target.checked }))}
+              className="h-4 w-4 border-neutral-300"
+            />
+            <span className="text-[10px] uppercase tracking-wider text-neutral-500">Show spam</span>
+          </label>
           <div className="flex items-end">
-            <p className="text-sm text-neutral-600">{total} lead{total === 1 ? "" : "s"}</p>
+            <p className="text-sm text-neutral-600">
+              {total} lead{total === 1 ? "" : "s"}
+              {spamHidden > 0 && !filters.includeSpam ? (
+                <span className="text-neutral-400"> · {spamHidden} spam hidden</span>
+              ) : null}
+            </p>
           </div>
         </div>
 
@@ -195,6 +211,9 @@ export function AdminDashboardPage() {
                     <td className="whitespace-nowrap px-3 py-3 text-xs text-neutral-600">{formatDate(lead.createdAt)}</td>
                     <td className="px-3 py-3">
                       <p className="font-medium">{lead.name}</p>
+                      {lead.duplicateOfId ? (
+                        <p className="mt-1 text-[10px] uppercase tracking-wider text-amber-700">Duplicate</p>
+                      ) : null}
                       {lead.message ? <p className="mt-1 max-w-xs text-xs text-neutral-600">{lead.message}</p> : null}
                     </td>
                     <td className="whitespace-nowrap px-3 py-3">
@@ -216,7 +235,11 @@ export function AdminDashboardPage() {
                         value={lead.status}
                         disabled={savingId === lead.id}
                         onChange={(e) => handleStatusChange(lead, e.target.value as LeadStatus)}
-                        className="border border-neutral-300 px-2 py-1 text-xs capitalize"
+                        className={`border px-2 py-1 text-xs capitalize ${
+                          lead.status === "spam"
+                            ? "border-amber-300 bg-amber-50 text-amber-900"
+                            : "border-neutral-300"
+                        }`}
                       >
                         {LEAD_STATUSES.map((s) => (
                           <option key={s} value={s}>

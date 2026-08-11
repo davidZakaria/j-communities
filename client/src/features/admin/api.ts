@@ -59,6 +59,7 @@ export async function fetchLeads(filters: LeadFilters = {}): Promise<LeadsRespon
   if (filters.projectSlug) params.set("projectSlug", filters.projectSlug);
   if (filters.status) params.set("status", filters.status);
   if (filters.source) params.set("source", filters.source);
+  if (filters.includeSpam) params.set("includeSpam", "1");
 
   const qs = params.toString();
   return request(`/leads${qs ? `?${qs}` : ""}`);
@@ -79,6 +80,7 @@ export function exportLeadsCsv(filters: LeadFilters = {}): string {
   if (filters.projectSlug) params.set("projectSlug", filters.projectSlug);
   if (filters.status) params.set("status", filters.status);
   if (filters.source) params.set("source", filters.source);
+  if (filters.includeSpam) params.set("includeSpam", "1");
   const qs = params.toString();
   return `${base}/leads.csv${qs ? `?${qs}` : ""}`;
 }

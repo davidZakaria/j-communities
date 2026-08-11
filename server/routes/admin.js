@@ -11,6 +11,29 @@ export const adminRouter = Router();
 const VALID_STATUSES = new Set(["new", "contacted", "qualified", "closed", "spam"]);
 const VALID_SOURCES = new Set(["contact", "popup"]);
 
+function buildLeadFilters(query) {
+  const where = {};
+  const projectSlug = String(query.projectSlug ?? "").trim();
+  const status = String(query.status ?? "").trim();
+  const source = String(query.source ?? "").trim();
+  const includeSpam = query.includeSpam === "1";
+
+  if (projectSlug) where.projectSlug = projectSlug;
+  if (source && VALID_SOURCES.has(source)) where.source = source;
+
+  if (status && VALID_STATUSES.has(status)) {
+    where.status = status;
+  } else if (!includeSpam) {
+    where.status = { not: "spam" };
+  }
+
+  const spamHiddenWhere = { status: "spam" };
+  if (projectSlug) spamHiddenWhere.projectSlug = projectSlug;
+  if (source && VALID_SOURCES.has(source)) spamHiddenWhere.source = source;
+
+  return { where, includeSpam, spamHiddenWhere, statusFilter: status };
+}
+
 function escapeCsv(value) {
   const s = String(value ?? "");
   if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
@@ -60,16 +83,9 @@ adminRouter.get("/leads", requireAdmin, async (req, res) => {
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
     const skip = (page - 1) * limit;
 
-    const where = {};
-    const projectSlug = String(req.query.projectSlug ?? "").trim();
-    const status = String(req.query.status ?? "").trim();
-    const source = String(req.query.source ?? "").trim();
+    const { where, includeSpam, spamHiddenWhere, statusFilter } = buildLeadFilters(req.query);
 
-    if (projectSlug) where.projectSlug = projectSlug;
-    if (status && VALID_STATUSES.has(status)) where.status = status;
-    if (source && VALID_SOURCES.has(source)) where.source = source;
-
-    const [leads, total] = await Promise.all([
+    const [leads, total, spamHidden] = await Promise.all([
       prisma.lead.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -77,6 +93,9 @@ adminRouter.get("/leads", requireAdmin, async (req, res) => {
         take: limit,
       }),
       prisma.lead.count({ where }),
+      !includeSpam && !statusFilter
+        ? prisma.lead.count({ where: spamHiddenWhere })
+        : Promise.resolve(0),
     ]);
 
     return res.json({
@@ -87,6 +106,7 @@ adminRouter.get("/leads", requireAdmin, async (req, res) => {
         limit,
         total,
         pages: Math.ceil(total / limit) || 1,
+        spamHidden,
       },
     });
   } catch (err) {
@@ -97,14 +117,7 @@ adminRouter.get("/leads", requireAdmin, async (req, res) => {
 
 adminRouter.get("/leads.csv", requireAdmin, async (req, res) => {
   try {
-    const where = {};
-    const projectSlug = String(req.query.projectSlug ?? "").trim();
-    const status = String(req.query.status ?? "").trim();
-    const source = String(req.query.source ?? "").trim();
-
-    if (projectSlug) where.projectSlug = projectSlug;
-    if (status && VALID_STATUSES.has(status)) where.status = status;
-    if (source && VALID_SOURCES.has(source)) where.source = source;
+    const { where } = buildLeadFilters(req.query);
 
     const leads = await prisma.lead.findMany({
       where,
@@ -126,6 +139,7 @@ adminRouter.get("/leads.csv", requireAdmin, async (req, res) => {
       "source",
       "status",
       "notes",
+      "duplicateOfId",
       "pageUrl",
     ];
 

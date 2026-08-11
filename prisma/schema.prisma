@@ -36,8 +36,11 @@ model Lead {
   ipHash      String?
   status      LeadStatus @default(new)
   notes       String?
+  phoneFingerprint String?
+  duplicateOfId    String?
 
   @@index([createdAt])
   @@index([projectSlug])
   @@index([status])
+  @@index([phoneFingerprint, projectSlug])
 }
