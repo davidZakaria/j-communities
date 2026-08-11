@@ -32,6 +32,10 @@ export function validateProductionEnv() {
     errors.push("SITE_ORIGIN or ALLOWED_ORIGINS must be set for origin validation");
   }
 
+  if (!config.turnstileSecretKey) {
+    errors.push("TURNSTILE_SECRET_KEY is required in production (Cloudflare Turnstile widget verify)");
+  }
+
   if (errors.length > 0) {
     throw new Error(`Production security configuration invalid:\n- ${errors.join("\n- ")}`);
   }

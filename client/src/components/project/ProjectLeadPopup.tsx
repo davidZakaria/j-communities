@@ -1,6 +1,8 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { readLeadHoneypots, submitProjectLead } from "../../config/submitProjectLead";
+import { isTurnstileEnabled } from "../../config/turnstile";
 import { LeadFormHoneypots } from "./LeadFormHoneypots";
+import { LeadTurnstile, type LeadTurnstileHandle } from "./LeadTurnstile";
 import type { ProjectThemeId } from "../../data/projects";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
@@ -38,6 +40,9 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
   const titleId = useId();
   const nameRef = useRef<HTMLInputElement>(null);
   const formReadyAtRef = useRef<number>(0);
+  const turnstileRef = useRef<LeadTurnstileHandle>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const handleTurnstileToken = useCallback((token: string | null) => setTurnstileToken(token), []);
   const [open, setOpen] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
   const [state, setState] = useState<SubmitState>("idle");
@@ -85,6 +90,10 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!canSubmit) return;
+    if (isTurnstileEnabled && !turnstileToken) {
+      setErrorMessage("Please complete the security check.");
+      return;
+    }
 
     const form = e.currentTarget;
     const fd = new FormData(form);
@@ -104,13 +113,16 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
         source: "popup",
         formReadyAt: formReadyAtRef.current,
         honeypots: readLeadHoneypots(form),
+        turnstileToken,
       });
       form.reset();
+      turnstileRef.current?.reset();
       setState("success");
       markDismissed(projectSlug);
       window.setTimeout(() => setOpen(false), 1600);
     } catch (err) {
       setState("error");
+      turnstileRef.current?.reset();
       setErrorMessage(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     }
   }
@@ -198,9 +210,11 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
                 />
               </div>
 
+              <LeadTurnstile ref={turnstileRef} size="compact" onTokenChange={handleTurnstileToken} />
+
               <button
                 type="submit"
-                disabled={state === "submitting" || !canSubmit}
+                disabled={state === "submitting" || !canSubmit || (isTurnstileEnabled && !turnstileToken)}
                 className="project-btn-primary project-body-font w-full min-h-[48px] border text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors disabled:opacity-60"
               >
                 {state === "submitting" ? "Sending…" : "Call me back"}

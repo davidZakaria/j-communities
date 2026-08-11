@@ -6,8 +6,10 @@ import { encryptLeadPayload } from "../lib/leadData.js";
 import { encryptField } from "../lib/leadCrypto.js";
 import { notifyNewLead } from "../lib/notify.js";
 import { validateLeadInput } from "../lib/validateLead.js";
+import { verifyTurnstileToken, isTurnstileRequired } from "../lib/turnstile.js";
 import { requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitLeads, checkLeadPhoneRateLimit } from "../middleware/rateLimit.js";
+import { config } from "../config.js";
 
 export const leadsRouter = Router();
 
@@ -18,6 +20,16 @@ leadsRouter.post(
   rateLimitLeads,
   async (req, res) => {
     try {
+      const ip = getClientIp(req);
+      const turnstile = await verifyTurnstileToken(req.body?.turnstileToken, ip);
+
+      if (!turnstile.ok) {
+        if (isTurnstileRequired() || config.turnstileSecretKey) {
+          console.warn("Lead rejected (turnstile):", turnstile.error, req.get("referer") || ip);
+          return res.status(400).json({ error: "Security verification failed. Please try again." });
+        }
+      }
+
       const parsed = validateLeadInput(req.body);
       if (!parsed.ok) {
         if (parsed.spam) {
@@ -28,7 +40,6 @@ leadsRouter.post(
         return res.status(400).json({ error: "Invalid submission." });
       }
 
-      const ip = getClientIp(req);
       const ipHash = hashIp(ip);
       const assessment = assessLeadSubmission({
         ...parsed.data,

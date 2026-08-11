@@ -1,4 +1,5 @@
 import { leadsApi } from "./leads";
+import { isTurnstileEnabled } from "./turnstile";
 import type { ProjectThemeId } from "../data/projects";
 
 export type LeadSource = "contact" | "popup";
@@ -15,6 +16,7 @@ export interface ProjectLeadPayload {
   source: LeadSource;
   formReadyAt: number;
   honeypots?: LeadHoneypotValues;
+  turnstileToken?: string | null;
 }
 
 export function readLeadHoneypots(form: HTMLFormElement): LeadHoneypotValues {
@@ -35,6 +37,11 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
     throw new Error("Something went wrong. Please refresh and try again.");
   }
 
+  const turnstileToken = payload.turnstileToken?.trim() ?? "";
+  if (isTurnstileEnabled && !turnstileToken) {
+    throw new Error("Please complete the security check.");
+  }
+
   const body: Record<string, unknown> = {
     name,
     phone,
@@ -45,6 +52,7 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
     source: payload.source,
     pageUrl: typeof window !== "undefined" ? window.location.href : "",
     formReadyAt: payload.formReadyAt,
+    turnstileToken: turnstileToken || undefined,
   };
 
   for (const field of leadsApi.honeypotFields) {

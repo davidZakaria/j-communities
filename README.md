@@ -41,10 +41,14 @@ React + Vite marketing site (`client/`), Express API + SQLite leads database, an
 | `DATABASE_URL` | SQLite path, e.g. `file:./data/leads.db` |
 | `NOTIFY_EMAIL` | Optional alert inbox |
 | `RESEND_API_KEY` | Optional Resend API key for new-lead emails |
+| `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile secret (required in production) |
 
 ### Client (`client/.env`)
 
-Copy [`client/.env.example`](client/.env.example) and set **`VITE_SITE_ORIGIN`** (no trailing slash) for canonical + Open Graph URLs.
+Copy [`client/.env.example`](client/.env.example) and set:
+
+- **`VITE_SITE_ORIGIN`** (no trailing slash) for canonical + Open Graph URLs
+- **`VITE_TURNSTILE_SITE_KEY`** — public site key from Cloudflare Turnstile (required for production builds)
 
 ### Look & Feel photos & logo
 
@@ -72,9 +76,11 @@ Lead data (name, phone, message, notes) is treated as sensitive PII.
 | Admin session | HttpOnly, `SameSite=Strict` in prod, 12h max age |
 | CSRF tokens | Required on admin logout and lead updates |
 | Origin validation | Blocks cross-site POST/PATCH when `SITE_ORIGIN` is set |
-| Rate limits | Login 10/15min/IP · leads 5/10min/IP |
-| Honeypot + allowlist | `_gotcha` field; only `jura-sokhna` / `jamila` slugs |
-| Production gate | Server refuses to start without secrets + encryption key |
+| Cloudflare Turnstile | CAPTCHA on popup + contact forms; verified server-side |
+| Rate limits | Login 10/15min/IP · leads 3/10min/IP · 3/hour per phone |
+| Honeypot + allowlist | Hidden fields; only `jura-sokhna` / `jamila` slugs |
+| Duplicate detection | Same phone + project within 24h → auto-spam |
+| Production gate | Server refuses to start without secrets + encryption key + Turnstile |
 
 Generate secrets before deploy:
 
@@ -84,6 +90,18 @@ npm run admin:hash-password -- 'your-strong-password'
 ```
 
 Back up **`LEAD_ENCRYPTION_KEY`** securely — without it, encrypted leads cannot be recovered.
+
+### Cloudflare Turnstile (forms)
+
+1. [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Turnstile** → **Add widget**
+2. Widget name: `J Communities leads`
+3. Hostnames: `j-communities.com`, `www.j-communities.com`
+4. Widget mode: **Managed** (recommended)
+5. Copy **Site key** → `client/.env` as `VITE_TURNSTILE_SITE_KEY`
+6. Copy **Secret key** → root `.env` as `TURNSTILE_SECRET_KEY`
+7. Rebuild and restart: `npm run build && pm2 restart j-communities --update-env`
+
+Turnstile is optional in local dev (leave keys empty). **Required in production.**
 
 On VPS: `chmod 700 data && chmod 600 data/leads.db`, firewall 22/80/443 only, nginx HSTS, do not expose port 3000 publicly.
 

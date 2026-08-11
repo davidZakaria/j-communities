@@ -55,4 +55,5 @@ export const config = {
   maxFormSubmitMs: Number(process.env.LEAD_MAX_SUBMIT_MS || 2 * 60 * 60 * 1000),
   /** Max submissions per phone fingerprint per hour (all projects). */
   leadPhoneMaxPerHour: Number(process.env.LEAD_PHONE_MAX_PER_HOUR || 3),
+  turnstileSecretKey: (process.env.TURNSTILE_SECRET_KEY || "").trim(),
 };
