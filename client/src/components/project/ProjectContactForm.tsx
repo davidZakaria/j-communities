@@ -66,13 +66,15 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
         ) : (
           <form className="relative mt-10 space-y-5" onSubmit={handleSubmit} noValidate>
             <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0">
-              <label htmlFor="contact-gotcha">Company</label>
               <input
-                id="contact-gotcha"
                 type="text"
                 name={leadsApi.honeypotField}
                 tabIndex={-1}
                 autoComplete="off"
+                data-1p-ignore
+                data-lpignore="true"
+                readOnly
+                value=""
               />
             </div>
 

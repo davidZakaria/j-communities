@@ -19,8 +19,10 @@ leadsRouter.post(
       const parsed = validateLeadInput(req.body);
       if (!parsed.ok) {
         if (parsed.spam) {
+          console.warn("Lead rejected (honeypot):", req.get("referer") || req.ip);
           return res.status(200).json({ ok: true });
         }
+        console.warn("Lead validation failed:", parsed.errors.join(", "));
         return res.status(400).json({ error: "Invalid submission." });
       }
 

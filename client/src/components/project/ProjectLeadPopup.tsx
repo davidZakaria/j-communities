@@ -153,13 +153,15 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
 
             <form className="relative mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
               <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0">
-                <label htmlFor="lead-popup-gotcha">Company</label>
                 <input
-                  id="lead-popup-gotcha"
                   type="text"
                   name={leadsApi.honeypotField}
                   tabIndex={-1}
                   autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  readOnly
+                  value=""
                 />
               </div>
 

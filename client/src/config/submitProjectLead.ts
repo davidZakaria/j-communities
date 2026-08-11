@@ -45,4 +45,8 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
     const data = (await res.json().catch(() => null)) as { error?: string } | null;
     throw new Error(data?.error || "Something went wrong. Please try again or email us.");
   }
+
+  if (res.status !== 201) {
+    throw new Error("Something went wrong. Please try again or email us.");
+  }
 }
