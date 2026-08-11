@@ -44,8 +44,15 @@ export const config = {
   },
   distDir: path.join(rootDir, "client", "dist"),
   honeypotField: "_gotcha",
+  honeypotFields: ["_gotcha", "_brief"],
   allowedProjectSlugs: new Set(["jura-sokhna", "jamila"]),
   allowedThemeIds: new Set(["jura", "jamila"]),
   /** Same phone + project within this window is stored as duplicate spam. */
   duplicateWindowMs: Number(process.env.DUPLICATE_WINDOW_HOURS || 24) * 60 * 60 * 1000,
+  /** Minimum ms after form opens before a submission is accepted. */
+  minFormSubmitMs: Number(process.env.LEAD_MIN_SUBMIT_MS || 2500),
+  /** Reject submissions with stale client timestamps. */
+  maxFormSubmitMs: Number(process.env.LEAD_MAX_SUBMIT_MS || 2 * 60 * 60 * 1000),
+  /** Max submissions per phone fingerprint per hour (all projects). */
+  leadPhoneMaxPerHour: Number(process.env.LEAD_PHONE_MAX_PER_HOUR || 3),
 };

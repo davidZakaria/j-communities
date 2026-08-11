@@ -1,11 +1,12 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { leadsApi } from "../../config/leads";
-import { submitProjectLead } from "../../config/submitProjectLead";
+import { readLeadHoneypots, submitProjectLead } from "../../config/submitProjectLead";
+import { LeadFormHoneypots } from "./LeadFormHoneypots";
 import type { ProjectThemeId } from "../../data/projects";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
 const OPEN_DELAY_MS = 1400;
+const MIN_SUBMIT_MS = 2500;
 
 function storageKey(slug: string) {
   return `jc-lead-popup:${slug}`;
@@ -36,7 +37,9 @@ interface ProjectLeadPopupProps {
 export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectLeadPopupProps) {
   const titleId = useId();
   const nameRef = useRef<HTMLInputElement>(null);
+  const formReadyAtRef = useRef<number>(0);
   const [open, setOpen] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
   const [state, setState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -55,6 +58,10 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
   useEffect(() => {
     if (!open) return;
 
+    formReadyAtRef.current = Date.now();
+    setCanSubmit(false);
+    const submitTimer = window.setTimeout(() => setCanSubmit(true), MIN_SUBMIT_MS);
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => nameRef.current?.focus(), 50);
@@ -70,18 +77,19 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
     return () => {
       document.body.style.overflow = prevOverflow;
       window.clearTimeout(focusTimer);
+      window.clearTimeout(submitTimer);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open, projectSlug]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!canSubmit) return;
 
     const form = e.currentTarget;
     const fd = new FormData(form);
     const name = String(fd.get("name") ?? "");
     const phone = String(fd.get("phone") ?? "");
-    const honeypot = String(fd.get(leadsApi.honeypotField) ?? "");
 
     setState("submitting");
     setErrorMessage(null);
@@ -94,7 +102,8 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
         projectSlug,
         themeId,
         source: "popup",
-        honeypot,
+        formReadyAt: formReadyAtRef.current,
+        honeypots: readLeadHoneypots(form),
       });
       form.reset();
       setState("success");
@@ -152,18 +161,7 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
             </p>
 
             <form className="relative mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
-              <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0">
-                <input
-                  type="text"
-                  name={leadsApi.honeypotField}
-                  tabIndex={-1}
-                  autoComplete="off"
-                  data-1p-ignore
-                  data-lpignore="true"
-                  readOnly
-                  value=""
-                />
-              </div>
+              <LeadFormHoneypots />
 
               <div>
                 <label
@@ -202,7 +200,7 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
 
               <button
                 type="submit"
-                disabled={state === "submitting"}
+                disabled={state === "submitting" || !canSubmit}
                 className="project-btn-primary project-body-font w-full min-h-[48px] border text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors disabled:opacity-60"
               >
                 {state === "submitting" ? "Sending…" : "Call me back"}

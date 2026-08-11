@@ -30,8 +30,10 @@ function isValidPageUrl(page) {
 export function validateLeadInput(body) {
   const errors = [];
 
-  if (body?.[config.honeypotField]) {
-    return { ok: false, spam: true, errors: ["Rejected"] };
+  for (const field of config.honeypotFields) {
+    if (String(body?.[field] ?? "").trim()) {
+      return { ok: false, spam: true, errors: ["Rejected"] };
+    }
   }
 
   const name = String(body?.name ?? "").trim();

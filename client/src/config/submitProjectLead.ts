@@ -3,6 +3,8 @@ import type { ProjectThemeId } from "../data/projects";
 
 export type LeadSource = "contact" | "popup";
 
+export type LeadHoneypotValues = Partial<Record<(typeof leadsApi.honeypotFields)[number], string>>;
+
 export interface ProjectLeadPayload {
   name: string;
   phone: string;
@@ -11,7 +13,15 @@ export interface ProjectLeadPayload {
   projectSlug: string;
   themeId: ProjectThemeId;
   source: LeadSource;
-  honeypot?: string;
+  formReadyAt: number;
+  honeypots?: LeadHoneypotValues;
+}
+
+export function readLeadHoneypots(form: HTMLFormElement): LeadHoneypotValues {
+  const fd = new FormData(form);
+  return Object.fromEntries(
+    leadsApi.honeypotFields.map((field) => [field, String(fd.get(field) ?? "")]),
+  );
 }
 
 export async function submitProjectLead(payload: ProjectLeadPayload): Promise<void> {
@@ -21,6 +31,26 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
     throw new Error("Please enter your name and phone number.");
   }
 
+  if (!Number.isFinite(payload.formReadyAt)) {
+    throw new Error("Something went wrong. Please refresh and try again.");
+  }
+
+  const body: Record<string, unknown> = {
+    name,
+    phone,
+    message: payload.message?.trim() ?? "",
+    projectName: payload.projectName,
+    projectSlug: payload.projectSlug,
+    themeId: payload.themeId,
+    source: payload.source,
+    pageUrl: typeof window !== "undefined" ? window.location.href : "",
+    formReadyAt: payload.formReadyAt,
+  };
+
+  for (const field of leadsApi.honeypotFields) {
+    body[field] = payload.honeypots?.[field] ?? "";
+  }
+
   const res = await fetch(leadsApi.endpoint, {
     method: "POST",
     headers: {
@@ -28,17 +58,7 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
       "Content-Type": "application/json",
     },
     credentials: "same-origin",
-    body: JSON.stringify({
-      name,
-      phone,
-      message: payload.message?.trim() ?? "",
-      projectName: payload.projectName,
-      projectSlug: payload.projectSlug,
-      themeId: payload.themeId,
-      source: payload.source,
-      pageUrl: typeof window !== "undefined" ? window.location.href : "",
-      [leadsApi.honeypotField]: payload.honeypot ?? "",
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {

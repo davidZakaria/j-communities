@@ -7,7 +7,7 @@ import { encryptField } from "../lib/leadCrypto.js";
 import { notifyNewLead } from "../lib/notify.js";
 import { validateLeadInput } from "../lib/validateLead.js";
 import { requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
-import { rateLimitLeads } from "../middleware/rateLimit.js";
+import { rateLimitLeads, checkLeadPhoneRateLimit } from "../middleware/rateLimit.js";
 
 export const leadsRouter = Router();
 
@@ -30,7 +30,19 @@ leadsRouter.post(
 
       const ip = getClientIp(req);
       const ipHash = hashIp(ip);
-      const assessment = assessLeadSubmission(parsed.data);
+      const assessment = assessLeadSubmission({
+        ...parsed.data,
+        formReadyAt: req.body?.formReadyAt,
+        userAgent: req.headers["user-agent"],
+      });
+
+      if (!assessment.isLikelySpam) {
+        const phoneLimit = checkLeadPhoneRateLimit(assessment.phoneFingerprint);
+        if (!phoneLimit.allowed) {
+          res.setHeader("Retry-After", String(phoneLimit.retryAfterSec));
+          return res.status(429).json({ error: "Too many submissions for this number. Please try again later." });
+        }
+      }
 
       let status = "new";
       let duplicateOfId = null;

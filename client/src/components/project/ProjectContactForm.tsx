@@ -1,10 +1,12 @@
-import { useState, type FormEvent } from "react";
-import { leadsApi } from "../../config/leads";
-import { submitProjectLead } from "../../config/submitProjectLead";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { readLeadHoneypots, submitProjectLead } from "../../config/submitProjectLead";
+import { LeadFormHoneypots } from "./LeadFormHoneypots";
 import type { ProjectThemeId } from "../../data/projects";
 import type { ProjectContactSection } from "../../content/projects/types";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
+
+const MIN_SUBMIT_MS = 2500;
 
 interface ProjectContactFormProps {
   section: ProjectContactSection;
@@ -14,18 +16,27 @@ interface ProjectContactFormProps {
 }
 
 export function ProjectContactForm({ section, projectName, projectSlug, themeId }: ProjectContactFormProps) {
+  const formReadyAtRef = useRef(Date.now());
+  const [canSubmit, setCanSubmit] = useState(false);
   const [state, setState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    formReadyAtRef.current = Date.now();
+    setCanSubmit(false);
+    const timer = window.setTimeout(() => setCanSubmit(true), MIN_SUBMIT_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!canSubmit) return;
 
     const form = e.currentTarget;
     const fd = new FormData(form);
     const name = String(fd.get("name") ?? "");
     const phone = String(fd.get("phone") ?? "");
     const message = String(fd.get("message") ?? "");
-    const honeypot = String(fd.get(leadsApi.honeypotField) ?? "");
 
     setState("submitting");
     setErrorMessage(null);
@@ -39,7 +50,8 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
         projectSlug,
         themeId,
         source: "contact",
-        honeypot,
+        formReadyAt: formReadyAtRef.current,
+        honeypots: readLeadHoneypots(form),
       });
       form.reset();
       setState("success");
@@ -65,18 +77,7 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
           </p>
         ) : (
           <form className="relative mt-10 space-y-5" onSubmit={handleSubmit} noValidate>
-            <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0">
-              <input
-                type="text"
-                name={leadsApi.honeypotField}
-                tabIndex={-1}
-                autoComplete="off"
-                data-1p-ignore
-                data-lpignore="true"
-                readOnly
-                value=""
-              />
-            </div>
+            <LeadFormHoneypots />
 
             <div>
               <label htmlFor="contact-name" className="project-body-font project-text-muted mb-1.5 block text-[10px] uppercase tracking-[0.16em]">
@@ -119,7 +120,7 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
             </div>
             <button
               type="submit"
-              disabled={state === "submitting"}
+              disabled={state === "submitting" || !canSubmit}
               className="project-btn-primary project-body-font w-full min-h-[48px] border text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors disabled:opacity-60"
             >
               {state === "submitting" ? "Sending…" : "Send inquiry"}
