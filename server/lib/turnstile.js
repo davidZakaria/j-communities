@@ -56,12 +56,13 @@ export async function verifyTurnstileToken(token, remoteIp, expectedAction) {
       return { ok: false, error: "verification-failed", codes: data?.["error-codes"] ?? [] };
     }
 
-    if (expectedAction && data.action !== expectedAction) {
+    if (expectedAction && data.action && data.action !== expectedAction) {
       return { ok: false, error: "action-mismatch", action: data.action };
     }
 
-    if (config.isProd && data.hostname && !config.turnstileHostnames.has(data.hostname)) {
-      return { ok: false, error: "hostname-mismatch", hostname: data.hostname };
+    const hostname = String(data.hostname ?? "").toLowerCase();
+    if (config.isProd && hostname && !config.turnstileHostnames.has(hostname)) {
+      return { ok: false, error: "hostname-mismatch", hostname };
     }
 
     return { ok: true };

@@ -30,7 +30,12 @@ leadsRouter.post(
 
       if (!turnstile.ok) {
         if (isTurnstileRequired() || config.turnstileSecretKey) {
-          console.warn("Lead rejected (turnstile):", turnstile.error, req.get("referer") || ip);
+          console.warn(
+            "Lead rejected (turnstile):",
+            turnstile.error,
+            turnstile.codes ?? turnstile.hostname ?? turnstile.action ?? "",
+            req.get("referer") || ip,
+          );
           return res.status(400).json({ error: "Security verification failed. Please try again." });
         }
       }
@@ -100,7 +105,7 @@ leadsRouter.post(
 
       return res.status(201).json({ ok: true });
     } catch (err) {
-      console.error("POST /api/leads failed:", err?.message || err);
+      console.error("POST /api/leads failed:", err?.code, err?.message || err);
       return res.status(500).json({ error: "Unable to save your inquiry. Please try again." });
     }
   },
