@@ -99,7 +99,8 @@ Back up **`LEAD_ENCRYPTION_KEY`** securely — without it, encrypted leads canno
 4. Widget mode: **Managed** (recommended)
 5. Copy **Site key** → `client/.env` as `VITE_TURNSTILE_SITE_KEY`
 6. Copy **Secret key** → root `.env` as `TURNSTILE_SECRET_KEY`
-7. Rebuild and restart: `npm run build && pm2 restart j-communities --update-env`
+7. Set `TURNSTILE_HOSTNAMES=j-communities.com,www.j-communities.com` in root `.env`
+8. Rebuild and restart: `npm run build && pm2 restart j-communities --update-env`
 
 Turnstile is optional in local dev (leave keys empty). **Required in production.**
 

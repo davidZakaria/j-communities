@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { isTurnstileEnabled, turnstileSiteKey } from "../../config/turnstile";
+import { isTurnstileEnabled, turnstileSiteKey, type TurnstileAction } from "../../config/turnstile";
 
 type TurnstileSize = "normal" | "compact";
 
@@ -8,12 +8,14 @@ export interface LeadTurnstileHandle {
 }
 
 interface LeadTurnstileProps {
+  action: TurnstileAction;
   onTokenChange: (token: string | null) => void;
   size?: TurnstileSize;
 }
 
 interface TurnstileRenderOptions {
   sitekey: string;
+  action?: string;
   size?: TurnstileSize;
   callback?: (token: string) => void;
   "expired-callback"?: () => void;
@@ -57,7 +59,7 @@ function loadTurnstileScript() {
 }
 
 export const LeadTurnstile = forwardRef<LeadTurnstileHandle, LeadTurnstileProps>(function LeadTurnstile(
-  { onTokenChange, size = "normal" },
+  { action, onTokenChange, size = "normal" },
   ref,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +87,7 @@ export const LeadTurnstile = forwardRef<LeadTurnstileHandle, LeadTurnstileProps>
 
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: turnstileSiteKey,
+          action,
           size,
           theme: "light",
           callback: (token) => onTokenChangeRef.current(token),
@@ -102,7 +105,7 @@ export const LeadTurnstile = forwardRef<LeadTurnstileHandle, LeadTurnstileProps>
       }
       onTokenChangeRef.current(null);
     };
-  }, [size]);
+  }, [action, size]);
 
   if (!isTurnstileEnabled) return null;
 

@@ -6,7 +6,7 @@ import { encryptLeadPayload } from "../lib/leadData.js";
 import { encryptField } from "../lib/leadCrypto.js";
 import { notifyNewLead } from "../lib/notify.js";
 import { validateLeadInput } from "../lib/validateLead.js";
-import { verifyTurnstileToken, isTurnstileRequired } from "../lib/turnstile.js";
+import { verifyTurnstileToken, isTurnstileRequired, readTurnstileToken, turnstileActionForSource } from "../lib/turnstile.js";
 import { requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitLeads, checkLeadPhoneRateLimit } from "../middleware/rateLimit.js";
 import { config } from "../config.js";
@@ -21,7 +21,12 @@ leadsRouter.post(
   async (req, res) => {
     try {
       const ip = getClientIp(req);
-      const turnstile = await verifyTurnstileToken(req.body?.turnstileToken, ip);
+      const source = String(req.body?.source ?? "contact").trim();
+      const turnstile = await verifyTurnstileToken(
+        readTurnstileToken(req.body),
+        ip,
+        turnstileActionForSource(source),
+      );
 
       if (!turnstile.ok) {
         if (isTurnstileRequired() || config.turnstileSecretKey) {

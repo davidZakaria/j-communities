@@ -36,6 +36,10 @@ export function validateProductionEnv() {
     errors.push("TURNSTILE_SECRET_KEY is required in production (Cloudflare Turnstile widget verify)");
   }
 
+  if (config.turnstileHostnames.size === 0) {
+    errors.push("TURNSTILE_HOSTNAMES is required in production (e.g. j-communities.com,www.j-communities.com)");
+  }
+
   if (errors.length > 0) {
     throw new Error(`Production security configuration invalid:\n- ${errors.join("\n- ")}`);
   }

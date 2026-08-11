@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { readLeadHoneypots, submitProjectLead } from "../../config/submitProjectLead";
-import { isTurnstileEnabled } from "../../config/turnstile";
+import { isTurnstileEnabled, TURNSTILE_ACTIONS } from "../../config/turnstile";
 import { LeadFormHoneypots } from "./LeadFormHoneypots";
 import { LeadTurnstile, type LeadTurnstileHandle } from "./LeadTurnstile";
 import type { ProjectThemeId } from "../../data/projects";
@@ -130,7 +130,7 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
                 className="project-body-font w-full resize-y border border-[var(--project-border)] bg-[var(--project-bg)] px-4 py-3 text-sm text-[var(--project-text)] outline-none focus:border-[var(--project-accent)] disabled:opacity-60"
               />
             </div>
-            <LeadTurnstile ref={turnstileRef} onTokenChange={handleTurnstileToken} />
+            <LeadTurnstile ref={turnstileRef} action={TURNSTILE_ACTIONS.contact} onTokenChange={handleTurnstileToken} />
             <button
               type="submit"
               disabled={state === "submitting" || !canSubmit || (isTurnstileEnabled && !turnstileToken)}

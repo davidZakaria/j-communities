@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { readLeadHoneypots, submitProjectLead } from "../../config/submitProjectLead";
-import { isTurnstileEnabled } from "../../config/turnstile";
+import { isTurnstileEnabled, TURNSTILE_ACTIONS } from "../../config/turnstile";
 import { LeadFormHoneypots } from "./LeadFormHoneypots";
 import { LeadTurnstile, type LeadTurnstileHandle } from "./LeadTurnstile";
 import type { ProjectThemeId } from "../../data/projects";
@@ -210,7 +210,7 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
                 />
               </div>
 
-              <LeadTurnstile ref={turnstileRef} size="compact" onTokenChange={handleTurnstileToken} />
+              <LeadTurnstile ref={turnstileRef} action={TURNSTILE_ACTIONS.popup} size="compact" onTokenChange={handleTurnstileToken} />
 
               <button
                 type="submit"
