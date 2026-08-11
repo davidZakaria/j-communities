@@ -17,7 +17,11 @@ export function validateProductionEnv() {
   }
 
   if (!config.adminPasswordHash) {
-    errors.push("ADMIN_PASSWORD_HASH is required (npm run admin:hash-password)");
+    errors.push("ADMIN_PASSWORD_HASH is required (npm run admin:set-password -- 'your-password')");
+  } else if (!/^\$2[aby]\$/.test(config.adminPasswordHash)) {
+    errors.push(
+      "ADMIN_PASSWORD_HASH looks corrupted (bcrypt hashes must start with $2a$, $2b$, or $2y$). Run: npm run admin:set-password -- 'your-password'",
+    );
   }
 
   if (!config.leadEncryptionKeyHex || config.leadEncryptionKeyHex.length !== 64) {

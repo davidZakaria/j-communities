@@ -28,7 +28,7 @@ export const config = {
   sessionSecret: process.env.SESSION_SECRET || "dev-session-secret-change-me",
   sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS) || 12 * 60 * 60 * 1000,
   adminUsername: process.env.ADMIN_USERNAME || "admin",
-  adminPasswordHash: process.env.ADMIN_PASSWORD_HASH || "",
+  adminPasswordHash: (process.env.ADMIN_PASSWORD_HASH || "").trim().replace(/^['"]|['"]$/g, ""),
   leadEncryptionKeyHex,
   leadEncryptionKey,
   allowedOrigins: [...new Set(allowedOrigins)],
