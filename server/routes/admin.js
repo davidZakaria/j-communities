@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
-import { decryptLeadRecord, encryptField, sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
+import { decryptLeadRecord, sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
+import { encryptField } from "../lib/leadCrypto.js";
 import { issueCsrfToken, requireCsrf, requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitAdminLogin } from "../middleware/rateLimit.js";
 import { regenerateSession, requireAdmin, verifyAdminCredentials } from "../middleware/auth.js";
