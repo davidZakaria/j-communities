@@ -89,7 +89,7 @@ export const COPY = {
     contact: "Contact us",
     terms: "Terms & conditions",
     privacy: "Privacy policy",
-    copyright: "© 2023 J Communities Developer. All rights reserved.",
+    copyright: "© 2026 J Communities Developer. All rights reserved.",
     quickItems: [
       { label: "Home", to: "/" as const },
       { label: "About us", to: "/#about-more" as const },
