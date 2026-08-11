@@ -14,6 +14,7 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
+    "deploy:vps": "prisma migrate deploy && prisma generate && npm run build",
     "admin:hash-password": "node scripts/hash-password.js",
     "admin:set-password": "node scripts/set-admin-password.js",
     "admin:verify-env": "node scripts/verify-admin-env.js",
