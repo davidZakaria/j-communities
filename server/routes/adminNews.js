@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
-import { serializeNewsArticle, serializeNewsListItem } from "../lib/newsArticles.js";
+import { serializeNewsArticle } from "../lib/newsArticles.js";
+import { newsImageUpload, publicNewsUploadUrl } from "../lib/newsUpload.js";
+import { plainTextToHtml, sanitizeArticleHtml } from "../lib/sanitizeHtml.js";
 import { requireCsrf, requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { requireAdmin } from "../middleware/auth.js";
 
@@ -45,7 +47,7 @@ function validateArticleInput(body, { partial = false } = {}) {
   if (!partial || body?.body != null) {
     const articleBody = String(body?.body ?? "").trim();
     if (!articleBody || articleBody.length > 50000) errors.push("Invalid body.");
-    else data.body = articleBody;
+    else data.body = sanitizeArticleHtml(plainTextToHtml(articleBody));
   }
 
   if (!partial || body?.publishedAt != null) {
@@ -110,6 +112,29 @@ adminNewsRouter.get("/", requireAdmin, async (_req, res) => {
     return res.status(500).json({ error: "Unable to load news articles." });
   }
 });
+
+adminNewsRouter.post(
+  "/upload",
+  requireAdmin,
+  requireCsrf,
+  requireSameOrigin,
+  (req, res) => {
+    newsImageUpload.single("image")(req, res, (err) => {
+      if (err) {
+        const message =
+          err?.code === "LIMIT_FILE_SIZE"
+            ? "Image must be 5 MB or smaller."
+            : err?.message || "Upload failed.";
+        return res.status(400).json({ error: message });
+      }
+      if (!req.file) return res.status(400).json({ error: "No image provided." });
+      return res.status(201).json({
+        ok: true,
+        url: publicNewsUploadUrl(req.file.filename),
+      });
+    });
+  },
+);
 
 adminNewsRouter.get("/:id", requireAdmin, async (req, res) => {
   try {

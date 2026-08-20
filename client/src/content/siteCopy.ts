@@ -89,6 +89,8 @@ export const COPY = {
       "Press coverage and social updates on our projects, initiatives, and community milestones across Egypt.",
     featured: "Featured",
     viewAll: "View all news",
+    filterLanguage: "Language",
+    filterCategory: "Category",
   },
 
   footer: {

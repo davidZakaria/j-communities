@@ -4,23 +4,37 @@ import { COPY } from "../content/siteCopy";
 import { site } from "../config/site";
 import { LF_TYPE } from "../config/lookFeel";
 import { fetchPublicNews } from "../features/news/api";
-import type { NewsCategory, NewsListItem } from "../features/news/types";
+import type { NewsCategory, NewsLanguage, NewsListItem } from "../features/news/types";
 import { Footer } from "../components/Footer";
 import { GrowSection } from "../components/GrowSection";
 import { LookFeelCanvas } from "../components/LookFeelCanvas";
 import { NewsCard } from "../components/NewsCard";
 import { NewsPageHeader } from "../components/NewsPageHeader";
 
-type Filter = "all" | NewsCategory;
+type CategoryFilter = "all" | NewsCategory;
+type LanguageFilter = "all" | NewsLanguage;
 
-const filters: { id: Filter; label: string }[] = [
-  { id: "all", label: "All" },
+const categoryFilters: { id: CategoryFilter; label: string }[] = [
+  { id: "all", label: "All types" },
   { id: "press", label: "Press" },
   { id: "social", label: "Social" },
 ];
 
+const languageFilters: { id: LanguageFilter; label: string }[] = [
+  { id: "all", label: "All languages" },
+  { id: "en", label: "English" },
+  { id: "ar", label: "Arabic" },
+];
+
+function filterButtonClass(active: boolean) {
+  return active
+    ? "border-j-charcoal bg-j-charcoal text-j-offwhite"
+    : "border-j-charcoal/20 bg-transparent text-j-charcoal hover:border-j-charcoal/40";
+}
+
 export function NewsListPage() {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
   const [articles, setArticles] = useState<NewsListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +50,10 @@ export function NewsListPage() {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchPublicNews({ category: filter === "all" ? undefined : filter })
+    fetchPublicNews({
+      category: categoryFilter === "all" ? undefined : categoryFilter,
+      language: languageFilter === "all" ? undefined : languageFilter,
+    })
       .then((res) => {
         if (!cancelled) setArticles(res.articles);
       })
@@ -49,7 +66,7 @@ export function NewsListPage() {
     return () => {
       cancelled = true;
     };
-  }, [filter]);
+  }, [categoryFilter, languageFilter]);
 
   const hero = useMemo(() => articles.find((article) => article.featured) ?? articles[0], [articles]);
   const rest = useMemo(() => articles.filter((article) => article.slug !== hero?.slug), [articles, hero]);
@@ -66,24 +83,44 @@ export function NewsListPage() {
             <p className={`max-w-[720px] ${LF_TYPE.projectsLead}`}>{COPY.news.lead}</p>
           </GrowSection>
 
-          <GrowSection className="mt-10">
-            <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter news">
-              {filters.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={filter === item.id}
-                  onClick={() => setFilter(item.id)}
-                  className={`border px-3 py-2 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] transition-colors ${
-                    filter === item.id
-                      ? "border-j-charcoal bg-j-charcoal text-j-offwhite"
-                      : "border-j-charcoal/20 bg-transparent text-j-charcoal hover:border-j-charcoal/40"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+          <GrowSection className="mt-10 space-y-4">
+            <div>
+              <p className="mb-2 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-slate">
+                {COPY.news.filterCategory}
+              </p>
+              <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter news by category">
+                {categoryFilters.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={categoryFilter === item.id}
+                    onClick={() => setCategoryFilter(item.id)}
+                    className={`border px-3 py-2 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] transition-colors ${filterButtonClass(categoryFilter === item.id)}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-slate">
+                {COPY.news.filterLanguage}
+              </p>
+              <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter news by language">
+                {languageFilters.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={languageFilter === item.id}
+                    onClick={() => setLanguageFilter(item.id)}
+                    className={`border px-3 py-2 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] transition-colors ${filterButtonClass(languageFilter === item.id)}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </GrowSection>
         </section>
@@ -127,7 +164,7 @@ export function NewsListPage() {
                   ))}
                 </ul>
               ) : !hero ? (
-                <p className="text-center font-serif text-j-slate">No stories match this filter yet.</p>
+                <p className="text-center font-serif text-j-slate">No stories match these filters yet.</p>
               ) : null}
 
               <GrowSection className="mt-12 border-t border-j-charcoal/10 pt-8 text-center">

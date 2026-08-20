@@ -133,3 +133,24 @@ export async function updateAdminNewsArticle(
 export async function deleteAdminNewsArticle(id: string): Promise<{ ok: boolean }> {
   return newsRequest(`/${id}`, { method: "DELETE" });
 }
+
+export async function uploadAdminNewsImage(file: File): Promise<{ ok: boolean; url: string }> {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const token = getAdminCsrfToken();
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (token) headers["X-CSRF-Token"] = token;
+
+  const res = await fetch(`${newsBase}/upload`, {
+    method: "POST",
+    credentials: "include",
+    headers,
+    body: formData,
+  });
+
+  const data = (await res.json().catch(() => null)) as { error?: string; url?: string; ok?: boolean };
+  if (!res.ok) throw new Error(data?.error || "Upload failed.");
+  if (!data?.url) throw new Error("Upload failed.");
+  return { ok: true, url: data.url };
+}

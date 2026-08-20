@@ -43,6 +43,8 @@ export const config = {
     from: (process.env.SMTP_FROM || process.env.SMTP_USER || "").trim(),
   },
   distDir: path.join(rootDir, "client", "dist"),
+  uploadsNewsDir: path.join(rootDir, "data", "uploads", "news"),
+  uploadsNewsPublicPath: "/uploads/news",
   honeypotField: "_gotcha",
   honeypotFields: ["_gotcha", "_brief"],
   allowedProjectSlugs: new Set(["jura-sokhna", "jamila"]),

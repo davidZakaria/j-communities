@@ -13,6 +13,10 @@ export function categoryLabel(category: NewsCategory): string {
   return category === "social" ? "Social" : "Press";
 }
 
+export function languageLabel(language: NewsLanguage): string {
+  return language === "ar" ? "Arabic" : "English";
+}
+
 export function isRtl(language: NewsLanguage): boolean {
   return language === "ar";
 }

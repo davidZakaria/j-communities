@@ -48,6 +48,16 @@ export function createApp() {
   app.use("/api/news", newsRouter);
 
   app.use(
+    config.uploadsNewsPublicPath,
+    express.static(config.uploadsNewsDir, {
+      maxAge: config.isProd ? "7d" : 0,
+      setHeaders(res) {
+        res.setHeader("Cache-Control", config.isProd ? "public, max-age=604800" : "no-store");
+      },
+    }),
+  );
+
+  app.use(
     express.static(config.distDir, {
       index: false,
       setHeaders(res, filePath) {

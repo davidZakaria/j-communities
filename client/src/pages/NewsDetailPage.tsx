@@ -4,10 +4,11 @@ import { absoluteUrl, site } from "../config/site";
 import { LF_TYPE } from "../config/lookFeel";
 import { fetchPublicNewsArticle } from "../features/news/api";
 import type { NewsArticle, NewsListItem } from "../features/news/types";
-import { categoryLabel, formatNewsDate, isRtl, newsCover, splitNewsBody } from "../features/news/utils";
+import { categoryLabel, formatNewsDate, isRtl, newsCover } from "../features/news/utils";
 import { Footer } from "../components/Footer";
 import { GrowSection } from "../components/GrowSection";
 import { LookFeelCanvas } from "../components/LookFeelCanvas";
+import { NewsBody } from "../components/NewsBody";
 import { NewsCard } from "../components/NewsCard";
 import { NewsPageHeader } from "../components/NewsPageHeader";
 
@@ -107,7 +108,6 @@ export function NewsDetailPage() {
   }
 
   const rtl = isRtl(article.language);
-  const paragraphs = splitNewsBody(article.body);
   const cover = newsCover(article);
 
   return (
@@ -153,11 +153,7 @@ export function NewsDetailPage() {
           <div className="bg-j-footer px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-16 xl:px-20">
             <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_280px]">
               <GrowSection>
-                <div className="j-news-prose max-w-3xl">
-                  {paragraphs.map((paragraph) => (
-                    <p key={paragraph.slice(0, 40)}>{paragraph}</p>
-                  ))}
-                </div>
+                <NewsBody body={article.body} />
 
                 {article.externalUrl ? (
                   <div className="mt-10 max-w-3xl rounded-sm border border-j-charcoal/10 bg-j-offwhite px-6 py-6 sm:px-8">

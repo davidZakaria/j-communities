@@ -6,8 +6,11 @@ import {
   deleteAdminNewsArticle,
   fetchAdminNews,
   updateAdminNewsArticle,
+  uploadAdminNewsImage,
 } from "../../features/admin/api";
 import type { AdminNewsArticle, AdminNewsCategory, AdminNewsLanguage } from "../../features/admin/types";
+import { RichTextEditor } from "../../components/admin/RichTextEditor";
+import { newsCover } from "../../features/news/utils";
 
 const emptyDraft = (): Omit<AdminNewsArticle, "id" | "createdAt" | "updatedAt"> => ({
   slug: "",
@@ -48,6 +51,7 @@ export function AdminNewsPage() {
   const [saving, setSaving] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState(emptyDraft());
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const loadArticles = useCallback(async () => {
     setLoading(true);
@@ -78,6 +82,10 @@ export function AdminNewsPage() {
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
+    if (!draft.body.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").trim()) {
+      setError("Article body is required.");
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
@@ -122,6 +130,25 @@ export function AdminNewsPage() {
     window.location.href = "/admin/login";
   }
 
+  async function handleCoverUpload(file: File | undefined) {
+    if (!file) return;
+    setUploadingCover(true);
+    setError(null);
+    try {
+      const res = await uploadAdminNewsImage(file);
+      setDraft((prev) => ({ ...prev, coverImageUrl: res.url }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Cover upload failed.");
+    } finally {
+      setUploadingCover(false);
+    }
+  }
+
+  async function handleEditorImageUpload(file: File) {
+    const res = await uploadAdminNewsImage(file);
+    return res.url;
+  }
+
   return (
     <div className="min-h-screen bg-neutral-100 font-sans text-neutral-900">
       <header className="border-b border-neutral-300 bg-white">
@@ -148,7 +175,7 @@ export function AdminNewsPage() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[1fr_420px] sm:px-6">
+      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[1fr_540px] sm:px-6">
         <section className="border border-neutral-300 bg-white">
           <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
             <h2 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500">Articles</h2>
@@ -215,7 +242,6 @@ export function AdminNewsPage() {
                 ["title", "Title"],
                 ["source", "Source"],
                 ["externalUrl", "External URL"],
-                ["coverImageUrl", "Cover image URL"],
                 ["publishedAt", "Published date"],
               ] as const
             ).map(([key, label]) => (
@@ -229,6 +255,36 @@ export function AdminNewsPage() {
                 />
               </label>
             ))}
+
+            <div className="space-y-2">
+              <p className="text-[10px] uppercase tracking-wider text-neutral-500">Cover image</p>
+              {draft.coverImageUrl ? (
+                <img
+                  src={newsCover({ coverImageUrl: draft.coverImageUrl })}
+                  alt=""
+                  className="aspect-[16/10] w-full border border-neutral-200 object-cover"
+                />
+              ) : null}
+              <input
+                value={draft.coverImageUrl}
+                onChange={(e) => setDraft((prev) => ({ ...prev, coverImageUrl: e.target.value }))}
+                className="w-full border border-neutral-300 px-2 py-2 text-sm normal-case text-neutral-900"
+                placeholder="/uploads/news/... or /assets/projects/..."
+              />
+              <label className="inline-flex cursor-pointer border border-neutral-300 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900">
+                {uploadingCover ? "Uploading…" : "Upload cover"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  disabled={uploadingCover}
+                  onChange={(e) => {
+                    void handleCoverUpload(e.target.files?.[0]);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
 
             <label className="block text-[10px] uppercase tracking-wider text-neutral-500">
               Category
@@ -265,16 +321,15 @@ export function AdminNewsPage() {
               />
             </label>
 
-            <label className="block text-[10px] uppercase tracking-wider text-neutral-500">
-              Body
-              <textarea
-                rows={10}
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-neutral-500">Body</p>
+              <RichTextEditor
                 value={draft.body}
-                onChange={(e) => setDraft((prev) => ({ ...prev, body: e.target.value }))}
-                className="mt-1 w-full border border-neutral-300 px-2 py-2 text-sm normal-case"
-                required
+                onChange={(body) => setDraft((prev) => ({ ...prev, body }))}
+                onUploadImage={handleEditorImageUpload}
+                dir={draft.language === "ar" ? "rtl" : "ltr"}
               />
-            </label>
+            </div>
 
             <div className="flex flex-wrap gap-4 text-sm">
               <label className="flex items-center gap-2">

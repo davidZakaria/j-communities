@@ -9,11 +9,13 @@ const VALID_CATEGORIES = new Set(["press", "social"]);
 newsRouter.get("/", async (req, res) => {
   try {
     const category = String(req.query.category ?? "").trim();
+    const language = String(req.query.language ?? "").trim();
     const featuredOnly = req.query.featured === "1";
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 100));
 
     const where = { published: true };
     if (category && VALID_CATEGORIES.has(category)) where.category = category;
+    if (language === "en" || language === "ar") where.language = language;
     if (featuredOnly) where.featured = true;
 
     const articles = await prisma.newsArticle.findMany({

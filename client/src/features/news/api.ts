@@ -1,14 +1,16 @@
-import type { NewsCategory, NewsDetailResponse, NewsListResponse } from "./types";
+import type { NewsCategory, NewsDetailResponse, NewsLanguage, NewsListResponse } from "./types";
 
 const base = "/api/news";
 
 export async function fetchPublicNews(options?: {
   category?: NewsCategory;
+  language?: NewsLanguage;
   featured?: boolean;
   limit?: number;
 }): Promise<NewsListResponse> {
   const params = new URLSearchParams();
   if (options?.category) params.set("category", options.category);
+  if (options?.language) params.set("language", options.language);
   if (options?.featured) params.set("featured", "1");
   if (options?.limit) params.set("limit", String(options.limit));
 
