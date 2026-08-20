@@ -28,8 +28,8 @@ const languageFilters: { id: LanguageFilter; label: string }[] = [
 
 function filterButtonClass(active: boolean) {
   return active
-    ? "border-j-charcoal bg-j-charcoal text-j-offwhite"
-    : "border-j-charcoal/20 bg-transparent text-j-charcoal hover:border-j-charcoal/40";
+    ? "border-jamila-blue bg-jamila-blue text-jamila-lemon"
+    : "border-j-charcoal/20 bg-transparent text-j-charcoal hover:border-jamila-blue/40";
 }
 
 export function NewsListPage() {
@@ -76,9 +76,12 @@ export function NewsListPage() {
       <LookFeelCanvas>
         <NewsPageHeader />
 
-        <section className="border-b border-j-charcoal/10 bg-j-offwhite px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-16 xl:px-20 xl:py-[72px]">
+        <section className="j-news-teaser border-b border-j-charcoal/10 bg-j-offwhite px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-16 xl:px-20 xl:py-[72px]">
           <GrowSection>
-            <p className={`mb-4 text-j-slate ${LF_TYPE.projectsKicker}`}>{COPY.news.kicker}</p>
+            <div className="mb-4 flex items-center gap-3">
+              <span className="h-px w-10 bg-jamila-lemon" aria-hidden />
+              <p className={`text-jamila-blue ${LF_TYPE.projectsKicker}`}>{COPY.news.kicker}</p>
+            </div>
             <h1 className={`mb-5 max-w-[980px] text-j-charcoal ${LF_TYPE.projectsTitle}`}>{COPY.news.title}</h1>
             <p className={`max-w-[720px] ${LF_TYPE.projectsLead}`}>{COPY.news.lead}</p>
           </GrowSection>
@@ -132,21 +135,31 @@ export function NewsListPage() {
         ) : null}
 
         {loading ? (
-          <section className="bg-j-black px-5 py-12 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+          <section className="j-news-teaser border-b border-j-charcoal/10 bg-j-offwhite px-5 py-12 sm:px-8 md:px-12 lg:px-16 xl:px-20">
             <div className="mx-auto max-w-[1200px] animate-pulse space-y-6">
-              <div className="aspect-[21/9] bg-j-charcoal/50" />
+              <div className="grid gap-px bg-j-slate/15 lg:grid-cols-12">
+                <div className="aspect-[16/10] bg-j-charcoal/10 lg:col-span-7" />
+                <div className="space-y-3 bg-j-offwhite p-8 lg:col-span-5">
+                  <div className="h-3 w-24 bg-j-charcoal/10" />
+                  <div className="h-10 w-full bg-j-charcoal/10" />
+                  <div className="h-20 w-full bg-j-charcoal/10" />
+                </div>
+              </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                <div className="h-72 bg-j-charcoal/40" />
-                <div className="h-72 bg-j-charcoal/40" />
-                <div className="h-72 bg-j-charcoal/40" />
+                <div className="h-72 bg-j-charcoal/10" />
+                <div className="h-72 bg-j-charcoal/10" />
+                <div className="h-72 bg-j-charcoal/10" />
               </div>
             </div>
           </section>
         ) : (
           <>
             {hero ? (
-              <section className="border-b border-j-charcoal/10 bg-j-black px-5 py-10 sm:px-8 md:px-12 lg:px-16 lg:py-12 xl:px-20">
+              <section className="j-news-teaser border-b border-j-charcoal/10 bg-j-offwhite px-5 py-10 sm:px-8 md:px-12 lg:px-16 lg:py-12 xl:px-20">
                 <GrowSection>
+                  <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-jamila-blue">
+                    {COPY.news.featured}
+                  </p>
                   <NewsCard article={hero} variant="hero" />
                 </GrowSection>
               </section>
@@ -154,10 +167,10 @@ export function NewsListPage() {
 
             <section className="bg-j-offwhite px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-14 xl:px-20 xl:pb-[72px]">
               {rest.length > 0 ? (
-                <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <ul className="grid grid-cols-1 gap-px bg-j-slate/15 md:grid-cols-2 xl:grid-cols-3">
                   {rest.map((article) => (
                     <GrowSection key={article.slug}>
-                      <li>
+                      <li className="bg-j-offwhite">
                         <NewsCard article={article} variant={article.featured ? "featured" : "default"} />
                       </li>
                     </GrowSection>
@@ -170,7 +183,7 @@ export function NewsListPage() {
               <GrowSection className="mt-12 border-t border-j-charcoal/10 pt-8 text-center">
                 <Link
                   to="/#projects"
-                  className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-charcoal hover:text-j-slate"
+                  className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-jamila-blue no-underline hover:text-j-charcoal"
                 >
                   Explore our projects
                 </Link>

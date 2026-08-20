@@ -18,6 +18,12 @@ module.exports = {
           charcoal: "#1A1F24",
           footer: "#E8EAEC",
         },
+        jamila: {
+          blue: "#1A4284",
+          lemon: "#DDFF00",
+          teal: "#0889A7",
+          coral: "#FF3C26",
+        },
       },
       fontFamily: {
         serif: ['"Playfair Display"', "Georgia", "Times New Roman", "serif"],

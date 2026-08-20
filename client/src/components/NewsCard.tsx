@@ -5,44 +5,171 @@ import { categoryLabel, formatNewsDate, isRtl, newsCover } from "../features/new
 
 interface NewsCardProps {
   article: NewsListItem;
-  variant?: "default" | "featured" | "hero" | "compact";
+  variant?: "default" | "featured" | "hero" | "compact" | "teaserFeatured" | "teaserSide";
+}
+
+function NewsCategoryBadge({ category }: { category: NewsListItem["category"] }) {
+  return (
+    <span className="inline-flex border border-jamila-blue/30 bg-jamila-blue px-2 py-1 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-jamila-lemon">
+      {categoryLabel(category)}
+    </span>
+  );
 }
 
 export function NewsCard({ article, variant = "default" }: NewsCardProps) {
   const rtl = isRtl(article.language);
   const cover = newsCover(article);
 
-  if (variant === "hero") {
+  if (variant === "teaserFeatured") {
     return (
-      <article dir={rtl ? "rtl" : "ltr"} className="group relative overflow-hidden bg-j-charcoal">
-        <Link to={`/news/${article.slug}`} className="block text-inherit no-underline">
-          <div className="relative aspect-[16/9] max-h-[520px] w-full overflow-hidden lg:aspect-[21/9]">
+      <article dir={rtl ? "rtl" : "ltr"} className="group flex h-full flex-col">
+        <Link to={`/news/${article.slug}`} className="block overflow-hidden text-inherit no-underline">
+          <div className="relative aspect-[16/10] overflow-hidden">
             <img
               src={cover}
               alt=""
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              className="j-img-editorial h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
               loading="eager"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-j-black/85 via-j-black/35 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-10">
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="inline-flex border border-j-offwhite/40 px-2 py-1 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-offwhite">
-                  {categoryLabel(article.category)}
-                </span>
-                <span className="font-sans text-[10px] uppercase tracking-[0.16em] text-j-offwhite/75">
-                  {article.source}
-                </span>
-              </div>
-              <h2 className="max-w-4xl font-serif text-[clamp(1.5rem,4vw,2.75rem)] font-medium leading-tight tracking-[0.02em] text-j-offwhite">
-                {article.title}
-              </h2>
-              <p className="mt-4 max-w-3xl font-serif text-[15px] leading-relaxed text-j-offwhite/85">{article.excerpt}</p>
-              <p className="mt-5 font-sans text-[10px] uppercase tracking-[0.16em] text-j-offwhite/70">
-                {formatNewsDate(article.publishedAt)} · Read story
-              </p>
+            <div className="absolute inset-x-0 top-0 h-1 bg-jamila-lemon" aria-hidden />
+            <div className="absolute inset-0 bg-gradient-to-t from-j-black/55 via-j-black/10 to-transparent opacity-90" />
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+              <NewsCategoryBadge category={article.category} />
             </div>
           </div>
         </Link>
+
+        <div className="flex flex-1 flex-col p-6 sm:p-8">
+          <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[10px] uppercase tracking-[0.14em] text-j-slate">
+            <time dateTime={article.publishedAt}>{formatNewsDate(article.publishedAt)}</time>
+            <span aria-hidden>·</span>
+            <span>{article.source}</span>
+            {article.language === "ar" ? (
+              <>
+                <span aria-hidden>·</span>
+                <span className="border border-jamila-teal/40 px-1.5 py-0.5 text-[9px] text-jamila-teal">Arabic</span>
+              </>
+            ) : null}
+          </div>
+
+          <h3 className={`text-j-charcoal ${LF_TYPE.cardTitle}`}>
+            <Link to={`/news/${article.slug}`} className="border-b border-transparent text-inherit no-underline hover:border-jamila-blue">
+              {article.title}
+            </Link>
+          </h3>
+
+          <p className="mt-4 line-clamp-3 flex-1 font-serif text-[15px] leading-relaxed tracking-[0.02em] text-j-slate">
+            {article.excerpt}
+          </p>
+
+          <Link
+            to={`/news/${article.slug}`}
+            className="mt-6 inline-flex items-center gap-2 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-jamila-blue no-underline transition-colors hover:text-j-charcoal"
+          >
+            Read story
+            <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+              →
+            </span>
+          </Link>
+        </div>
+      </article>
+    );
+  }
+
+  if (variant === "teaserSide") {
+    return (
+      <article
+        dir={rtl ? "rtl" : "ltr"}
+        className="group flex h-full min-h-[168px] transition-colors hover:bg-j-black/[0.02]"
+      >
+        <Link
+          to={`/news/${article.slug}`}
+          className="grid h-full w-full grid-cols-[108px_1fr] text-inherit no-underline sm:grid-cols-[132px_1fr]"
+        >
+          <div className="relative overflow-hidden">
+            <img
+              src={cover}
+              alt=""
+              className="j-img-editorial h-full min-h-[168px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+              loading="lazy"
+            />
+            <div className="absolute inset-y-0 end-0 w-0.5 bg-jamila-lemon opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
+          </div>
+
+          <div className="flex flex-col justify-center border-s border-j-charcoal/8 px-4 py-5 sm:px-5">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <NewsCategoryBadge category={article.category} />
+              {article.language === "ar" ? (
+                <span className="font-sans text-[9px] font-semibold uppercase tracking-[0.12em] text-jamila-teal">AR</span>
+              ) : null}
+            </div>
+            <p className="font-sans text-[10px] uppercase tracking-[0.14em] text-j-slate">
+              {formatNewsDate(article.publishedAt)} · {article.source}
+            </p>
+            <h3 className="mt-2 line-clamp-3 font-serif text-[1rem] font-medium leading-snug tracking-[0.02em] text-j-charcoal group-hover:text-jamila-blue sm:text-[1.05rem]">
+              {article.title}
+            </h3>
+          </div>
+        </Link>
+      </article>
+    );
+  }
+
+  if (variant === "hero") {
+    return (
+      <article dir={rtl ? "rtl" : "ltr"} className="group grid overflow-hidden border border-j-charcoal/10 bg-j-offwhite lg:grid-cols-12">
+        <Link
+          to={`/news/${article.slug}`}
+          className="relative block overflow-hidden text-inherit no-underline lg:col-span-7"
+        >
+          <div className="relative aspect-[16/10] w-full lg:aspect-auto lg:min-h-[420px] lg:h-full">
+            <img
+              src={cover}
+              alt=""
+              className="j-img-editorial h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              loading="eager"
+            />
+            <div className="absolute inset-x-0 top-0 h-1 bg-jamila-lemon" aria-hidden />
+            <div className="absolute inset-0 bg-gradient-to-t from-j-black/60 via-j-black/15 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-j-black/20" />
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:hidden">
+              <NewsCategoryBadge category={article.category} />
+            </div>
+          </div>
+        </Link>
+
+        <div className="flex flex-col justify-center border-t border-j-charcoal/10 p-6 sm:p-8 lg:col-span-5 lg:border-t-0 lg:border-s lg:p-10 xl:p-12">
+          <div className="mb-4 hidden lg:block">
+            <NewsCategoryBadge category={article.category} />
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[10px] uppercase tracking-[0.14em] text-j-slate">
+            <time dateTime={article.publishedAt}>{formatNewsDate(article.publishedAt)}</time>
+            <span aria-hidden>·</span>
+            <span>{article.source}</span>
+            {article.language === "ar" ? (
+              <>
+                <span aria-hidden>·</span>
+                <span className="border border-jamila-teal/40 px-1.5 py-0.5 text-[9px] text-jamila-teal">Arabic</span>
+              </>
+            ) : null}
+          </div>
+
+          <h2 className="font-serif text-[clamp(1.65rem,3.2vw,2.5rem)] font-medium leading-tight tracking-[0.02em] text-j-charcoal">
+            <Link to={`/news/${article.slug}`} className="border-b border-transparent text-inherit no-underline hover:border-jamila-blue">
+              {article.title}
+            </Link>
+          </h2>
+
+          <p className="mt-4 max-w-xl font-serif text-[16px] leading-relaxed tracking-[0.02em] text-j-slate">{article.excerpt}</p>
+
+          <Link
+            to={`/news/${article.slug}`}
+            className="mt-8 inline-flex min-h-[44px] items-center gap-2 border border-j-charcoal/20 px-5 font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-charcoal no-underline transition-colors hover:border-jamila-blue hover:bg-jamila-blue hover:text-jamila-lemon"
+          >
+            Read story
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
       </article>
     );
   }
@@ -81,23 +208,21 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
           <img
             src={cover}
             alt=""
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            className="j-img-editorial h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-j-black/50 via-transparent to-transparent opacity-80" />
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-jamila-lemon opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
         </div>
       </Link>
 
       <div className={`flex flex-1 flex-col p-6 sm:p-7 ${isFeatured ? "lg:p-9" : ""}`}>
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className={`inline-flex border px-2 py-1 ${LF_TYPE.cardTag} border-j-slate/50 text-j-slate`}>
-            {categoryLabel(article.category)}
-          </span>
+          <NewsCategoryBadge category={article.category} />
           <span className="font-sans text-[10px] uppercase tracking-[0.16em] text-j-slate">{article.source}</span>
         </div>
 
         <h3 className={`text-j-charcoal ${isFeatured ? LF_TYPE.cardTitle : "font-serif text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-[0.02em]"}`}>
-          <Link to={`/news/${article.slug}`} className="border-b border-transparent hover:border-j-charcoal">
+          <Link to={`/news/${article.slug}`} className="border-b border-transparent text-inherit no-underline hover:border-jamila-blue">
             {article.title}
           </Link>
         </h3>
@@ -110,7 +235,7 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
           </time>
           <Link
             to={`/news/${article.slug}`}
-            className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-charcoal hover:text-j-slate"
+            className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-jamila-blue no-underline hover:text-j-charcoal"
           >
             Read story
           </Link>
