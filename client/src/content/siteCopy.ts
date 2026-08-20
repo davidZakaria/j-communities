@@ -98,8 +98,8 @@ export const COPY = {
       { label: "News", to: "/#footer-contact" as const },
     ],
     socialItems: [
-      { label: "Facebook", href: "https://www.facebook.com" },
-      { label: "Instagram", href: "https://www.instagram.com" },
+      { label: "Facebook", href: "https://www.facebook.com/jcommunitiesofficial/" },
+      { label: "Instagram", href: "https://www.instagram.com/jcommunities_/" },
       { label: "YouTube", href: "https://www.youtube.com" },
       { label: "LinkedIn", href: "https://www.linkedin.com" },
     ],

@@ -55,7 +55,7 @@ export function DocumentMeta() {
       "@type": "Organization",
       name: site.name,
       url: site.origin,
-      sameAs: [site.social.linkedin, site.social.instagram],
+      sameAs: [site.social.facebook, site.social.instagram, site.social.linkedin],
     });
   }, []);
 
