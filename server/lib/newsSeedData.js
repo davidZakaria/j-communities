@@ -1,23 +1,39 @@
-export type NewsCategory = "press" | "social";
+const COVERS = [
+  "/assets/projects/jamila/hero.webp",
+  "/assets/projects/jamila/gallery-9.webp",
+  "/assets/projects/jamila/gallery-2.webp",
+  "/assets/projects/jamila/gallery-5.webp",
+  "/assets/projects/jamila/gallery-7.webp",
+  "/assets/projects/jamila/gallery-1.webp",
+  "/assets/projects/jura/hero.webp",
+  "/assets/projects/jamila/gallery-8.webp",
+];
 
-export type NewsLanguage = "en" | "ar";
+export const EN_BODY_FULL = `J Communities has launched the first phase of handing over hotel-style chalets to players of Egypt's national football team. The initiative honors the team's players and coaching staff in recognition of their outstanding performances and remarkable efforts, which brought joy to millions of Egyptians and marked a national achievement worthy of celebration.
 
-export interface NewsArticle {
-  slug: string;
-  title: string;
-  excerpt: string;
-  publishedAt: string;
-  source: string;
-  externalUrl: string;
-  category: NewsCategory;
-  language: NewsLanguage;
-  featured?: boolean;
-}
+Eng. Girgis Youssef, Chairman of J Communities, said the company has already begun handing over the first batch of chalets at its headquarters, emphasizing that the initiative reflects the company's commitment to corporate social responsibility and its belief in recognizing outstanding national role models who proudly represent Egypt on the international sporting stage.
 
-export const newsArticles: NewsArticle[] = [
+The first batch of handovers included chalets for Mahmoud Hassan "Trezeguet," Mohamed Hany, Ramy Rabia, Ahmed Fattouh, Hossam Abdelmaguid, Mohamed Alaa, Tarek Alaa, Mahmoud Saber, Mohamed Abdelmonem, Marwan Attia, Egypt national team goalkeeper Mohamed El Shenawy, Mahdy Soliman, Hamdy Fathy, and Mohannad Lasheen. The remaining units are scheduled to be handed over at the Jamila project on Egypt's North Coast to the rest of the national team players.
+
+The initiative includes gifting every Egypt national team player a luxury hotel-style chalet with a direct sea view at the Jamila project on the North Coast. In addition, Head Coach Hossam Hassan and General Manager Ibrahim Hassan will each receive a chalet within the project, while members of the coaching staff will be granted a 10-year Talé Hotel Membership at the Jura project in Ain Sokhna.
+
+Eng. Girgis Youssef concluded that J Communities will continue to launch community-driven initiatives alongside the expansion of its real estate portfolio in Egypt.`;
+
+export const AR_BODY_FULL = `أعلنت شركة J Communities بدء المرحلة الأولى من تسليم الشاليهات الفندقية المهداة للاعبي المنتخب الوطني المصري لكرة القدم، تنفيذًا للمبادرة التي أطلقتها الشركة لتكريم أبطال المنتخب والجهاز الفني، تقديرًا لما قدموه من أداء مميز وجهود كبيرة ساهمت في إسعاد الجماهير المصرية وتحقيق إنجاز وطني يستحق الاحتفاء.
+
+وقال المهندس جرجس يوسف، رئيس مجلس إدارة J Communities، إن الشركة بدأت بالفعل تسليم الدفعة الأولى من الشاليهات داخل مقرها الرئيسي، مؤكدًا أن هذه المبادرة تأتي انطلاقًا من مسئولية الشركة المجتمعية وإيمانها بأهمية دعم النماذج الوطنية الناجحة والاحتفاء بمن يرفعون اسم مصر في المحافل الرياضية.
+
+وشملت الدفعة الأولى تسليم الشاليهات لعدد من نجوم المنتخب، على أن يتم استكمال تسليم باقي الوحدات خلال الأسبوع المقبل داخل مشروع Jamila بالساحل الشمالي لبقية لاعبي المنتخب.
+
+وتتضمن المبادرة إهداء شاليه فندقي فاخر بإطلالة مباشرة على البحر داخل مشروع Jamila بالساحل الشمالي لكل لاعب من لاعبي المنتخب الوطني، بالإضافة إلى إهداء الكابتن حسام حسن والكابتن إبراهيم حسن شاليهات ضمن المشروع، فيما يحصل أعضاء الجهاز الفني على عضوية Talé Hotel Membership لمدة 10 سنوات داخل مشروع Jura بالعين السخنة.
+
+وأكد رئيس مجلس الإدارة أن الشركة ستواصل إطلاق المبادرات التي تعزز دورها المجتمعي بالتوازي مع خططها التوسعية في السوق العقاري المصري.`;
+
+const articles = [
   {
     slug: "tadawul-news-en-jamila-handover",
-    title: "J Communities begins delivering first batch of Jamila North Coast chalets to Egypt's National Football Team players",
+    title:
+      "J Communities begins delivering first batch of Jamila North Coast chalets to Egypt's National Football Team players",
     excerpt:
       "J Communities has launched the first phase of handing over hotel-style chalets to Egypt's national football team, honoring players and coaching staff for their outstanding performances.",
     publishedAt: "2026-08-01",
@@ -29,7 +45,8 @@ export const newsArticles: NewsArticle[] = [
   },
   {
     slug: "profayly-en-jamila-handover",
-    title: "J Communities commences handover of complimentary chalets to Egypt's National Football Team heroes at Jamila North Coast",
+    title:
+      "J Communities commences handover of complimentary chalets to Egypt's National Football Team heroes at Jamila North Coast",
     excerpt:
       "Eng. Girgis Youssef, Chairman of J Communities, confirmed the first batch of chalets has begun handover at company headquarters, with remaining units scheduled at Jamila on the North Coast.",
     publishedAt: "2026-08-01",
@@ -190,25 +207,34 @@ export const newsArticles: NewsArticle[] = [
   },
 ];
 
-const sortedArticles = [...newsArticles].sort(
-  (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
-);
-
-export function getNewsArticles(): NewsArticle[] {
-  return sortedArticles;
+function bodyFor(article) {
+  if (article.category === "social") {
+    return article.language === "ar"
+      ? `${article.excerpt}\n\nتابع J Communities على منصات التواصل الاجتماعي للاطلاع على آخر المستجدات حول مشروع Jamila North Coast ومبادرات الشركة المجتمعية.`
+      : `${article.excerpt}\n\nFollow J Communities on social media for the latest on Jamila North Coast and our community initiatives across Egypt.`;
+  }
+  if (article.featured) {
+    return article.language === "ar" ? AR_BODY_FULL : EN_BODY_FULL;
+  }
+  if (article.language === "ar") {
+    return `${article.excerpt}\n\n${AR_BODY_FULL}`;
+  }
+  return `${article.excerpt}\n\n${EN_BODY_FULL}`;
 }
 
-export function getNewsBySlug(slug: string | undefined): NewsArticle | undefined {
-  if (!slug) return undefined;
-  return newsArticles.find((article) => article.slug === slug);
-}
-
-export function getFeaturedNews(limit = 3): NewsArticle[] {
-  const featured = sortedArticles.filter((article) => article.featured);
-  if (featured.length >= limit) return featured.slice(0, limit);
-  return sortedArticles.slice(0, limit);
-}
-
-export function getRelatedNews(currentSlug: string, limit = 3): NewsArticle[] {
-  return sortedArticles.filter((article) => article.slug !== currentSlug).slice(0, limit);
+export function getNewsSeedRecords() {
+  return articles.map((article, index) => ({
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.excerpt,
+    body: bodyFor(article),
+    publishedAt: new Date(`${article.publishedAt}T12:00:00.000Z`),
+    source: article.source,
+    externalUrl: article.externalUrl ?? null,
+    category: article.category,
+    language: article.language,
+    featured: Boolean(article.featured),
+    published: true,
+    coverImageUrl: COVERS[index % COVERS.length],
+  }));
 }

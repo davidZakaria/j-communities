@@ -83,6 +83,9 @@ export function AdminDashboardPage() {
             <h1 className="font-serif text-xl sm:text-2xl">Leads</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <Link to="/admin/news" className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 hover:text-neutral-900">
+              News
+            </Link>
             <a
               href={exportLeadsCsv(filters)}
               className="border border-neutral-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900"

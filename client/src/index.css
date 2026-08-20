@@ -276,6 +276,19 @@
   outline-offset: 2px;
 }
 
+.j-news-prose {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.j-news-prose p {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+  color: #313e44;
+}
+
 /* Editorial stills: punchy monochrome */
 .j-img-editorial {
   @apply grayscale contrast-[1.15] brightness-[0.92] saturate-0;

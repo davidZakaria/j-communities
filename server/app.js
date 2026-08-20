@@ -4,7 +4,9 @@ import session from "express-session";
 import path from "path";
 import { config } from "./config.js";
 import { adminRouter } from "./routes/admin.js";
+import { adminNewsRouter } from "./routes/adminNews.js";
 import { leadsRouter } from "./routes/leads.js";
+import { newsRouter } from "./routes/news.js";
 import { apiSecurityHeaders, noStoreApi } from "./middleware/security.js";
 
 export function createApp() {
@@ -22,7 +24,7 @@ export function createApp() {
 
   app.use(apiSecurityHeaders);
 
-  app.use(express.json({ limit: "16kb" }));
+  app.use(express.json({ limit: "256kb" }));
 
   app.use(
     session({
@@ -41,7 +43,9 @@ export function createApp() {
   );
 
   app.use("/api/admin", noStoreApi, adminRouter);
+  app.use("/api/admin/news", noStoreApi, adminNewsRouter);
   app.use("/api/leads", noStoreApi, leadsRouter);
+  app.use("/api/news", newsRouter);
 
   app.use(
     express.static(config.distDir, {

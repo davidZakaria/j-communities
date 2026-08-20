@@ -20,6 +20,39 @@ enum LeadStatus {
   spam
 }
 
+enum NewsCategory {
+  press
+  social
+}
+
+enum NewsLanguage {
+  en
+  ar
+}
+
+model NewsArticle {
+  id            String       @id @default(cuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  slug          String       @unique
+  title         String
+  excerpt       String
+  body          String
+  publishedAt   DateTime
+  source        String
+  externalUrl   String?
+  category      NewsCategory
+  language      NewsLanguage
+  featured      Boolean      @default(false)
+  published     Boolean      @default(true)
+  coverImageUrl String?
+
+  @@index([publishedAt])
+  @@index([published])
+  @@index([featured])
+  @@index([category])
+}
+
 model Lead {
   id          String     @id @default(cuid())
   createdAt   DateTime   @default(now())

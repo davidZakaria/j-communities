@@ -10,6 +10,7 @@ import { LenisProvider } from "./features/motion/LenisProvider";
 import { ScrollProgressProvider } from "./features/motion/ScrollProgressContext";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
+import { AdminNewsPage } from "./pages/admin/AdminNewsPage";
 import { HomePage } from "./pages/HomePage";
 import { NewsDetailPage } from "./pages/NewsDetailPage";
 import { NewsListPage } from "./pages/NewsListPage";
@@ -58,6 +59,14 @@ function AdminApp() {
   return (
     <Routes>
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route
+        path="/admin/news"
+        element={
+          <AdminGuard>
+            <AdminNewsPage />
+          </AdminGuard>
+        }
+      />
       <Route
         path="/admin"
         element={

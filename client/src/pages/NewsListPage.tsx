@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { COPY } from "../content/siteCopy";
 import { site } from "../config/site";
 import { LF_TYPE } from "../config/lookFeel";
-import { getNewsArticles, type NewsCategory } from "../data/news";
+import { fetchPublicNews } from "../features/news/api";
+import type { NewsCategory, NewsListItem } from "../features/news/types";
 import { Footer } from "../components/Footer";
 import { GrowSection } from "../components/GrowSection";
 import { LookFeelCanvas } from "../components/LookFeelCanvas";
@@ -20,6 +21,9 @@ const filters: { id: Filter; label: string }[] = [
 
 export function NewsListPage() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [articles, setArticles] = useState<NewsListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = `${COPY.news.title} · ${site.defaultTitle}`;
@@ -27,13 +31,28 @@ export function NewsListPage() {
       document.title = site.defaultTitle;
     };
   }, []);
-  const articles = useMemo(() => getNewsArticles(), []);
-  const visible = useMemo(
-    () => (filter === "all" ? articles : articles.filter((article) => article.category === filter)),
-    [articles, filter],
-  );
-  const featured = visible.filter((article) => article.featured);
-  const rest = visible.filter((article) => !article.featured);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetchPublicNews({ category: filter === "all" ? undefined : filter })
+      .then((res) => {
+        if (!cancelled) setArticles(res.articles);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load news.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [filter]);
+
+  const hero = useMemo(() => articles.find((article) => article.featured) ?? articles[0], [articles]);
+  const rest = useMemo(() => articles.filter((article) => article.slug !== hero?.slug), [articles, hero]);
 
   return (
     <main id="main-content" className="lf-canvas-clip bg-j-black">
@@ -69,47 +88,59 @@ export function NewsListPage() {
           </GrowSection>
         </section>
 
-        {featured.length > 0 ? (
-          <section className="border-b border-j-charcoal/10 bg-j-footer px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-14 xl:px-20">
-            <GrowSection>
-              <h2 className={`mb-8 text-j-charcoal ${LF_TYPE.footerColTitle}`}>{COPY.news.featured}</h2>
-            </GrowSection>
-            <ul className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {featured.map((article) => (
-                <GrowSection key={article.slug}>
-                  <li>
-                    <NewsCard article={article} featured />
-                  </li>
-                </GrowSection>
-              ))}
-            </ul>
+        {error ? (
+          <section className="border-b border-red-200 bg-red-50 px-5 py-6 text-sm text-red-800 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+            {error}
           </section>
         ) : null}
 
-        <section className="bg-j-offwhite px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-14 xl:px-20 xl:pb-[72px]">
-          {rest.length > 0 ? (
-            <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {rest.map((article) => (
-                <GrowSection key={article.slug}>
-                  <li>
-                    <NewsCard article={article} />
-                  </li>
+        {loading ? (
+          <section className="bg-j-black px-5 py-12 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+            <div className="mx-auto max-w-[1200px] animate-pulse space-y-6">
+              <div className="aspect-[21/9] bg-j-charcoal/50" />
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div className="h-72 bg-j-charcoal/40" />
+                <div className="h-72 bg-j-charcoal/40" />
+                <div className="h-72 bg-j-charcoal/40" />
+              </div>
+            </div>
+          </section>
+        ) : (
+          <>
+            {hero ? (
+              <section className="border-b border-j-charcoal/10 bg-j-black px-5 py-10 sm:px-8 md:px-12 lg:px-16 lg:py-12 xl:px-20">
+                <GrowSection>
+                  <NewsCard article={hero} variant="hero" />
                 </GrowSection>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-center font-serif text-j-slate">No stories match this filter yet.</p>
-          )}
+              </section>
+            ) : null}
 
-          <GrowSection className="mt-12 border-t border-j-charcoal/10 pt-8 text-center">
-            <Link
-              to="/#projects"
-              className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-charcoal hover:text-j-slate"
-            >
-              Explore our projects
-            </Link>
-          </GrowSection>
-        </section>
+            <section className="bg-j-offwhite px-5 py-12 text-j-charcoal sm:px-8 md:px-12 lg:px-16 lg:py-14 xl:px-20 xl:pb-[72px]">
+              {rest.length > 0 ? (
+                <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  {rest.map((article) => (
+                    <GrowSection key={article.slug}>
+                      <li>
+                        <NewsCard article={article} variant={article.featured ? "featured" : "default"} />
+                      </li>
+                    </GrowSection>
+                  ))}
+                </ul>
+              ) : !hero ? (
+                <p className="text-center font-serif text-j-slate">No stories match this filter yet.</p>
+              ) : null}
+
+              <GrowSection className="mt-12 border-t border-j-charcoal/10 pt-8 text-center">
+                <Link
+                  to="/#projects"
+                  className="font-sans text-[10px] font-semibold uppercase tracking-[0.16em] text-j-charcoal hover:text-j-slate"
+                >
+                  Explore our projects
+                </Link>
+              </GrowSection>
+            </section>
+          </>
+        )}
 
         <Footer />
       </LookFeelCanvas>

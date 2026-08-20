@@ -84,3 +84,52 @@ export function exportLeadsCsv(filters: LeadFilters = {}): string {
   const qs = params.toString();
   return `${base}/leads.csv${qs ? `?${qs}` : ""}`;
 }
+
+const newsBase = "/api/admin/news";
+
+async function newsRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const method = init?.method?.toUpperCase() || "GET";
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...(init?.body ? { "Content-Type": "application/json" } : {}),
+  };
+
+  if (method !== "GET" && method !== "HEAD") {
+    const token = getAdminCsrfToken();
+    if (token) headers["X-CSRF-Token"] = token;
+  }
+
+  const res = await fetch(`${newsBase}${path}`, {
+    credentials: "include",
+    headers: { ...headers, ...(init?.headers as Record<string, string> | undefined) },
+    ...init,
+  });
+
+  const data = (await res.json().catch(() => null)) as { error?: string; csrfToken?: string } & T;
+  if (!res.ok) throw new Error(data?.error || "Request failed");
+  if (data && typeof data === "object" && "csrfToken" in data && data.csrfToken) {
+    setAdminCsrfToken(data.csrfToken);
+  }
+  return data;
+}
+
+export async function fetchAdminNews(): Promise<import("./types").AdminNewsResponse> {
+  return newsRequest("/");
+}
+
+export async function createAdminNewsArticle(
+  payload: Record<string, unknown>,
+): Promise<{ ok: boolean; article: import("./types").AdminNewsArticle }> {
+  return newsRequest("/", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function updateAdminNewsArticle(
+  id: string,
+  payload: Record<string, unknown>,
+): Promise<{ ok: boolean; article: import("./types").AdminNewsArticle }> {
+  return newsRequest(`/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
+}
+
+export async function deleteAdminNewsArticle(id: string): Promise<{ ok: boolean }> {
+  return newsRequest(`/${id}`, { method: "DELETE" });
+}
