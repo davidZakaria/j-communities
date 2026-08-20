@@ -15,7 +15,8 @@ export const site = {
   social: {
     facebook: "https://www.facebook.com/jcommunitiesofficial/",
     instagram: "https://www.instagram.com/jcommunities_/",
-    linkedin: "https://www.linkedin.com/company/j-communities/",
+    linkedin: "https://www.linkedin.com/company/jcommunities/",
+    youtube: "https://www.youtube.com/@jcommunities",
   },
   /** Used for og:image; absolute URL built at runtime in DocumentMeta. */
   ogImagePath: "/favicon.svg",

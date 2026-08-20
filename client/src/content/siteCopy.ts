@@ -100,8 +100,8 @@ export const COPY = {
     socialItems: [
       { label: "Facebook", href: "https://www.facebook.com/jcommunitiesofficial/" },
       { label: "Instagram", href: "https://www.instagram.com/jcommunities_/" },
-      { label: "YouTube", href: "https://www.youtube.com" },
-      { label: "LinkedIn", href: "https://www.linkedin.com" },
+      { label: "YouTube", href: "https://www.youtube.com/@jcommunities" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/jcommunities/" },
     ],
     email: "info@j-communities.com",
   },
