@@ -41,5 +41,20 @@ export interface LeadFilters {
   includeSpam?: boolean;
 }
 
+export interface LeadStats {
+  activeTotal: number;
+  spamTotal: number;
+  newTotal: number;
+  last7Days: number;
+  bySource: { popup: number; contact: number };
+  adsConversionEligible: number;
+  byProject: { projectSlug: string; count: number }[];
+}
+
+export interface LeadStatsResponse {
+  ok: boolean;
+  stats: LeadStats;
+}
+
 export const LEAD_STATUSES: LeadStatus[] = ["new", "contacted", "qualified", "closed", "spam"];
 export const LEAD_SOURCES: LeadSource[] = ["contact", "popup"];

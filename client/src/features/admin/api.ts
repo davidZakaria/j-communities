@@ -1,5 +1,5 @@
 import { getAdminCsrfToken, setAdminCsrfToken } from "./csrf";
-import type { Lead, LeadFilters, LeadsResponse } from "./types";
+import type { Lead, LeadFilters, LeadStatsResponse, LeadsResponse } from "./types";
 
 const base = "/api/admin";
 
@@ -63,6 +63,10 @@ export async function fetchLeads(filters: LeadFilters = {}): Promise<LeadsRespon
 
   const qs = params.toString();
   return request(`/leads${qs ? `?${qs}` : ""}`);
+}
+
+export async function fetchLeadStats(): Promise<LeadStatsResponse> {
+  return request("/stats");
 }
 
 export async function updateLead(
