@@ -349,6 +349,10 @@
   background-image: linear-gradient(180deg, rgba(26, 66, 132, 0.04) 0%, transparent 220px);
 }
 
+.j-news-teaser-grid > * {
+  min-width: 0;
+}
+
 .j-news-teaser-cta:focus-visible {
   outline: 2px solid #1a4284;
   outline-offset: 4px;

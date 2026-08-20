@@ -22,13 +22,13 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
 
   if (variant === "teaserFeatured") {
     return (
-      <article dir={rtl ? "rtl" : "ltr"} className="group flex h-full w-full flex-col">
+      <article dir={rtl ? "rtl" : "ltr"} className="group flex h-full w-full min-w-0 flex-col overflow-hidden">
         <Link to={`/news/${article.slug}`} className="block overflow-hidden text-inherit no-underline">
-          <div className="relative aspect-[16/10] overflow-hidden">
+          <div className="relative aspect-[16/10] max-h-[340px] w-full overflow-hidden sm:max-h-[380px]">
             <img
               src={cover}
               alt=""
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
               loading="eager"
             />
             <div className="absolute inset-x-0 top-0 h-1 bg-jamila-lemon" aria-hidden />
@@ -78,17 +78,17 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
 
   if (variant === "teaserSide") {
     return (
-      <article className="group flex h-full min-h-[180px] transition-colors hover:bg-j-black/[0.02]">
+      <article className="group h-full min-h-[180px] w-full min-w-0 overflow-hidden transition-colors hover:bg-j-black/[0.02]">
         <Link
           to={`/news/${article.slug}`}
           dir="ltr"
-          className="grid h-full w-full grid-cols-[108px_minmax(0,1fr)] text-inherit no-underline sm:grid-cols-[132px_minmax(0,1fr)]"
+          className="flex h-full min-h-[180px] w-full min-w-0 text-inherit no-underline"
         >
-          <div className="relative h-full min-h-[180px] overflow-hidden">
+          <div className="relative w-[120px] shrink-0 overflow-hidden bg-j-charcoal/5 sm:w-[140px]">
             <img
               src={cover}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+              className="h-full min-h-[180px] w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.05]"
               loading="lazy"
             />
             <div className="absolute inset-y-0 right-0 w-0.5 bg-jamila-lemon opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
@@ -96,7 +96,7 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
 
           <div
             dir={rtl ? "rtl" : "ltr"}
-            className="flex min-w-0 flex-col justify-center border-l border-j-charcoal/8 px-4 py-5 sm:px-5"
+            className="flex min-w-0 flex-1 flex-col justify-center border-l border-j-charcoal/8 px-4 py-5 sm:px-5"
           >
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <NewsCategoryBadge category={article.category} />
