@@ -85,7 +85,7 @@ export function NewsTeaser() {
           ) : null}
           <div className="grid min-w-0 gap-px bg-j-slate/15 lg:col-span-5 lg:grid-rows-2 lg:self-stretch">
             {side.map((article) => (
-              <div key={article.slug} className="min-h-[180px] min-w-0 overflow-hidden bg-j-offwhite lg:min-h-0">
+              <div key={article.slug} className="min-w-0 overflow-hidden bg-j-offwhite">
                 <NewsCard article={article} variant="teaserSide" />
               </div>
             ))}

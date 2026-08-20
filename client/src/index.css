@@ -353,6 +353,11 @@
   min-width: 0;
 }
 
+.j-news-teaser-grid img {
+  display: block;
+  max-width: 100%;
+}
+
 .j-news-teaser-cta:focus-visible {
   outline: 2px solid #1a4284;
   outline-offset: 4px;

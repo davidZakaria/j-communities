@@ -24,16 +24,16 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
     return (
       <article dir={rtl ? "rtl" : "ltr"} className="group flex h-full w-full min-w-0 flex-col overflow-hidden">
         <Link to={`/news/${article.slug}`} className="block overflow-hidden text-inherit no-underline">
-          <div className="relative aspect-[16/10] max-h-[340px] w-full overflow-hidden sm:max-h-[380px]">
+          <div className="relative aspect-[16/10] w-full overflow-hidden bg-j-charcoal/5">
             <img
               src={cover}
               alt=""
-              className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+              className="absolute inset-0 block h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
               loading="eager"
             />
-            <div className="absolute inset-x-0 top-0 h-1 bg-jamila-lemon" aria-hidden />
-            <div className="absolute inset-0 bg-gradient-to-t from-j-black/55 via-j-black/10 to-transparent opacity-90" />
-            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1 bg-jamila-lemon" aria-hidden />
+            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-j-black/55 via-j-black/10 to-transparent opacity-90" />
+            <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-6">
               <NewsCategoryBadge category={article.category} />
             </div>
           </div>
@@ -78,25 +78,21 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
 
   if (variant === "teaserSide") {
     return (
-      <article className="group h-full min-h-[180px] w-full min-w-0 overflow-hidden transition-colors hover:bg-j-black/[0.02]">
-        <Link
-          to={`/news/${article.slug}`}
-          dir="ltr"
-          className="flex h-full min-h-[180px] w-full min-w-0 text-inherit no-underline"
-        >
-          <div className="relative w-[120px] shrink-0 overflow-hidden bg-j-charcoal/5 sm:w-[140px]">
+      <article className="group flex h-full w-full min-w-0 flex-col overflow-hidden transition-colors hover:bg-j-black/[0.02]">
+        <Link to={`/news/${article.slug}`} className="flex h-full min-w-0 flex-col text-inherit no-underline">
+          <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-j-charcoal/5">
             <img
               src={cover}
               alt=""
-              className="h-full min-h-[180px] w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.05]"
+              className="absolute inset-0 block h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
               loading="lazy"
             />
-            <div className="absolute inset-y-0 right-0 w-0.5 bg-jamila-lemon opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-jamila-lemon" aria-hidden />
           </div>
 
           <div
             dir={rtl ? "rtl" : "ltr"}
-            className="flex min-w-0 flex-1 flex-col justify-center border-l border-j-charcoal/8 px-4 py-5 sm:px-5"
+            className="flex min-h-0 flex-1 flex-col justify-center border-t border-j-charcoal/8 px-4 py-4 sm:px-5 sm:py-5"
           >
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <NewsCategoryBadge category={article.category} />
@@ -108,7 +104,7 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
               {formatNewsDate(article.publishedAt)} · {article.source}
             </p>
             <h3
-              className={`mt-2 line-clamp-3 font-serif text-[1rem] font-medium leading-snug tracking-[0.02em] text-j-charcoal group-hover:text-jamila-blue sm:text-[1.05rem] ${
+              className={`mt-2 line-clamp-2 font-serif text-[0.95rem] font-medium leading-snug tracking-[0.02em] text-j-charcoal group-hover:text-jamila-blue sm:line-clamp-3 sm:text-[1.05rem] ${
                 rtl ? "text-right" : "text-left"
               }`}
             >
