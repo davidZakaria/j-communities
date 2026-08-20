@@ -1,13 +1,6 @@
-const COVERS = [
-  "/assets/projects/jamila/hero.webp",
-  "/assets/projects/jamila/gallery-9.webp",
-  "/assets/projects/jamila/gallery-2.webp",
-  "/assets/projects/jamila/gallery-5.webp",
-  "/assets/projects/jamila/gallery-7.webp",
-  "/assets/projects/jamila/gallery-1.webp",
-  "/assets/projects/jura/hero.webp",
-  "/assets/projects/jamila/gallery-8.webp",
-];
+import coverManifest from "./newsCoverManifest.json" with { type: "json" };
+
+const DEFAULT_COVER = "/assets/projects/jamila/hero.webp";
 
 export const EN_BODY_FULL = `J Communities has launched the first phase of handing over hotel-style chalets to players of Egypt's national football team. The initiative honors the team's players and coaching staff in recognition of their outstanding performances and remarkable efforts, which brought joy to millions of Egyptians and marked a national achievement worthy of celebration.
 
@@ -77,7 +70,7 @@ const articles = [
     publishedAt: "2026-08-01",
     source: "أخبار اليوم",
     externalUrl:
-      "https://akhbarelyom.com/news/NewDetails/4858519/1/%D8%B4%D8%B1%D9%83%D8%A9-%C2%ABJ-Communities%C2%BB-%D8%AA%D8%A8%D8%AF%D8%A3-%D8%A3%D9%88%D9%84%D9%89-%D8%AA%D8%B3%D9%84%D9%8A%D9%85%D8%A7%D8%AA-%D8%A7%D9%84%D8%B4%D8%A7%D9%84%D9%8A%D9%87%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%87%D8%AF%D8%A7",
+      "https://akhbarelyom.com/news/newdetails/4858519/1/%D8%B4%D8%B1%D9%83%D8%A9-J-Communities-%D8%AA%D8%A8%D8%AF%D8%A3-%D8%A3%D9%88%D9%84%D9%89-%D8%AA%D8%B3%D9%84%D9%8A%D9%85%D8%A7%D8%AA-%D8%A7%D9%84%D8%B4%D8%A7%D9%84%D9%8A%D9%87%D8%A7%D8%AA-%D8%A7%D9%84%D9%85%D9%87%D8%AF%D8%A7%D8%A9-%D9%84%D8%A3%D8%A8%D8%B7%D8%A7%D9%84-%D8%A7%D9%84%D9%85%D9%86%D8%AA%D8%AE%D8%A8-%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A-%D9%84%D9%83%D8%B1%D8%A9-%D8%A7%D9%84%D9%82%D8%AF%D9%85-%D8%A8%D9%85%D8%B4%D8%B1%D9%88%D8%B9-jamila-%D8%A8%D8%A7%D9%84%D8%B3%D8%A7%D8%AD%D9%84-%D8%A7%D9%84%D8%B4%D9%85%D8%A7%D9%84%D9%8A",
     category: "press",
     language: "ar",
   },
@@ -223,7 +216,7 @@ function bodyFor(article) {
 }
 
 export function getNewsSeedRecords() {
-  return articles.map((article, index) => ({
+  return articles.map((article) => ({
     slug: article.slug,
     title: article.title,
     excerpt: article.excerpt,
@@ -235,6 +228,6 @@ export function getNewsSeedRecords() {
     language: article.language,
     featured: Boolean(article.featured),
     published: true,
-    coverImageUrl: COVERS[index % COVERS.length],
+    coverImageUrl: coverManifest[article.slug] || DEFAULT_COVER,
   }));
 }

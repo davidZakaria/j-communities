@@ -16,6 +16,7 @@
     "db:push": "prisma db push",
     "deploy:vps": "prisma migrate deploy && prisma generate && node scripts/seed-news.js && npm run build",
     "db:seed-news": "node scripts/seed-news.js",
+    "db:fetch-news-covers": "node scripts/fetch-news-covers.js",
     "admin:hash-password": "node scripts/hash-password.js",
     "admin:set-password": "node scripts/set-admin-password.js",
     "admin:verify-env": "node scripts/verify-admin-env.js",
