@@ -11,12 +11,19 @@ import { ScrollProgressProvider } from "./features/motion/ScrollProgressContext"
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { HomePage } from "./pages/HomePage";
+import { NewsDetailPage } from "./pages/NewsDetailPage";
+import { NewsListPage } from "./pages/NewsListPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProjectPage } from "./pages/ProjectPage";
 
 function ProjectPageRoute() {
   const { pathname } = useLocation();
   return <ProjectPage key={pathname} />;
+}
+
+function NewsDetailPageRoute() {
+  const { pathname } = useLocation();
+  return <NewsDetailPage key={pathname} />;
 }
 
 function MarketingApp() {
@@ -34,6 +41,8 @@ function MarketingApp() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/projects/jamila-north-coast" element={<Navigate to="/projects/jamila" replace />} />
                 <Route path="/projects/:slug" element={<ProjectPageRoute />} />
+                <Route path="/news" element={<NewsListPage />} />
+                <Route path="/news/:slug" element={<NewsDetailPageRoute />} />
                 <Route path="/not-found" element={<NotFoundPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

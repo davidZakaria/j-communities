@@ -43,4 +43,13 @@ describe("App render", () => {
     );
     expect(screen.queryByText(/Something went wrong/i)).not.toBeInTheDocument();
   });
+
+  it("renders news listing without crashing", () => {
+    render(
+      <MemoryRouter initialEntries={["/news"]}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText(/Latest from J Communities/i)).toBeInTheDocument();
+  });
 });

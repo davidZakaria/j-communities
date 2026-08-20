@@ -15,7 +15,7 @@ export const COPY = {
       { label: "About us", to: "/#about-more" as const },
       { label: "Projects", to: "/#projects" as const },
       { label: "Lifestyle", to: "/#lifestyle" as const },
-      { label: "News", to: "/#footer-contact" as const },
+      { label: "News", to: "/news" as const },
       { label: "Contact", to: "/#footer-contact" as const },
     ],
     labelsLeft: ["It starts with J", "Purpose into everything", "UK"],
@@ -82,6 +82,15 @@ export const COPY = {
       "Two flagship coastal destinations — Jura Sokhna on the Red Sea and Jamila on the North Coast — each with its own character, amenities, and immersive 3D experience.",
   },
 
+  news: {
+    kicker: "News & press",
+    title: "Latest from J Communities",
+    lead:
+      "Press coverage and social updates on our projects, initiatives, and community milestones across Egypt.",
+    featured: "Featured",
+    viewAll: "View all news",
+  },
+
   footer: {
     journey: "Start your journey today",
     quickLinks: "Quick links",
@@ -95,7 +104,7 @@ export const COPY = {
       { label: "About us", to: "/#about-more" as const },
       { label: "Projects", to: "/#projects" as const },
       { label: "Lifestyle", to: "/#lifestyle" as const },
-      { label: "News", to: "/#footer-contact" as const },
+      { label: "News", to: "/news" as const },
     ],
     socialItems: [
       { label: "Facebook", href: "https://www.facebook.com/jcommunitiesofficial/" },
