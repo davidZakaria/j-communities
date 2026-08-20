@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
     cb(null, config.uploadsNewsDir);
   },
   filename(_req, file, cb) {
-    const ext = EXT_BY_MIME[file.mimetype] ?? path.extname(file.originalname).toLowerCase() || ".jpg";
+    const ext = EXT_BY_MIME[file.mimetype] ?? (path.extname(file.originalname).toLowerCase() || ".jpg");
     cb(null, `${randomUUID()}${ext}`);
   },
 });
