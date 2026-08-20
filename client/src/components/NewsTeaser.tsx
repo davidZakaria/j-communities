@@ -77,15 +77,15 @@ export function NewsTeaser() {
       ) : articles.length === 0 ? (
         <p className="font-serif text-j-slate">News will appear here soon.</p>
       ) : (
-        <div className="grid gap-px bg-j-slate/15 lg:grid-cols-12">
+        <div className="grid gap-px bg-j-slate/15 lg:grid-cols-12 lg:items-stretch">
           {hero ? (
-            <GrowSection className="bg-j-offwhite lg:col-span-7">
+            <GrowSection className="flex bg-j-offwhite lg:col-span-7">
               <NewsCard article={hero} variant="teaserFeatured" />
             </GrowSection>
           ) : null}
-          <div className="flex flex-col gap-px bg-j-slate/15 lg:col-span-5">
+          <div className="grid gap-px bg-j-slate/15 lg:col-span-5 lg:grid-rows-2 lg:self-stretch">
             {side.map((article) => (
-              <GrowSection key={article.slug} className="flex-1 bg-j-offwhite">
+              <GrowSection key={article.slug} className="flex min-h-[180px] bg-j-offwhite lg:min-h-0">
                 <NewsCard article={article} variant="teaserSide" />
               </GrowSection>
             ))}

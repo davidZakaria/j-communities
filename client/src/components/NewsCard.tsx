@@ -22,7 +22,7 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
 
   if (variant === "teaserFeatured") {
     return (
-      <article dir={rtl ? "rtl" : "ltr"} className="group flex h-full flex-col">
+      <article dir={rtl ? "rtl" : "ltr"} className="group flex h-full w-full flex-col">
         <Link to={`/news/${article.slug}`} className="block overflow-hidden text-inherit no-underline">
           <div className="relative aspect-[16/10] overflow-hidden">
             <img
@@ -78,25 +78,26 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
 
   if (variant === "teaserSide") {
     return (
-      <article
-        dir={rtl ? "rtl" : "ltr"}
-        className="group flex h-full min-h-[168px] transition-colors hover:bg-j-black/[0.02]"
-      >
+      <article className="group flex h-full min-h-[180px] transition-colors hover:bg-j-black/[0.02]">
         <Link
           to={`/news/${article.slug}`}
-          className="grid h-full w-full grid-cols-[108px_1fr] text-inherit no-underline sm:grid-cols-[132px_1fr]"
+          dir="ltr"
+          className="grid h-full w-full grid-cols-[108px_minmax(0,1fr)] text-inherit no-underline sm:grid-cols-[132px_minmax(0,1fr)]"
         >
-          <div className="relative overflow-hidden">
+          <div className="relative h-full min-h-[180px] overflow-hidden">
             <img
               src={cover}
               alt=""
-              className="j-img-editorial h-full min-h-[168px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+              className="j-img-editorial absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
               loading="lazy"
             />
-            <div className="absolute inset-y-0 end-0 w-0.5 bg-jamila-lemon opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
+            <div className="absolute inset-y-0 right-0 w-0.5 bg-jamila-lemon opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
           </div>
 
-          <div className="flex flex-col justify-center border-s border-j-charcoal/8 px-4 py-5 sm:px-5">
+          <div
+            dir={rtl ? "rtl" : "ltr"}
+            className="flex min-w-0 flex-col justify-center border-l border-j-charcoal/8 px-4 py-5 sm:px-5"
+          >
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <NewsCategoryBadge category={article.category} />
               {article.language === "ar" ? (
@@ -106,7 +107,11 @@ export function NewsCard({ article, variant = "default" }: NewsCardProps) {
             <p className="font-sans text-[10px] uppercase tracking-[0.14em] text-j-slate">
               {formatNewsDate(article.publishedAt)} · {article.source}
             </p>
-            <h3 className="mt-2 line-clamp-3 font-serif text-[1rem] font-medium leading-snug tracking-[0.02em] text-j-charcoal group-hover:text-jamila-blue sm:text-[1.05rem]">
+            <h3
+              className={`mt-2 line-clamp-3 font-serif text-[1rem] font-medium leading-snug tracking-[0.02em] text-j-charcoal group-hover:text-jamila-blue sm:text-[1.05rem] ${
+                rtl ? "text-right" : "text-left"
+              }`}
+            >
               {article.title}
             </h3>
           </div>
