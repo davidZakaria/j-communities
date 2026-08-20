@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { GOOGLE_ADS_ID, isGoogleAdsConversionEnabled } from "../../config/googleAds";
-import { adminLogout, exportLeadsCsv, fetchLeadStats, fetchLeads, updateLead } from "../../features/admin/api";
-import { LEAD_SOURCES, LEAD_STATUSES, type Lead, type LeadFilters, type LeadStats, type LeadStatus } from "../../features/admin/types";
+import { adminLogout, exportLeadsCsv, fetchLeads, updateLead } from "../../features/admin/api";
+import { LEAD_SOURCES, LEAD_STATUSES, type Lead, type LeadFilters, type LeadStatus } from "../../features/admin/types";
 import { projects } from "../../data/projects";
 
 function formatDate(iso: string) {
@@ -12,23 +11,8 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
-function projectNameForSlug(slug: string) {
-  return projects.find((p) => p.slug === slug)?.name ?? slug;
-}
-
-function StatCard({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
-  return (
-    <div className="border border-neutral-300 bg-white px-4 py-3">
-      <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-500">{label}</p>
-      <p className="mt-1 font-serif text-2xl text-neutral-900">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-neutral-500">{hint}</p> : null}
-    </div>
-  );
-}
-
 export function AdminDashboardPage() {
   const [filters, setFilters] = useState<LeadFilters>({ page: 1, limit: 50, includeSpam: false });
-  const [stats, setStats] = useState<LeadStats | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(1);
@@ -57,22 +41,9 @@ export function AdminDashboardPage() {
     }
   }, [filters]);
 
-  const loadStats = useCallback(async () => {
-    try {
-      const res = await fetchLeadStats();
-      setStats(res.stats);
-    } catch {
-      /* stats are supplementary; table error handling is enough */
-    }
-  }, []);
-
   useEffect(() => {
     loadLeads();
   }, [loadLeads]);
-
-  useEffect(() => {
-    loadStats();
-  }, [loadStats]);
 
   async function handleLogout() {
     await adminLogout();
@@ -84,7 +55,6 @@ export function AdminDashboardPage() {
     try {
       const res = await updateLead(lead.id, { status });
       setLeads((prev) => prev.map((item) => (item.id === lead.id ? res.lead : item)));
-      loadStats();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update status");
     } finally {
@@ -134,53 +104,6 @@ export function AdminDashboardPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        {stats ? (
-          <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <StatCard label="Active leads" value={stats.activeTotal} />
-            <StatCard label="New" value={stats.newTotal} hint="Awaiting contact" />
-            <StatCard label="Last 7 days" value={stats.last7Days} />
-            <StatCard label="Popup" value={stats.bySource.popup} />
-            <StatCard label="Contact form" value={stats.bySource.contact} />
-          </div>
-        ) : null}
-
-        <div className="mb-4 border border-neutral-300 bg-white p-4">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-500">Google Ads</p>
-              <p className="mt-1 text-sm text-neutral-800">
-                Tag <span className="font-mono text-xs">{GOOGLE_ADS_ID}</span>
-                {" · "}
-                Conversion on successful lead submit
-              </p>
-              <p className="mt-1 text-xs text-neutral-500">
-                {isGoogleAdsConversionEnabled
-                  ? "Conversion label is configured in the site build."
-                  : "Set VITE_GOOGLE_ADS_CONVERSION_SEND_TO in client/.env and rebuild to enable conversion events."}
-              </p>
-            </div>
-            {stats ? (
-              <div className="text-right">
-                <p className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">Conversion-eligible leads</p>
-                <p className="font-serif text-2xl text-neutral-900">{stats.adsConversionEligible}</p>
-                <p className="text-xs text-neutral-500">Non-spam leads; new submits fire a Google Ads conversion</p>
-              </div>
-            ) : null}
-          </div>
-          {stats && stats.byProject.length > 0 ? (
-            <div className="mt-4 border-t border-neutral-200 pt-4">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">Leads by project</p>
-              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-700">
-                {stats.byProject.map((row) => (
-                  <li key={row.projectSlug}>
-                    {projectNameForSlug(row.projectSlug)}: {row.count}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-
         <div className="mb-4 flex flex-wrap gap-3 border border-neutral-300 bg-white p-4">
           <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-neutral-500">
             Project
@@ -278,7 +201,6 @@ export function AdminDashboardPage() {
                   <th className="px-3 py-3">Phone</th>
                   <th className="px-3 py-3">Project</th>
                   <th className="px-3 py-3">Source</th>
-                  <th className="px-3 py-3">Ads</th>
                   <th className="px-3 py-3">Status</th>
                   <th className="px-3 py-3">Notes</th>
                 </tr>
@@ -308,15 +230,6 @@ export function AdminDashboardPage() {
                       ) : null}
                     </td>
                     <td className="px-3 py-3 capitalize">{lead.source}</td>
-                    <td className="px-3 py-3">
-                      {lead.status === "spam" ? (
-                        <span className="text-xs text-neutral-400">—</span>
-                      ) : (
-                        <span className="text-xs text-emerald-700" title="Google Ads conversion fires in the browser when this lead is submitted">
-                          Yes
-                        </span>
-                      )}
-                    </td>
                     <td className="px-3 py-3">
                       <select
                         value={lead.status}

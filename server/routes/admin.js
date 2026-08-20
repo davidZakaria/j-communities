@@ -77,49 +77,6 @@ adminRouter.get("/me", requireAdmin, (req, res) => {
   return res.json({ ok: true, username: req.session.adminUsername ?? "admin", csrfToken });
 });
 
-adminRouter.get("/stats", requireAdmin, async (req, res) => {
-  try {
-    const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const activeWhere = { status: { not: "spam" } };
-
-    const [activeTotal, spamTotal, newTotal, last7Days, popupTotal, contactTotal, byProject] =
-      await Promise.all([
-        prisma.lead.count({ where: activeWhere }),
-        prisma.lead.count({ where: { status: "spam" } }),
-        prisma.lead.count({ where: { ...activeWhere, status: "new" } }),
-        prisma.lead.count({ where: { ...activeWhere, createdAt: { gte: since7d } } }),
-        prisma.lead.count({ where: { ...activeWhere, source: "popup" } }),
-        prisma.lead.count({ where: { ...activeWhere, source: "contact" } }),
-        prisma.lead.groupBy({
-          by: ["projectSlug"],
-          where: activeWhere,
-          _count: { _all: true },
-          orderBy: { _count: { projectSlug: "desc" } },
-          take: 10,
-        }),
-      ]);
-
-    return res.json({
-      ok: true,
-      stats: {
-        activeTotal,
-        spamTotal,
-        newTotal,
-        last7Days,
-        bySource: { popup: popupTotal, contact: contactTotal },
-        adsConversionEligible: activeTotal,
-        byProject: byProject.map((row) => ({
-          projectSlug: row.projectSlug,
-          count: row._count._all,
-        })),
-      },
-    });
-  } catch (err) {
-    console.error("GET /api/admin/stats failed:", err?.message || err);
-    return res.status(500).json({ error: "Unable to load stats." });
-  }
-});
-
 adminRouter.get("/leads", requireAdmin, async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);

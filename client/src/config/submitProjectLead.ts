@@ -1,4 +1,3 @@
-import { trackLeadConversion } from "./googleAds";
 import { leadsApi } from "./leads";
 import { isTurnstileEnabled } from "./turnstile";
 import type { ProjectThemeId } from "../data/projects";
@@ -77,10 +76,5 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
 
   if (res.status !== 201) {
     throw new Error("Something went wrong. Please try again or email us.");
-  }
-
-  const data = (await res.json().catch(() => null)) as { trackConversion?: boolean } | null;
-  if (data?.trackConversion) {
-    trackLeadConversion(payload.source);
   }
 }

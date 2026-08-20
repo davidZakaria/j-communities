@@ -103,7 +103,7 @@ leadsRouter.post(
         notifyNewLead(lead).catch(() => {});
       }
 
-      return res.status(201).json({ ok: true, trackConversion: status !== "spam" });
+      return res.status(201).json({ ok: true });
     } catch (err) {
       console.error("POST /api/leads failed:", err?.code, err?.message || err);
       return res.status(500).json({ error: "Unable to save your inquiry. Please try again." });
