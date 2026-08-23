@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
-import { decryptLeadRecord, sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
+import { sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
+import { fetchLeadsForExport, leadsToCsv, leadsToXlsxBuffer } from "../lib/leadExport.js";
 import { encryptField } from "../lib/leadCrypto.js";
 import { issueCsrfToken, requireCsrf, requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitAdminLogin } from "../middleware/rateLimit.js";
@@ -32,12 +33,6 @@ function buildLeadFilters(query) {
   if (source && VALID_SOURCES.has(source)) spamHiddenWhere.source = source;
 
   return { where, includeSpam, spamHiddenWhere, statusFilter: status };
-}
-
-function escapeCsv(value) {
-  const s = String(value ?? "");
-  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
 }
 
 adminRouter.post("/login", rateLimitAdminLogin, requireSameOrigin, requireJsonContentType, async (req, res) => {
@@ -118,39 +113,32 @@ adminRouter.get("/leads", requireAdmin, async (req, res) => {
 adminRouter.get("/leads.csv", requireAdmin, async (req, res) => {
   try {
     const { where } = buildLeadFilters(req.query);
-
-    const leads = await prisma.lead.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: 5000,
-    });
-
-    const decrypted = leads.map(decryptLeadRecord);
-
-    const header = [
-      "id",
-      "createdAt",
-      "name",
-      "phone",
-      "message",
-      "projectName",
-      "projectSlug",
-      "themeId",
-      "source",
-      "status",
-      "notes",
-      "duplicateOfId",
-      "pageUrl",
-    ];
-
-    const rows = decrypted.map((lead) => header.map((key) => escapeCsv(lead[key])).join(","));
+    const leads = await fetchLeadsForExport(where);
 
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", 'attachment; filename="leads.csv"');
     res.setHeader("Cache-Control", "no-store");
-    return res.send([header.join(","), ...rows].join("\n"));
+    return res.send(leadsToCsv(leads));
   } catch (err) {
     console.error("GET /api/admin/leads.csv failed:", err?.message || err);
+    return res.status(500).json({ error: "Unable to export leads." });
+  }
+});
+
+adminRouter.get("/leads.xlsx", requireAdmin, async (req, res) => {
+  try {
+    const { where } = buildLeadFilters(req.query);
+    const leads = await fetchLeadsForExport(where);
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader("Content-Disposition", 'attachment; filename="leads.xlsx"');
+    res.setHeader("Cache-Control", "no-store");
+    return res.send(leadsToXlsxBuffer(leads));
+  } catch (err) {
+    console.error("GET /api/admin/leads.xlsx failed:", err?.message || err);
     return res.status(500).json({ error: "Unable to export leads." });
   }
 });

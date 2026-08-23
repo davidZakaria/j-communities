@@ -75,14 +75,23 @@ export async function updateLead(
   });
 }
 
-export function exportLeadsCsv(filters: LeadFilters = {}): string {
+export function buildLeadExportQuery(filters: LeadFilters = {}): string {
   const params = new URLSearchParams();
   if (filters.projectSlug) params.set("projectSlug", filters.projectSlug);
   if (filters.status) params.set("status", filters.status);
   if (filters.source) params.set("source", filters.source);
   if (filters.includeSpam) params.set("includeSpam", "1");
-  const qs = params.toString();
+  return params.toString();
+}
+
+export function exportLeadsCsv(filters: LeadFilters = {}): string {
+  const qs = buildLeadExportQuery(filters);
   return `${base}/leads.csv${qs ? `?${qs}` : ""}`;
+}
+
+export function exportLeadsXlsx(filters: LeadFilters = {}): string {
+  const qs = buildLeadExportQuery(filters);
+  return `${base}/leads.xlsx${qs ? `?${qs}` : ""}`;
 }
 
 const newsBase = "/api/admin/news";

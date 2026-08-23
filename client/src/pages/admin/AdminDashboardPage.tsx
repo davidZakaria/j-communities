@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { adminLogout, exportLeadsCsv, fetchLeads, updateLead } from "../../features/admin/api";
+import { adminLogout, exportLeadsCsv, exportLeadsXlsx, fetchLeads, updateLead } from "../../features/admin/api";
 import { LEAD_SOURCES, LEAD_STATUSES, type Lead, type LeadFilters, type LeadStatus } from "../../features/admin/types";
 import { projects } from "../../data/projects";
 
@@ -91,6 +91,12 @@ export function AdminDashboardPage() {
               className="border border-neutral-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900"
             >
               Export CSV
+            </a>
+            <a
+              href={exportLeadsXlsx(filters)}
+              className="border border-neutral-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900"
+            >
+              Export XLSX
             </a>
             <Link to="/" className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 hover:text-neutral-900">
               Site
