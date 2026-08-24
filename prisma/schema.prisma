@@ -71,9 +71,14 @@ model Lead {
   notes       String?
   phoneFingerprint String?
   duplicateOfId    String?
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
+  flashLeadSync    String     @default("pending")
 
   @@index([createdAt])
   @@index([projectSlug])
   @@index([status])
   @@index([phoneFingerprint, projectSlug])
+  @@index([flashLeadSync])
 }

@@ -1,5 +1,6 @@
 export type LeadStatus = "new" | "contacted" | "qualified" | "closed" | "spam";
 export type LeadSource = "contact" | "popup";
+export type FlashLeadSyncStatus = "pending" | "success" | "failed" | "skipped";
 
 export interface Lead {
   id: string;
@@ -18,6 +19,10 @@ export interface Lead {
   status: LeadStatus;
   notes: string | null;
   duplicateOfId: string | null;
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  flashLeadSync: FlashLeadSyncStatus;
 }
 
 export interface LeadsResponse {

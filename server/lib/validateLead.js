@@ -6,6 +6,12 @@ const MAX_PHONE = 20;
 const MAX_MESSAGE = 2000;
 const MAX_PROJECT = 120;
 const MAX_URL = 2048;
+const MAX_UTM = 120;
+
+function sanitizeUtm(value) {
+  const s = String(value ?? "").trim().slice(0, MAX_UTM);
+  return s || null;
+}
 
 const LEGACY_PHONE_PATTERN = /^[\d\s+\-().]{7,40}$/;
 
@@ -47,6 +53,9 @@ export function validateLeadInput(body) {
   const source = String(body?.source ?? "contact").trim();
   const pageUrl = body?.pageUrl ?? body?.page;
   const page = pageUrl != null ? String(pageUrl).trim() : "";
+  const utmSource = sanitizeUtm(body?.utmSource);
+  const utmMedium = sanitizeUtm(body?.utmMedium);
+  const utmCampaign = sanitizeUtm(body?.utmCampaign);
 
   if (!name || name.length > MAX_NAME) errors.push("Invalid name");
 
@@ -85,6 +94,9 @@ export function validateLeadInput(body) {
       themeId,
       source,
       pageUrl: page || null,
+      utmSource,
+      utmMedium,
+      utmCampaign,
     },
   };
 }

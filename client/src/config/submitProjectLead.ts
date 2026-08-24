@@ -1,6 +1,7 @@
 import { leadsApi } from "./leads";
 import { isTurnstileEnabled } from "./turnstile";
 import { validateLocalPhone } from "./countryDialCodes";
+import { getStoredUtm } from "../features/utm";
 import type { ProjectThemeId } from "../data/projects";
 
 export type LeadSource = "contact" | "popup";
@@ -56,6 +57,8 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
     throw new Error("Please complete the security check.");
   }
 
+  const utm = getStoredUtm();
+
   const body: Record<string, unknown> = {
     name,
     phone: phoneCheck.digits,
@@ -68,6 +71,9 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
     pageUrl: typeof window !== "undefined" ? window.location.href : "",
     formReadyAt: payload.formReadyAt,
     turnstileToken: turnstileToken || undefined,
+    utmSource: utm.utmSource,
+    utmMedium: utm.utmMedium,
+    utmCampaign: utm.utmCampaign,
   };
 
   for (const field of leadsApi.honeypotFields) {

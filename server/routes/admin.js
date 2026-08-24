@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../db.js";
 import { sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
 import { applyExportDateRange, fetchLeadsForExport, leadsToCsv, leadsToXlsxBuffer } from "../lib/leadExport.js";
+import { resolveFlashLeadSyncStatus } from "../lib/flashLeadSync.js";
 import { encryptField } from "../lib/leadCrypto.js";
 import { issueCsrfToken, requireCsrf, requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitAdminLogin } from "../middleware/rateLimit.js";
@@ -183,6 +184,42 @@ adminRouter.patch(
       }
       console.error("PATCH /api/admin/leads/:id failed:", err?.message || err);
       return res.status(500).json({ error: "Unable to update lead." });
+    }
+  },
+);
+
+adminRouter.post(
+  "/leads/:id/sync",
+  requireAdmin,
+  requireCsrf,
+  requireSameOrigin,
+  requireJsonContentType,
+  async (req, res) => {
+    try {
+      const id = String(req.params.id ?? "").trim();
+      if (!id || id.length > 40 || !/^[a-z0-9]+$/i.test(id)) {
+        return res.status(400).json({ error: "Invalid lead id." });
+      }
+
+      const lead = await prisma.lead.findUnique({ where: { id } });
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found." });
+      }
+
+      if (lead.status === "spam") {
+        return res.status(400).json({ error: "Spam leads are not synced to Flash Lead." });
+      }
+
+      const flashLeadSync = await resolveFlashLeadSyncStatus(lead, { status: lead.status });
+      const updated = await prisma.lead.update({
+        where: { id },
+        data: { flashLeadSync },
+      });
+
+      return res.json({ ok: true, lead: sanitizeLeadForAdmin(updated) });
+    } catch (err) {
+      console.error("POST /api/admin/leads/:id/sync failed:", err?.message || err);
+      return res.status(500).json({ error: "Unable to sync lead." });
     }
   },
 );

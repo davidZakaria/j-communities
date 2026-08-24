@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { adminLogout, exportLeadsCsv, exportLeadsXlsx, fetchLeads, updateLead } from "../../features/admin/api";
-import { LEAD_SOURCES, LEAD_STATUSES, type Lead, type LeadFilters, type LeadStatus } from "../../features/admin/types";
+import { adminLogout, exportLeadsCsv, exportLeadsXlsx, fetchLeads, retryLeadFlashSync, updateLead } from "../../features/admin/api";
+import { LEAD_SOURCES, LEAD_STATUSES, type FlashLeadSyncStatus, type Lead, type LeadFilters, type LeadStatus } from "../../features/admin/types";
 import { projects } from "../../data/projects";
 
 function formatDate(iso: string) {
@@ -9,6 +9,77 @@ function formatDate(iso: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(iso));
+}
+
+function FlashSyncIndicator({
+  status,
+  onRetry,
+  retrying,
+}: {
+  status: FlashLeadSyncStatus;
+  onRetry?: () => void;
+  retrying?: boolean;
+}) {
+  const dotClass =
+    status === "success"
+      ? "bg-green-500"
+      : status === "failed"
+        ? "bg-red-500"
+        : "bg-neutral-400";
+
+  const label =
+    status === "success"
+      ? "Synced to Flash Lead"
+      : status === "failed"
+        ? "Flash Lead sync failed"
+        : status === "skipped"
+          ? "Flash Lead sync skipped"
+          : "Flash Lead sync pending";
+
+  const canRetry = (status === "failed" || status === "pending") && onRetry;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-neutral-600">
+        <span className={`h-2 w-2 shrink-0 rounded-full ${dotClass}`} aria-hidden />
+        {label}
+      </span>
+      {canRetry ? (
+        <button
+          type="button"
+          onClick={onRetry}
+          disabled={retrying}
+          className="border border-[#1A4284]/30 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#1A4284] hover:border-[#1A4284] disabled:opacity-50"
+        >
+          {retrying ? "Retrying…" : "Retry"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function UtmBadges({ lead }: { lead: Lead }) {
+  const badges = [
+    lead.utmSource ? { key: "src", value: lead.utmSource } : null,
+    lead.utmMedium ? { key: "med", value: lead.utmMedium } : null,
+    lead.utmCampaign ? { key: "camp", value: lead.utmCampaign } : null,
+  ].filter(Boolean) as { key: string; value: string }[];
+
+  if (badges.length === 0) return null;
+
+  return (
+    <div className="mt-2 flex flex-wrap gap-1">
+      {badges.map((badge) => (
+        <span
+          key={badge.key}
+          className="inline-flex border border-[#1A4284]/20 bg-[#1A4284]/5 px-1.5 py-0.5 font-sans text-[9px] uppercase tracking-wider text-[#1A4284]"
+          title={`utm_${badge.key === "src" ? "source" : badge.key === "med" ? "medium" : "campaign"}: ${badge.value}`}
+        >
+          {badge.key}: {badge.value}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 export function AdminDashboardPage() {
@@ -77,6 +148,19 @@ export function AdminDashboardPage() {
       setLeads((prev) => prev.map((item) => (item.id === lead.id ? res.lead : item)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save notes");
+    } finally {
+      setSavingId(null);
+    }
+  }
+
+  async function handleRetrySync(lead: Lead) {
+    setSavingId(lead.id);
+    setError(null);
+    try {
+      const res = await retryLeadFlashSync(lead.id);
+      setLeads((prev) => prev.map((item) => (item.id === lead.id ? res.lead : item)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to sync lead");
     } finally {
       setSavingId(null);
     }
@@ -236,6 +320,7 @@ export function AdminDashboardPage() {
                   <th className="px-3 py-3">Phone</th>
                   <th className="px-3 py-3">Project</th>
                   <th className="px-3 py-3">Source</th>
+                  <th className="px-3 py-3">Flash sync</th>
                   <th className="px-3 py-3">Status</th>
                   <th className="px-3 py-3">Notes</th>
                 </tr>
@@ -264,7 +349,21 @@ export function AdminDashboardPage() {
                         </a>
                       ) : null}
                     </td>
-                    <td className="px-3 py-3 capitalize">{lead.source}</td>
+                    <td className="px-3 py-3 capitalize">
+                      {lead.source}
+                      <UtmBadges lead={lead} />
+                    </td>
+                    <td className="px-3 py-3">
+                      <FlashSyncIndicator
+                        status={lead.flashLeadSync}
+                        onRetry={
+                          lead.status !== "spam" && (lead.flashLeadSync === "failed" || lead.flashLeadSync === "pending")
+                            ? () => handleRetrySync(lead)
+                            : undefined
+                        }
+                        retrying={savingId === lead.id}
+                      />
+                    </td>
                     <td className="px-3 py-3">
                       <select
                         value={lead.status}

@@ -75,6 +75,13 @@ export async function updateLead(
   });
 }
 
+export async function retryLeadFlashSync(id: string): Promise<{ ok: boolean; lead: Lead }> {
+  return request(`/leads/${id}/sync`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
 export function buildLeadExportQuery(filters: LeadFilters = {}): string {
   const params = new URLSearchParams();
   if (filters.projectSlug) params.set("projectSlug", filters.projectSlug);

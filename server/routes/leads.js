@@ -3,7 +3,7 @@ import { prisma } from "../db.js";
 import { getClientIp, hashIp } from "../lib/ipHash.js";
 import { assessLeadSubmission, duplicateNote, findDuplicateLead, spamNote } from "../lib/leadDedup.js";
 import { encryptLeadPayload } from "../lib/leadData.js";
-import { encryptField } from "../lib/leadCrypto.js";
+import { resolveFlashLeadSyncStatus } from "../lib/flashLeadSync.js";
 import { notifyNewLead } from "../lib/notify.js";
 import { validateLeadInput } from "../lib/validateLead.js";
 import { verifyTurnstileToken, isTurnstileRequired, readTurnstileToken, turnstileActionForSource } from "../lib/turnstile.js";
@@ -87,6 +87,8 @@ leadsRouter.post(
         }
       }
 
+      const initialFlashLeadSync = status === "spam" ? "skipped" : "pending";
+
       const lead = await prisma.lead.create({
         data: encryptLeadPayload({
           ...parsed.data,
@@ -96,11 +98,28 @@ leadsRouter.post(
           phoneFingerprint: assessment.phoneFingerprint,
           userAgent: req.headers["user-agent"]?.slice(0, 512) ?? null,
           ipHash,
+          flashLeadSync: initialFlashLeadSync,
         }),
       });
 
       if (status !== "spam") {
         notifyNewLead(lead).catch(() => {});
+
+        try {
+          const flashLeadSync = await resolveFlashLeadSyncStatus(lead, { status });
+          if (flashLeadSync !== initialFlashLeadSync) {
+            await prisma.lead.update({
+              where: { id: lead.id },
+              data: { flashLeadSync },
+            });
+          }
+        } catch (err) {
+          console.warn("Flash Lead post-save sync failed:", err?.message || "unknown");
+          await prisma.lead.update({
+            where: { id: lead.id },
+            data: { flashLeadSync: "failed" },
+          }).catch(() => {});
+        }
       }
 
       return res.status(201).json({ ok: true });
