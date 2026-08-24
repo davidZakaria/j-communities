@@ -10,7 +10,7 @@ const TEAM = [
     username: "esraa",
     email: "esraa.sami@j-communities.com",
     passwordEnv: "TEAM_ADMIN_ESRAA_PASSWORD",
-    isSuperAdmin: true,
+    isSuperAdmin: false,
   },
   {
     username: "marketing",
