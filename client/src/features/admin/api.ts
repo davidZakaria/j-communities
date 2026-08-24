@@ -81,6 +81,8 @@ export function buildLeadExportQuery(filters: LeadFilters = {}): string {
   if (filters.status) params.set("status", filters.status);
   if (filters.source) params.set("source", filters.source);
   if (filters.includeSpam) params.set("includeSpam", "1");
+  if (filters.exportFrom) params.set("exportFrom", filters.exportFrom);
+  if (filters.exportTo) params.set("exportTo", filters.exportTo);
   return params.toString();
 }
 

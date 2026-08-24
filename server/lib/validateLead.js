@@ -1,19 +1,20 @@
 import { config } from "../config.js";
+import { validateLocalPhone } from "./phoneValidation.js";
 
-const MAX_NAME = 120;
-const MAX_PHONE = 40;
+export const MAX_NAME = 15;
+const MAX_PHONE = 20;
 const MAX_MESSAGE = 2000;
 const MAX_PROJECT = 120;
 const MAX_URL = 2048;
 
-const PHONE_PATTERN = /^[\d\s+\-().]{7,40}$/;
+const LEGACY_PHONE_PATTERN = /^[\d\s+\-().]{7,40}$/;
 
 function countDigits(value) {
   return (value.match(/\d/g) || []).length;
 }
 
-function isValidPhone(phone) {
-  if (!PHONE_PATTERN.test(phone)) return false;
+function isValidLegacyPhone(phone) {
+  if (!LEGACY_PHONE_PATTERN.test(phone)) return false;
   return countDigits(phone) >= 7;
 }
 
@@ -38,6 +39,7 @@ export function validateLeadInput(body) {
 
   const name = String(body?.name ?? "").trim();
   const phone = String(body?.phone ?? "").trim();
+  const countryCode = String(body?.countryCode ?? "").trim();
   const message = body?.message != null ? String(body.message).trim() : "";
   const projectName = String(body?.projectName ?? body?.project ?? "").trim();
   const projectSlug = String(body?.projectSlug ?? "").trim();
@@ -47,7 +49,20 @@ export function validateLeadInput(body) {
   const page = pageUrl != null ? String(pageUrl).trim() : "";
 
   if (!name || name.length > MAX_NAME) errors.push("Invalid name");
-  if (!isValidPhone(phone)) errors.push("Invalid phone");
+
+  let normalizedPhone = phone;
+  if (countryCode) {
+    const phoneCheck = validateLocalPhone(countryCode, phone);
+    if (!phoneCheck.ok) {
+      errors.push("Invalid phone");
+    } else {
+      normalizedPhone = phoneCheck.fullPhone;
+    }
+  } else if (!isValidLegacyPhone(phone)) {
+    errors.push("Invalid phone");
+  }
+
+  if (normalizedPhone.length > MAX_PHONE) errors.push("Invalid phone");
   if (message.length > MAX_MESSAGE) errors.push("Message too long");
   if (!projectName || projectName.length > MAX_PROJECT) errors.push("Invalid project");
   if (!config.allowedProjectSlugs.has(projectSlug)) errors.push("Invalid project");
@@ -63,7 +78,7 @@ export function validateLeadInput(body) {
     ok: true,
     data: {
       name,
-      phone,
+      phone: normalizedPhone,
       message: message || null,
       projectName,
       projectSlug,

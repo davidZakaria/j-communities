@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { readLeadHoneypots, submitProjectLead } from "../../config/submitProjectLead";
+import { readLeadHoneypots, submitProjectLead, MAX_LEAD_NAME } from "../../config/submitProjectLead";
+import { DEFAULT_COUNTRY_ISO } from "../../config/countryDialCodes";
+import { LeadPhoneField } from "./LeadPhoneField";
 import { isTurnstileEnabled, TURNSTILE_ACTIONS } from "../../config/turnstile";
 import { LeadFormHoneypots } from "./LeadFormHoneypots";
 import { LeadTurnstile, type LeadTurnstileHandle } from "./LeadTurnstile";
@@ -23,6 +25,7 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const handleTurnstileToken = useCallback((token: string | null) => setTurnstileToken(token), []);
   const [canSubmit, setCanSubmit] = useState(false);
+  const [countryIso, setCountryIso] = useState(DEFAULT_COUNTRY_ISO);
   const [state, setState] = useState<SubmitState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -45,6 +48,7 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
     const fd = new FormData(form);
     const name = String(fd.get("name") ?? "");
     const phone = String(fd.get("phone") ?? "");
+    const countryCode = String(fd.get("countryCode") ?? countryIso);
     const message = String(fd.get("message") ?? "");
 
     setState("submitting");
@@ -54,6 +58,7 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
       await submitProjectLead({
         name,
         phone,
+        countryCode,
         message,
         projectName,
         projectSlug,
@@ -100,24 +105,20 @@ export function ProjectContactForm({ section, projectName, projectSlug, themeId 
                 name="name"
                 required
                 autoComplete="name"
+                maxLength={MAX_LEAD_NAME}
                 disabled={state === "submitting"}
                 className="project-body-font w-full border border-[var(--project-border)] bg-[var(--project-bg)] px-4 py-3 text-sm text-[var(--project-text)] outline-none focus:border-[var(--project-accent)] disabled:opacity-60"
               />
+              <p className="project-body-font project-text-muted mt-1.5 text-[10px] tracking-wide">
+                Maximum {MAX_LEAD_NAME} characters.
+              </p>
             </div>
-            <div>
-              <label htmlFor="contact-phone" className="project-body-font project-text-muted mb-1.5 block text-[10px] uppercase tracking-[0.16em]">
-                Phone number
-              </label>
-              <input
-                id="contact-phone"
-                name="phone"
-                type="tel"
-                required
-                autoComplete="tel"
-                disabled={state === "submitting"}
-                className="project-body-font w-full border border-[var(--project-border)] bg-[var(--project-bg)] px-4 py-3 text-sm text-[var(--project-text)] outline-none focus:border-[var(--project-accent)] disabled:opacity-60"
-              />
-            </div>
+            <LeadPhoneField
+              id="contact-phone"
+              countryIso={countryIso}
+              onCountryChange={setCountryIso}
+              disabled={state === "submitting"}
+            />
             <div>
               <label htmlFor="contact-message" className="project-body-font project-text-muted mb-1.5 block text-[10px] uppercase tracking-[0.16em]">
                 Your message (optional)

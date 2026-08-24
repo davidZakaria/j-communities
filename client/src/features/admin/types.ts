@@ -39,6 +39,8 @@ export interface LeadFilters {
   status?: LeadStatus | "";
   source?: LeadSource | "";
   includeSpam?: boolean;
+  exportFrom?: string;
+  exportTo?: string;
 }
 
 export const LEAD_STATUSES: LeadStatus[] = ["new", "contacted", "qualified", "closed", "spam"];

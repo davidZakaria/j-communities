@@ -21,6 +21,14 @@ export function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
+  const [exportFrom, setExportFrom] = useState("");
+  const [exportTo, setExportTo] = useState("");
+
+  const exportFilters: LeadFilters = {
+    ...filters,
+    exportFrom: exportFrom || undefined,
+    exportTo: exportTo || undefined,
+  };
 
   const loadLeads = useCallback(async () => {
     setLoading(true);
@@ -87,13 +95,13 @@ export function AdminDashboardPage() {
               News
             </Link>
             <a
-              href={exportLeadsCsv(filters)}
+              href={exportLeadsCsv(exportFilters)}
               className="border border-neutral-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900"
             >
               Export CSV
             </a>
             <a
-              href={exportLeadsXlsx(filters)}
+              href={exportLeadsXlsx(exportFilters)}
               className="border border-neutral-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900"
             >
               Export XLSX
@@ -179,6 +187,24 @@ export function AdminDashboardPage() {
               className="h-4 w-4 border-neutral-300"
             />
             <span className="text-[10px] uppercase tracking-wider text-neutral-500">Show spam</span>
+          </label>
+          <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-neutral-500">
+            Export from
+            <input
+              type="datetime-local"
+              value={exportFrom}
+              onChange={(e) => setExportFrom(e.target.value)}
+              className="min-w-[190px] border border-neutral-300 px-2 py-2 text-sm normal-case text-neutral-900"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-neutral-500">
+            Export to
+            <input
+              type="datetime-local"
+              value={exportTo}
+              onChange={(e) => setExportTo(e.target.value)}
+              className="min-w-[190px] border border-neutral-300 px-2 py-2 text-sm normal-case text-neutral-900"
+            />
           </label>
           <div className="flex items-end">
             <p className="text-sm text-neutral-600">

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
-import { fetchLeadsForExport, leadsToCsv, leadsToXlsxBuffer } from "../lib/leadExport.js";
+import { applyExportDateRange, fetchLeadsForExport, leadsToCsv, leadsToXlsxBuffer } from "../lib/leadExport.js";
 import { encryptField } from "../lib/leadCrypto.js";
 import { issueCsrfToken, requireCsrf, requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitAdminLogin } from "../middleware/rateLimit.js";
@@ -113,7 +113,8 @@ adminRouter.get("/leads", requireAdmin, async (req, res) => {
 adminRouter.get("/leads.csv", requireAdmin, async (req, res) => {
   try {
     const { where } = buildLeadFilters(req.query);
-    const leads = await fetchLeadsForExport(where);
+    const exportWhere = applyExportDateRange(where, req.query);
+    const leads = await fetchLeadsForExport(exportWhere);
 
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", 'attachment; filename="leads.csv"');
@@ -128,7 +129,8 @@ adminRouter.get("/leads.csv", requireAdmin, async (req, res) => {
 adminRouter.get("/leads.xlsx", requireAdmin, async (req, res) => {
   try {
     const { where } = buildLeadFilters(req.query);
-    const leads = await fetchLeadsForExport(where);
+    const exportWhere = applyExportDateRange(where, req.query);
+    const leads = await fetchLeadsForExport(exportWhere);
 
     res.setHeader(
       "Content-Type",

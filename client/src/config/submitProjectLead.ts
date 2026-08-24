@@ -1,14 +1,18 @@
 import { leadsApi } from "./leads";
 import { isTurnstileEnabled } from "./turnstile";
+import { validateLocalPhone } from "./countryDialCodes";
 import type { ProjectThemeId } from "../data/projects";
 
 export type LeadSource = "contact" | "popup";
 
 export type LeadHoneypotValues = Partial<Record<(typeof leadsApi.honeypotFields)[number], string>>;
 
+export const MAX_LEAD_NAME = 15;
+
 export interface ProjectLeadPayload {
   name: string;
   phone: string;
+  countryCode: string;
   message?: string;
   projectName: string;
   projectSlug: string;
@@ -29,8 +33,18 @@ export function readLeadHoneypots(form: HTMLFormElement): LeadHoneypotValues {
 export async function submitProjectLead(payload: ProjectLeadPayload): Promise<void> {
   const name = payload.name.trim();
   const phone = payload.phone.trim();
+  const countryCode = payload.countryCode.trim();
+
   if (!name || !phone) {
     throw new Error("Please enter your name and phone number.");
+  }
+  if (name.length > MAX_LEAD_NAME) {
+    throw new Error(`Name must be ${MAX_LEAD_NAME} characters or fewer.`);
+  }
+
+  const phoneCheck = validateLocalPhone(countryCode, phone);
+  if (!phoneCheck.ok) {
+    throw new Error(phoneCheck.error);
   }
 
   if (!Number.isFinite(payload.formReadyAt)) {
@@ -44,7 +58,8 @@ export async function submitProjectLead(payload: ProjectLeadPayload): Promise<vo
 
   const body: Record<string, unknown> = {
     name,
-    phone,
+    phone: phoneCheck.digits,
+    countryCode,
     message: payload.message?.trim() ?? "",
     projectName: payload.projectName,
     projectSlug: payload.projectSlug,
