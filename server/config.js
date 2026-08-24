@@ -21,6 +21,13 @@ const allowedOrigins = [
   ...parseOrigins(process.env.SITE_ORIGIN),
 ];
 
+function parseNotifyEmails(raw) {
+  return String(raw ?? "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter((email) => email.includes("@"));
+}
+
 export const config = {
   port: Number(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || "development",
@@ -33,6 +40,7 @@ export const config = {
   leadEncryptionKey,
   allowedOrigins: [...new Set(allowedOrigins)],
   notifyEmail: process.env.NOTIFY_EMAIL || "",
+  notifyEmails: parseNotifyEmails(process.env.NOTIFY_EMAIL),
   resendApiKey: process.env.RESEND_API_KEY || "",
   smtp: {
     host: (process.env.SMTP_HOST || "").trim(),

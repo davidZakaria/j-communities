@@ -37,7 +37,7 @@ async function sendViaSmtp(subject, text) {
 
   await transport.sendMail({
     from: config.smtp.from || config.smtp.user,
-    to: config.notifyEmail,
+    to: config.notifyEmails,
     subject,
     text,
   });
@@ -52,7 +52,7 @@ async function sendViaResend(subject, text) {
     },
     body: JSON.stringify({
       from: config.smtp.from || "J Communities <onboarding@resend.dev>",
-      to: [config.notifyEmail],
+      to: config.notifyEmails,
       subject,
       text,
     }),
@@ -64,7 +64,7 @@ async function sendViaResend(subject, text) {
 }
 
 export async function notifyNewLead(lead) {
-  if (!config.notifyEmail || lead.status === "spam") return;
+  if (!config.notifyEmails.length || lead.status === "spam") return;
 
   const { subject, text } = buildLeadEmail(lead);
   const hasSmtp = config.smtp.host && config.smtp.user && config.smtp.pass;
