@@ -1,7 +1,38 @@
 import { getAdminCsrfToken, setAdminCsrfToken } from "./csrf";
-import type { Lead, LeadFilters, LeadsResponse } from "./types";
+import type { AdminUser, Lead, LeadFilters, LeadsResponse, TotpSetup } from "./types";
 
 const base = "/api/admin";
+const usersBase = "/api/admin/users";
+
+async function usersRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const method = init?.method?.toUpperCase() || "GET";
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...(init?.body ? { "Content-Type": "application/json" } : {}),
+  };
+
+  if (method !== "GET" && method !== "HEAD") {
+    const token = getAdminCsrfToken();
+    if (token) headers["X-CSRF-Token"] = token;
+  }
+
+  const res = await fetch(`${usersBase}${path}`, {
+    credentials: "include",
+    headers: { ...headers, ...(init?.headers as Record<string, string> | undefined) },
+    ...init,
+  });
+
+  const data = (await res.json().catch(() => null)) as { error?: string; csrfToken?: string } & T;
+  if (!res.ok) {
+    throw new Error(data?.error || "Request failed");
+  }
+
+  if (data && typeof data === "object" && "csrfToken" in data && data.csrfToken) {
+    setAdminCsrfToken(data.csrfToken);
+  }
+
+  return data;
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const method = init?.method?.toUpperCase() || "GET";
@@ -33,18 +64,63 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return data;
 }
 
-export async function adminMe(): Promise<{ ok: boolean; username: string; csrfToken: string }> {
+export async function adminMe(): Promise<{
+  ok: boolean;
+  username: string;
+  csrfToken: string;
+  isSuperAdmin: boolean;
+  userId: string | null;
+}> {
   return request("/me");
+}
+
+export class AdminLoginError extends Error {
+  readonly requireTotp: boolean;
+
+  constructor(message: string, options?: { requireTotp?: boolean }) {
+    super(message);
+    this.name = "AdminLoginError";
+    this.requireTotp = options?.requireTotp ?? false;
+  }
 }
 
 export async function adminLogin(
   username: string,
   password: string,
-): Promise<{ ok: boolean; username: string; csrfToken: string }> {
-  return request("/login", {
+  totpCode?: string,
+): Promise<{ ok: boolean; username: string; csrfToken: string; isSuperAdmin?: boolean }> {
+  const payload: Record<string, string> = { username, password };
+  if (totpCode) payload.totpCode = totpCode;
+
+  const res = await fetch(`${base}/login`, {
     method: "POST",
-    body: JSON.stringify({ username, password }),
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
   });
+
+  const data = (await res.json().catch(() => null)) as {
+    error?: string;
+    message?: string;
+    requireTotp?: boolean;
+    csrfToken?: string;
+    username?: string;
+    ok?: boolean;
+  } | null;
+
+  if (res.status === 403 && data?.requireTotp) {
+    throw new AdminLoginError(data.message || "Two-factor authentication required", { requireTotp: true });
+  }
+
+  if (!res.ok) {
+    throw new AdminLoginError(data?.message || data?.error || "Login failed");
+  }
+
+  if (data?.csrfToken) setAdminCsrfToken(data.csrfToken);
+  return data as { ok: boolean; username: string; csrfToken: string };
 }
 
 export async function adminLogout(): Promise<void> {
@@ -77,6 +153,35 @@ export async function updateLead(
 
 export async function retryLeadFlashSync(id: string): Promise<{ ok: boolean; lead: Lead }> {
   return request(`/leads/${id}/sync`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function fetchAdminUsers(): Promise<{ ok: boolean; users: AdminUser[] }> {
+  return usersRequest("");
+}
+
+export async function createAdminUser(payload: {
+  username: string;
+  password: string;
+  isSuperAdmin?: boolean;
+}): Promise<{ ok: boolean; user: AdminUser; totpSetup: TotpSetup }> {
+  return usersRequest("", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function setAdminUserActive(id: string, active: boolean): Promise<{ ok: boolean; user: AdminUser }> {
+  return usersRequest(`/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ active }),
+  });
+}
+
+export async function resetAdminUserTotp(id: string): Promise<{ ok: boolean; user: AdminUser; totpSetup: TotpSetup }> {
+  return usersRequest(`/${id}/reset-totp`, {
     method: "POST",
     body: JSON.stringify({}),
   });

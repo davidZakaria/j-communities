@@ -53,6 +53,20 @@ model NewsArticle {
   @@index([category])
 }
 
+model AdminUser {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  username     String    @unique
+  passwordHash String
+  totpSecret   String?
+  isSuperAdmin Boolean   @default(false)
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+
+  @@index([active])
+}
+
 model Lead {
   id          String     @id @default(cuid())
   createdAt   DateTime   @default(now())

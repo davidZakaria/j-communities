@@ -5,6 +5,7 @@ import path from "path";
 import { config } from "./config.js";
 import { adminRouter } from "./routes/admin.js";
 import { adminNewsRouter } from "./routes/adminNews.js";
+import { adminUsersRouter } from "./routes/adminUsers.js";
 import { leadsRouter } from "./routes/leads.js";
 import { newsRouter } from "./routes/news.js";
 import { apiSecurityHeaders, noStoreApi } from "./middleware/security.js";
@@ -43,6 +44,7 @@ export function createApp() {
   );
 
   app.use("/api/admin", noStoreApi, adminRouter);
+  app.use("/api/admin/users", noStoreApi, adminUsersRouter);
   app.use("/api/admin/news", noStoreApi, adminNewsRouter);
   app.use("/api/leads", noStoreApi, leadsRouter);
   app.use("/api/news", newsRouter);

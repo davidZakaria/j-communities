@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { adminLogout, exportLeadsCsv, exportLeadsXlsx, fetchLeads, retryLeadFlashSync, updateLead } from "../../features/admin/api";
+import { adminLogout, adminMe, exportLeadsCsv, exportLeadsXlsx, fetchLeads, retryLeadFlashSync, updateLead } from "../../features/admin/api";
 import { LEAD_SOURCES, LEAD_STATUSES, type FlashLeadSyncStatus, type Lead, type LeadFilters, type LeadStatus } from "../../features/admin/types";
 import { projects } from "../../data/projects";
 
@@ -94,6 +94,7 @@ export function AdminDashboardPage() {
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [exportFrom, setExportFrom] = useState("");
   const [exportTo, setExportTo] = useState("");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const exportFilters: LeadFilters = {
     ...filters,
@@ -119,6 +120,12 @@ export function AdminDashboardPage() {
       setLoading(false);
     }
   }, [filters]);
+
+  useEffect(() => {
+    adminMe()
+      .then((res) => setIsSuperAdmin(res.isSuperAdmin))
+      .catch(() => setIsSuperAdmin(false));
+  }, []);
 
   useEffect(() => {
     loadLeads();
@@ -178,6 +185,11 @@ export function AdminDashboardPage() {
             <Link to="/admin/news" className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 hover:text-neutral-900">
               News
             </Link>
+            {isSuperAdmin ? (
+              <Link to="/admin/users" className="text-[10px] uppercase tracking-[0.14em] text-[#1A4284] hover:text-neutral-900">
+                Users
+              </Link>
+            ) : null}
             <a
               href={exportLeadsCsv(exportFilters)}
               className="border border-neutral-300 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] hover:border-neutral-900"

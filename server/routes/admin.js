@@ -1,12 +1,14 @@
+import { verifySync } from "otplib";
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { sanitizeLeadForAdmin, sanitizeLeadsForAdmin } from "../lib/leadData.js";
 import { applyExportDateRange, fetchLeadsForExport, leadsToCsv, leadsToXlsxBuffer } from "../lib/leadExport.js";
 import { resolveFlashLeadSyncStatus } from "../lib/flashLeadSync.js";
+import { getTotpSecretForAuth, touchAdminLogin, verifyAdminCredentials } from "../lib/adminUsers.js";
 import { encryptField } from "../lib/leadCrypto.js";
 import { issueCsrfToken, requireCsrf, requireJsonContentType, requireSameOrigin } from "../middleware/security.js";
 import { rateLimitAdminLogin } from "../middleware/rateLimit.js";
-import { regenerateSession, requireAdmin, verifyAdminCredentials } from "../middleware/auth.js";
+import { regenerateSession, requireAdmin } from "../middleware/auth.js";
 
 export const adminRouter = Router();
 
@@ -39,22 +41,50 @@ function buildLeadFilters(query) {
 adminRouter.post("/login", rateLimitAdminLogin, requireSameOrigin, requireJsonContentType, async (req, res) => {
   const username = String(req.body?.username ?? "").trim();
   const password = String(req.body?.password ?? "");
+  const totpCode = String(req.body?.totpCode ?? "").trim();
 
   if (!username || !password || password.length > 256) {
     return res.status(400).json({ error: "Invalid credentials." });
   }
 
-  const valid = await verifyAdminCredentials(username, password);
-  if (!valid) {
+  const authUser = await verifyAdminCredentials(username, password);
+  if (!authUser) {
     return res.status(401).json({ error: "Invalid credentials." });
+  }
+
+  const totpSecret = getTotpSecretForAuth(authUser);
+  if (totpSecret) {
+    if (!totpCode) {
+      return res.status(403).json({
+        requireTotp: true,
+        message: "Two-factor authentication required",
+      });
+    }
+
+    const totpValid = verifySync({ secret: totpSecret, token: totpCode }).valid;
+    if (!totpValid) {
+      return res.status(401).json({ message: "Invalid authenticator code" });
+    }
   }
 
   try {
     await regenerateSession(req);
     req.session.admin = true;
-    req.session.adminUsername = username;
+    req.session.adminUserId = authUser.id ?? null;
+    req.session.adminUsername = authUser.username;
+    req.session.isSuperAdmin = Boolean(authUser.isSuperAdmin);
+
+    if (authUser.id) {
+      await touchAdminLogin(authUser.id);
+    }
+
     const csrfToken = issueCsrfToken(req);
-    return res.json({ ok: true, username, csrfToken });
+    return res.json({
+      ok: true,
+      username: authUser.username,
+      csrfToken,
+      isSuperAdmin: Boolean(authUser.isSuperAdmin),
+    });
   } catch {
     return res.status(500).json({ error: "Login failed." });
   }
@@ -70,7 +100,13 @@ adminRouter.post("/logout", requireAdmin, requireCsrf, requireSameOrigin, (req, 
 
 adminRouter.get("/me", requireAdmin, (req, res) => {
   const csrfToken = issueCsrfToken(req);
-  return res.json({ ok: true, username: req.session.adminUsername ?? "admin", csrfToken });
+  return res.json({
+    ok: true,
+    username: req.session.adminUsername ?? "admin",
+    csrfToken,
+    isSuperAdmin: Boolean(req.session.isSuperAdmin),
+    userId: req.session.adminUserId ?? null,
+  });
 });
 
 adminRouter.get("/leads", requireAdmin, async (req, res) => {

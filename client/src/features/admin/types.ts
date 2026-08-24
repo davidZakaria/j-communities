@@ -2,6 +2,22 @@ export type LeadStatus = "new" | "contacted" | "qualified" | "closed" | "spam";
 export type LeadSource = "contact" | "popup";
 export type FlashLeadSyncStatus = "pending" | "success" | "failed" | "skipped";
 
+export interface AdminUser {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  username: string;
+  isSuperAdmin: boolean;
+  active: boolean;
+  lastLoginAt: string | null;
+  hasTotp: boolean;
+}
+
+export interface TotpSetup {
+  secret: string;
+  otpauthUrl: string;
+}
+
 export interface Lead {
   id: string;
   createdAt: string;

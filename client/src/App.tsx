@@ -11,6 +11,8 @@ import { ScrollProgressProvider } from "./features/motion/ScrollProgressContext"
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { AdminNewsPage } from "./pages/admin/AdminNewsPage";
+import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
+import { SuperAdminGuard } from "./components/admin/SuperAdminGuard";
 import { HomePage } from "./pages/HomePage";
 import { NewsDetailPage } from "./pages/NewsDetailPage";
 import { NewsListPage } from "./pages/NewsListPage";
@@ -64,6 +66,16 @@ function AdminApp() {
         element={
           <AdminGuard>
             <AdminNewsPage />
+          </AdminGuard>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminGuard>
+            <SuperAdminGuard>
+              <AdminUsersPage />
+            </SuperAdminGuard>
           </AdminGuard>
         }
       />
