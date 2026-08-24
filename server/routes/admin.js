@@ -39,35 +39,35 @@ function buildLeadFilters(query) {
 }
 
 adminRouter.post("/login", rateLimitAdminLogin, requireSameOrigin, requireJsonContentType, async (req, res) => {
-  const username = String(req.body?.username ?? "").trim();
-  const password = String(req.body?.password ?? "");
-  const totpCode = String(req.body?.totpCode ?? "").trim();
-
-  if (!username || !password || password.length > 256) {
-    return res.status(400).json({ error: "Invalid credentials." });
-  }
-
-  const authUser = await verifyAdminCredentials(username, password);
-  if (!authUser) {
-    return res.status(401).json({ error: "Invalid credentials." });
-  }
-
-  const totpSecret = getTotpSecretForAuth(authUser);
-  if (totpSecret) {
-    if (!totpCode) {
-      return res.status(403).json({
-        requireTotp: true,
-        message: "Two-factor authentication required",
-      });
-    }
-
-    const totpValid = verifySync({ secret: totpSecret, token: totpCode }).valid;
-    if (!totpValid) {
-      return res.status(401).json({ message: "Invalid authenticator code" });
-    }
-  }
-
   try {
+    const username = String(req.body?.username ?? "").trim();
+    const password = String(req.body?.password ?? "");
+    const totpCode = String(req.body?.totpCode ?? "").trim();
+
+    if (!username || !password || password.length > 256) {
+      return res.status(400).json({ error: "Invalid credentials." });
+    }
+
+    const authUser = await verifyAdminCredentials(username, password);
+    if (!authUser) {
+      return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    const totpSecret = getTotpSecretForAuth(authUser);
+    if (totpSecret) {
+      if (!totpCode) {
+        return res.status(403).json({
+          requireTotp: true,
+          message: "Two-factor authentication required",
+        });
+      }
+
+      const totpValid = verifySync({ secret: totpSecret, token: totpCode }).valid;
+      if (!totpValid) {
+        return res.status(401).json({ message: "Invalid authenticator code" });
+      }
+    }
+
     await regenerateSession(req);
     req.session.admin = true;
     req.session.adminUserId = authUser.id ?? null;
@@ -85,7 +85,8 @@ adminRouter.post("/login", rateLimitAdminLogin, requireSameOrigin, requireJsonCo
       csrfToken,
       isSuperAdmin: Boolean(authUser.isSuperAdmin),
     });
-  } catch {
+  } catch (err) {
+    console.error("POST /api/admin/login failed:", err?.message || err);
     return res.status(500).json({ error: "Login failed." });
   }
 });

@@ -22,7 +22,8 @@
     "admin:verify-env": "node scripts/verify-admin-env.js",
     "admin:generate-key": "node scripts/generate-key.js",
     "admin:generate-totp": "node scripts/generate-totp.js",
-    "admin:seed-from-env": "node scripts/seed-admin-from-env.js"
+    "admin:seed-from-env": "node scripts/seed-admin-from-env.js",
+    "admin:seed-team": "node scripts/seed-team-admins.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

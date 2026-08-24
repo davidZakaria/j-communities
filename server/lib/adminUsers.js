@@ -62,30 +62,12 @@ export async function verifyAdminCredentials(username, password) {
     return user;
   }
 
-  const envOk =
-    normalized === config.adminUsername &&
-    config.adminPasswordHash &&
-    (await bcrypt.compare(password, config.adminPasswordHash));
-
-  if (envOk) {
-    return {
-      id: null,
-      username: normalized,
-      isSuperAdmin: true,
-      legacyEnv: true,
-      totpSecret: null,
-    };
-  }
-
   await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
   return null;
 }
 
 export function getTotpSecretForAuth(user) {
   if (!user) return null;
-  if (user.legacyEnv) {
-    return String(process.env.ADMIN_TOTP_SECRET ?? "").trim() || null;
-  }
   return decryptTotpSecret(user.totpSecret);
 }
 
@@ -112,7 +94,7 @@ export function validateNewUsername(username) {
   return { ok: true, value };
 }
 
-export async function createAdminUser({ username, password, isSuperAdmin = false }) {
+export async function createAdminUser({ username, password, isSuperAdmin = false, enrollTotp = true }) {
   const parsed = validateNewUsername(username);
   if (!parsed.ok) return parsed;
 
@@ -126,14 +108,14 @@ export async function createAdminUser({ username, password, isSuperAdmin = false
     return { ok: false, error: "Username already exists." };
   }
 
-  const { secret, otpauthUrl } = createTotpEnrollment(parsed.value);
+  const totpSetup = enrollTotp ? createTotpEnrollment(parsed.value) : null;
   const passwordHash = await bcrypt.hash(pwd, 12);
 
   const user = await prisma.adminUser.create({
     data: {
       username: parsed.value,
       passwordHash,
-      totpSecret: encryptTotpSecret(secret),
+      totpSecret: totpSetup ? encryptTotpSecret(totpSetup.secret) : null,
       isSuperAdmin: Boolean(isSuperAdmin),
     },
   });
@@ -141,7 +123,7 @@ export async function createAdminUser({ username, password, isSuperAdmin = false
   return {
     ok: true,
     user: sanitizeAdminUser(user),
-    totpSetup: { secret, otpauthUrl },
+    totpSetup: totpSetup ? { secret: totpSetup.secret, otpauthUrl: totpSetup.otpauthUrl } : null,
   };
 }
 
