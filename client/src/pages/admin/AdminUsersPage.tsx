@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { adminLogout, createAdminUser, fetchAdminUsers, resetAdminUserTotp, setAdminUserActive } from "../../features/admin/api";
 import type { AdminUser, TotpSetup } from "../../features/admin/types";
@@ -23,6 +23,9 @@ export function AdminUsersPage() {
   const [password, setPassword] = useState("");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [creating, setCreating] = useState(false);
+  const totpPanelRef = useRef<HTMLDivElement>(null);
+
+  const usersNeedingTotp = users.filter((user) => user.active && !user.hasTotp);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -41,6 +44,16 @@ export function AdminUsersPage() {
     loadUsers();
   }, [loadUsers]);
 
+  useEffect(() => {
+    if (totpSetup) {
+      totpPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [totpSetup]);
+
+  function showTotpSetup(setup: TotpSetup, usernameForSetup: string) {
+    setTotpSetup({ ...setup, username: usernameForSetup });
+  }
+
   async function handleLogout() {
     await adminLogout();
     window.location.href = "/admin/login";
@@ -52,7 +65,9 @@ export function AdminUsersPage() {
     setError(null);
     try {
       const res = await createAdminUser({ username, password, isSuperAdmin });
-      setTotpSetup({ ...res.totpSetup, username: res.user.username });
+      if (res.totpSetup) {
+        showTotpSetup(res.totpSetup, res.user.username);
+      }
       setUsername("");
       setPassword("");
       setIsSuperAdmin(false);
@@ -77,15 +92,18 @@ export function AdminUsersPage() {
     }
   }
 
-  async function handleResetTotp(user: AdminUser) {
+  async function handleSetupTotp(user: AdminUser) {
     setSavingId(user.id);
     setError(null);
     try {
       const res = await resetAdminUserTotp(user.id);
-      setTotpSetup({ ...res.totpSetup, username: user.username });
+      if (!res.totpSetup) {
+        throw new Error("Authenticator setup failed.");
+      }
+      showTotpSetup(res.totpSetup, user.username);
       await loadUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reset authenticator");
+      setError(err instanceof Error ? err.message : "Failed to set up authenticator");
     } finally {
       setSavingId(null);
     }
@@ -119,18 +137,29 @@ export function AdminUsersPage() {
 
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
         {totpSetup ? (
-          <TotpSetupPanel
-            username={totpSetup.username}
-            otpauthUrl={totpSetup.otpauthUrl}
-            secret={totpSetup.secret}
-            onDone={() => setTotpSetup(null)}
-          />
+          <div ref={totpPanelRef}>
+            <TotpSetupPanel
+              username={totpSetup.username}
+              otpauthUrl={totpSetup.otpauthUrl}
+              secret={totpSetup.secret}
+              onDone={() => setTotpSetup(null)}
+            />
+          </div>
+        ) : null}
+
+        {usersNeedingTotp.length > 0 && !totpSetup ? (
+          <p className="border border-[#1A4284]/20 bg-[#1A4284]/5 px-4 py-3 text-sm text-neutral-700">
+            {usersNeedingTotp.length === 1
+              ? `${usersNeedingTotp[0].username} still needs Google Authenticator. Click `
+              : `${usersNeedingTotp.length} users still need Google Authenticator. Click `}
+            <strong>Set up 2FA</strong> in the table below to show their QR code.
+          </p>
         ) : null}
 
         <section className="border border-neutral-300 bg-white p-5">
           <h2 className="font-serif text-lg">Add team member</h2>
           <p className="mt-1 text-sm text-neutral-600">
-            Each user gets their own password and Google Authenticator setup.
+            New users get a QR code after creation. Existing users use <strong>Set up 2FA</strong> in the table.
           </p>
           <form className="mt-5 grid gap-4 sm:grid-cols-2" onSubmit={handleCreate}>
             <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-neutral-500">
@@ -172,7 +201,7 @@ export function AdminUsersPage() {
                 disabled={creating}
                 className="bg-[#1A4284] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white hover:bg-[#15356a] disabled:opacity-60"
               >
-                {creating ? "Creating…" : "Create user & show QR"}
+                {creating ? "Creating…" : "Create user"}
               </button>
             </div>
           </form>
@@ -206,7 +235,7 @@ export function AdminUsersPage() {
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-6 text-neutral-600">
-                    No admin users yet. Run <code className="text-xs">npm run admin:seed-from-env</code> or create one above.
+                    No admin users yet. Run <code className="text-xs">npm run admin:seed-team</code> or create one above.
                   </td>
                 </tr>
               ) : (
@@ -238,10 +267,14 @@ export function AdminUsersPage() {
                         <button
                           type="button"
                           disabled={savingId === user.id}
-                          onClick={() => handleResetTotp(user)}
-                          className="border border-neutral-300 px-2 py-1 text-[10px] uppercase tracking-wider hover:border-[#1A4284] disabled:opacity-50"
+                          onClick={() => handleSetupTotp(user)}
+                          className={`px-2 py-1 text-[10px] uppercase tracking-wider disabled:opacity-50 ${
+                            user.hasTotp
+                              ? "border border-neutral-300 hover:border-[#1A4284]"
+                              : "border border-[#1A4284] bg-[#1A4284]/10 font-semibold text-[#1A4284] hover:bg-[#1A4284]/20"
+                          }`}
                         >
-                          Reset 2FA
+                          {user.hasTotp ? "Reset 2FA" : "Set up 2FA"}
                         </button>
                         <button
                           type="button"

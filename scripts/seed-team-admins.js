@@ -84,7 +84,7 @@ try {
   }
 
   console.log("Sign in at /admin with the username (not the email).");
-  console.log("Two-factor auth is off until you enable it from /admin/users.\n");
+  console.log("Enable 2FA from /admin/users → Set up 2FA (shows QR for each user).\n");
 } catch (err) {
   console.error(err?.message || err);
   process.exitCode = 1;
