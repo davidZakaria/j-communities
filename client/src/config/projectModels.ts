@@ -25,9 +25,9 @@ export const projectModels: Record<ProjectThemeId | "home", ProjectModelConfig> 
     glbUrl: "/assets/models/home/hero.glb",
     animationClips: ["HeroLoop"],
     cameraKeyframes: [
-      { position: [0, 2.5, 7], target: [0, 0, 0] },
-      { position: [0, 1.8, 5], target: [0, -0.2, 0] },
-      { position: [0, 1.2, 4], target: [0, -0.4, 0] },
+      { position: [5.5, 3.5, 7], target: [0, 2.2, 0] },
+      { position: [3.5, 2.8, 5], target: [0, 2.0, 0] },
+      { position: [2.0, 2.2, 3.5], target: [0, 1.8, 0] },
     ],
     useProceduralFallback: true,
   },

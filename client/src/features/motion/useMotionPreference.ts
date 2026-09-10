@@ -30,6 +30,13 @@ function readPreferences(): MotionPreferences {
 }
 
 export function resolveExperienceTier(prefs: MotionPreferences): ExperienceTier {
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    const tierOverride = params.get("tier");
+    if (tierOverride === "full" && prefs.webglAvailable) return "full";
+    if (tierOverride === "light") return "light";
+    if (tierOverride === "static") return "static";
+  }
   if (prefs.reducedMotion || prefs.saveData) return "static";
   if (prefs.largeViewport && prefs.webglAvailable) return "full";
   if (prefs.largeViewport) return "light";

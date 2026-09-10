@@ -28,6 +28,10 @@ export function HeroExperienceShell({
   const show3d = enableWebGL && enableScene3D;
   const [webglReady, setWebglReady] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [mediaReady, setMediaReady] = useState(false);
+  const reducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const handleWebGLReady = useCallback(() => {
     setWebglReady(true);
@@ -41,12 +45,15 @@ export function HeroExperienceShell({
   useEffect(() => {
     if (!enableScene3D) {
       setInitialLoadComplete(true);
+      setMediaReady(true);
       return;
     }
     if (tier === "static" || tier === "light") {
       setInitialLoadComplete(true);
+      setMediaReady(true);
     } else if (webglReady) {
       setInitialLoadComplete(true);
+      setMediaReady(true);
     }
   }, [tier, webglReady, enableScene3D]);
 

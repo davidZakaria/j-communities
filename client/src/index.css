@@ -716,6 +716,9 @@
     animation: none;
     border-color: rgba(255, 255, 255, 0.25);
     border-top-color: rgba(255, 255, 255, 0.25);
+  }
+}
+
 /* Mobile-safe text handling for long headings with letter-spacing */
 .j-text-mobile-safe {
   overflow-wrap: break-word;
