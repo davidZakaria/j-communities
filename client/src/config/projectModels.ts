@@ -3,7 +3,7 @@
  * When NJD delivers final GLBs: drop files in public/assets/models/ and update paths here.
  * Run: npm run compress:models (after installing @gltf-transform/cli)
  */
-import type { ProjectThemeId } from "../../data/projects";
+import type { ProjectThemeId } from "../data/projects";
 import type { CameraKeyframe } from "../features/three/scrollCameraRig";
 
 export interface ProjectModelConfig {
