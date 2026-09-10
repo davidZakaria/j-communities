@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, type ReactNode } from "react";
 import type { PerspectiveCamera } from "three";
 import { applyScrollCameraRig } from "./scrollCameraRig";
 import type { CameraKeyframe } from "./scrollCameraRig";
@@ -20,11 +20,28 @@ function ScrollCamera({ keyframes, scrollProgress }: ScrollCameraProps) {
   return null;
 }
 
+function ReadyNotifier({ onReady }: { onReady?: () => void }) {
+  const calledRef = useRef(false);
+
+  useEffect(() => {
+    if (onReady && !calledRef.current) {
+      calledRef.current = true;
+      const timer = requestAnimationFrame(() => {
+        onReady();
+      });
+      return () => cancelAnimationFrame(timer);
+    }
+  }, [onReady]);
+
+  return null;
+}
+
 interface HeroCanvasProps {
   scrollProgress: number;
   cameraKeyframes: CameraKeyframe[];
   visible: boolean;
   children: ReactNode;
+  onReady?: () => void;
 }
 
 export function HeroCanvas({
@@ -32,6 +49,7 @@ export function HeroCanvas({
   cameraKeyframes,
   visible,
   children,
+  onReady,
 }: HeroCanvasProps) {
   if (!visible) return null;
 
@@ -50,6 +68,7 @@ export function HeroCanvas({
         <Suspense fallback={null}>
           <ScrollCamera keyframes={cameraKeyframes} scrollProgress={scrollProgress} />
           {children}
+          <ReadyNotifier onReady={onReady} />
         </Suspense>
       </Canvas>
     </div>

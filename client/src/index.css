@@ -544,3 +544,111 @@
 .j-label-caps {
   @apply text-[0.625rem] font-medium uppercase tracking-[0.4em] text-j-slate;
 }
+
+/* Mobile-safe footer headline: ensures wrapping and reduces tracking on narrow viewports */
+.j-footer-headline-mobile {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+@media (max-width: 430px) {
+  .j-footer-headline-mobile {
+    font-size: clamp(1.35rem, 7vw, 1.65rem);
+    letter-spacing: 0.03em;
+    line-height: 1.3;
+  }
+}
+
+/* Hero loading skeleton: CSS-first, visible before JS loads */
+.j-hero-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: linear-gradient(
+    135deg,
+    #0a0a0a 0%,
+    #1a1a1a 25%,
+    #0f0f0f 50%,
+    #1a1a1a 75%,
+    #0a0a0a 100%
+  );
+  background-size: 400% 400%;
+  animation: j-hero-skeleton-gradient 3s ease-in-out infinite;
+}
+
+.j-hero-skeleton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: j-hero-skeleton-shimmer 2s ease-in-out infinite;
+}
+
+.j-hero-skeleton::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(2.5rem, 8vw, 4rem);
+  height: clamp(2.5rem, 8vw, 4rem);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: j-hero-skeleton-spin 1s linear infinite;
+}
+
+.j-hero-skeleton--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease-out;
+}
+
+@keyframes j-hero-skeleton-gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes j-hero-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes j-hero-skeleton-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .j-hero-skeleton {
+    animation: none;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  }
+
+  .j-hero-skeleton::before {
+    animation: none;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .j-hero-skeleton::after {
+    animation: none;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-top-color: rgba(255, 255, 255, 0.25);
+  }
+}

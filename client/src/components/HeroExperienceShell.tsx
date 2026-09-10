@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useExperienceTier } from "../features/motion/ExperienceTierContext";
 import { ParallaxLayer } from "../features/motion/ParallaxLayer";
 import { useScrollProgress } from "../features/motion/ScrollProgressContext";
@@ -26,11 +26,18 @@ export function HeroExperienceShell({
   const { registerHero, heroProgress } = useScrollProgress();
   const { enableWebGL, tier } = useExperienceTier();
   const show3d = enableWebGL && enableScene3D;
+  const [webglReady, setWebglReady] = useState(false);
+
+  const handleWebGLReady = useCallback(() => {
+    setWebglReady(true);
+  }, []);
 
   useEffect(() => {
     registerHero(sectionRef.current);
     return () => registerHero(null);
   }, [registerHero]);
+
+  const showSkeleton = show3d && !webglReady;
 
   return (
     <section
@@ -42,8 +49,19 @@ export function HeroExperienceShell({
         {poster}
       </ParallaxLayer>
 
+      {show3d && (
+        <div
+          className={`j-hero-skeleton ${!showSkeleton ? "j-hero-skeleton--hidden" : ""}`}
+          aria-hidden="true"
+        />
+      )}
+
       {show3d ? (
-        <HeroWebGLBackground scene={scene} scrollProgress={heroProgress} />
+        <HeroWebGLBackground
+          scene={scene}
+          scrollProgress={heroProgress}
+          onReady={handleWebGLReady}
+        />
       ) : null}
 
       {overlay}
