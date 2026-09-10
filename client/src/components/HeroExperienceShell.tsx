@@ -58,7 +58,21 @@ export function HeroExperienceShell({
       className={`j-hero-experience relative w-full overflow-hidden ${className}`.trim()}
       data-motion-tier={tier}
     >
-      <ParallaxLayer className="absolute inset-0 z-0 h-[118%] -top-[9%]" speed={0.52}>
+      {/* Loading skeleton - shows before media is ready */}
+      <div
+        className={`j-hero-skeleton absolute inset-0 z-[1] ${mediaReady ? "j-hero-skeleton--hidden" : ""}`}
+        aria-hidden="true"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1f24] via-[#0d1012] to-[#0a0c0e]" />
+        {!reducedMotion && (
+          <div className="j-hero-skeleton-shimmer absolute inset-0 opacity-[0.08]" />
+        )}
+      </div>
+
+      <ParallaxLayer
+        className={`absolute inset-0 z-0 h-[118%] -top-[9%] j-hero-media ${mediaReady ? "j-hero-media--ready" : ""}`}
+        speed={0.52}
+      >
         {poster}
       </ParallaxLayer>
 

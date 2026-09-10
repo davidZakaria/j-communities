@@ -9,7 +9,9 @@ import type { ProjectThemeId } from "../../data/projects";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
-const OPEN_DELAY_MS = 1400;
+const MIN_DELAY_MS = 8000;
+const IDLE_TRIGGER_MS = 6000;
+const SCROLL_DEPTH_TRIGGER = 0.35;
 const MIN_SUBMIT_MS = 2500;
 
 function storageKey(slug: string) {
@@ -54,8 +56,64 @@ export function ProjectLeadPopup({ projectName, projectSlug, themeId }: ProjectL
   useEffect(() => {
     if (wasDismissed(projectSlug)) return;
 
-    const timer = window.setTimeout(() => setOpen(true), OPEN_DELAY_MS);
-    return () => window.clearTimeout(timer);
+    let triggered = false;
+    let minDelayPassed = false;
+    let intentSignal = false;
+    let idleTimer: number | null = null;
+    let minDelayTimer: number | null = null;
+
+    const tryOpen = () => {
+      if (triggered || wasDismissed(projectSlug)) return;
+      if (minDelayPassed && intentSignal) {
+        triggered = true;
+        setOpen(true);
+      }
+    };
+
+    const resetIdleTimer = () => {
+      if (idleTimer !== null) window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        intentSignal = true;
+        tryOpen();
+      }, IDLE_TRIGGER_MS);
+    };
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollRatio = docHeight > 0 ? scrollY / docHeight : 0;
+      
+      if (scrollRatio >= SCROLL_DEPTH_TRIGGER) {
+        intentSignal = true;
+        tryOpen();
+      }
+      resetIdleTimer();
+    };
+
+    const handleActivity = () => {
+      resetIdleTimer();
+    };
+
+    minDelayTimer = window.setTimeout(() => {
+      minDelayPassed = true;
+      tryOpen();
+    }, MIN_DELAY_MS);
+
+    resetIdleTimer();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("mousemove", handleActivity, { passive: true });
+    window.addEventListener("touchstart", handleActivity, { passive: true });
+    window.addEventListener("keydown", handleActivity, { passive: true });
+
+    return () => {
+      if (minDelayTimer !== null) window.clearTimeout(minDelayTimer);
+      if (idleTimer !== null) window.clearTimeout(idleTimer);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("touchstart", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+    };
   }, [projectSlug]);
 
   function close() {

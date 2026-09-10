@@ -60,7 +60,7 @@ export const projectThemes: Record<ProjectThemeId, ProjectTheme> = {
       surface: juraBluishCyan,
       surfaceAlt: juraDeepSea,
       text: juraWhite,
-      muted: "#c9bfb0",
+      muted: "#d9d0c4",
       accent: juraTigerEye,
       accentHover: juraRedFox,
       accentContrast: juraWhite,
