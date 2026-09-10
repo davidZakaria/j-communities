@@ -4,12 +4,13 @@ import { AnimatedModel } from "../AnimatedModel";
 import { HeroCanvas } from "../HeroCanvas";
 import { SceneEnvironment } from "../SceneEnvironment";
 
-interface HomeHeroSceneProps {
+interface HeroSceneProps {
   scrollProgress: number;
   visible: boolean;
+  onReady?: () => void;
 }
 
-export function HomeHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
+export function HomeHeroScene({ scrollProgress, visible, onReady }: HeroSceneProps) {
   const config = getProjectModelConfig("home");
 
   return (
@@ -17,6 +18,7 @@ export function HomeHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
       scrollProgress={scrollProgress}
       cameraKeyframes={config.cameraKeyframes}
       visible={visible}
+      onReady={onReady}
     >
       <SceneEnvironment fogColor="#0a0a0a">
         <AnimatedModel
@@ -32,7 +34,7 @@ export function HomeHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
   );
 }
 
-export function JuraHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
+export function JuraHeroScene({ scrollProgress, visible, onReady }: HeroSceneProps) {
   const theme = getProjectTheme("jura");
   const config = getProjectModelConfig("jura");
 
@@ -41,6 +43,7 @@ export function JuraHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
       scrollProgress={scrollProgress}
       cameraKeyframes={config.cameraKeyframes}
       visible={visible}
+      onReady={onReady}
     >
       <SceneEnvironment fogColor={theme.colors.bg}>
         <AnimatedModel
@@ -56,7 +59,7 @@ export function JuraHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
   );
 }
 
-export function JamilaHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
+export function JamilaHeroScene({ scrollProgress, visible, onReady }: HeroSceneProps) {
   const theme = getProjectTheme("jamila");
   const config = getProjectModelConfig("jamila");
 
@@ -65,6 +68,7 @@ export function JamilaHeroScene({ scrollProgress, visible }: HomeHeroSceneProps)
       scrollProgress={scrollProgress}
       cameraKeyframes={config.cameraKeyframes}
       visible={visible}
+      onReady={onReady}
     >
       <SceneEnvironment fogColor={theme.colors.accent} fogNear={6} fogFar={28}>
         <AnimatedModel

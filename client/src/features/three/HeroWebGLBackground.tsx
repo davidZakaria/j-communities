@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState, type ComponentType } from "react";
 import { useExperienceTier } from "../motion/ExperienceTierContext";
 
-type SceneProps = { scrollProgress: number; visible: boolean };
+type SceneProps = { scrollProgress: number; visible: boolean; onReady?: () => void };
 
 const sceneLoaders = {
   home: () => import("./scenes/HeroScenes").then((m) => ({ default: m.HomeHeroScene })),
@@ -18,9 +18,10 @@ const lazyScenes: Record<keyof typeof sceneLoaders, React.LazyExoticComponent<Co
 interface HeroWebGLBackgroundProps {
   scene: keyof typeof sceneLoaders;
   scrollProgress: number;
+  onReady?: () => void;
 }
 
-export function HeroWebGLBackground({ scene, scrollProgress }: HeroWebGLBackgroundProps) {
+export function HeroWebGLBackground({ scene, scrollProgress, onReady }: HeroWebGLBackgroundProps) {
   const { enableWebGL } = useExperienceTier();
   const [mounted, setMounted] = useState(false);
 
@@ -35,7 +36,7 @@ export function HeroWebGLBackground({ scene, scrollProgress }: HeroWebGLBackgrou
 
   return (
     <Suspense fallback={null}>
-      <Scene scrollProgress={scrollProgress} visible={enableWebGL} />
+      <Scene scrollProgress={scrollProgress} visible={enableWebGL} onReady={onReady} />
     </Suspense>
   );
 }
