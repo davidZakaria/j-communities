@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { MotionPreferences } from "./types";
+import type { ExperienceTier, MotionPreferences } from "./types";
 import { probeWebGL } from "./webgl";
 
 const LG_MQ = "(min-width: 1024px)";
