@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useRef, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, type ReactNode } from "react";
 import type { PerspectiveCamera } from "three";
 import {
   applyDampedCameraRig,
@@ -57,6 +57,22 @@ function ScrollCamera({
   return null;
 }
 
+function ReadyNotifier({ onReady }: { onReady?: () => void }) {
+  const calledRef = useRef(false);
+
+  useEffect(() => {
+    if (onReady && !calledRef.current) {
+      calledRef.current = true;
+      const timer = requestAnimationFrame(() => {
+        onReady();
+      });
+      return () => cancelAnimationFrame(timer);
+    }
+  }, [onReady]);
+
+  return null;
+}
+
 interface HeroCanvasProps {
   scrollProgress: number;
   cameraKeyframes: CameraKeyframe[];
@@ -64,6 +80,8 @@ interface HeroCanvasProps {
   children: ReactNode;
   tier?: "full" | "light" | "static";
   reducedMotion?: boolean;
+  onReady?: () => void;
+
 }
 
 export function HeroCanvas({
@@ -73,6 +91,8 @@ export function HeroCanvas({
   children,
   tier = "full",
   reducedMotion = false,
+  onReady,
+
 }: HeroCanvasProps) {
   const enableDamping = tier === "full" && !reducedMotion;
   const enablePointerParallax = tier === "full" && !reducedMotion;
@@ -115,6 +135,7 @@ export function HeroCanvas({
             enableDamping={enableDamping}
           />
           {children}
+          <ReadyNotifier onReady={onReady} />
         </Suspense>
       </Canvas>
     </div>

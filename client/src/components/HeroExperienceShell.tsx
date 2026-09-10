@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useExperienceTier } from "../features/motion/ExperienceTierContext";
 import { ParallaxLayer } from "../features/motion/ParallaxLayer";
 import { useScrollProgress } from "../features/motion/ScrollProgressContext";
@@ -26,8 +26,12 @@ export function HeroExperienceShell({
   const { registerHero, heroProgress } = useScrollProgress();
   const { enableWebGL, tier } = useExperienceTier();
   const show3d = enableWebGL && enableScene3D;
-  const [mediaReady, setMediaReady] = useState(false);
-  const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [webglReady, setWebglReady] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  const handleWebGLReady = useCallback(() => {
+    setWebglReady(true);
+  }, []);
 
   useEffect(() => {
     registerHero(sectionRef.current);
@@ -35,35 +39,18 @@ export function HeroExperienceShell({
   }, [registerHero]);
 
   useEffect(() => {
-    if (!sectionRef.current) return;
-    const section = sectionRef.current;
-    const images = section.querySelectorAll<HTMLImageElement>("img");
-    
-    if (images.length === 0) {
-      setMediaReady(true);
+    if (!enableScene3D) {
+      setInitialLoadComplete(true);
       return;
     }
+    if (tier === "static" || tier === "light") {
+      setInitialLoadComplete(true);
+    } else if (webglReady) {
+      setInitialLoadComplete(true);
+    }
+  }, [tier, webglReady, enableScene3D]);
 
-    let loadedCount = 0;
-    const checkReady = () => {
-      loadedCount++;
-      if (loadedCount >= images.length) {
-        setMediaReady(true);
-      }
-    };
-
-    images.forEach((img) => {
-      if (img.complete && img.naturalWidth > 0) {
-        checkReady();
-      } else {
-        img.addEventListener("load", checkReady, { once: true });
-        img.addEventListener("error", checkReady, { once: true });
-      }
-    });
-
-    const fallbackTimer = window.setTimeout(() => setMediaReady(true), 3000);
-    return () => window.clearTimeout(fallbackTimer);
-  }, [poster]);
+  const showSkeleton = enableScene3D && !initialLoadComplete;
 
   return (
     <section
@@ -89,8 +76,19 @@ export function HeroExperienceShell({
         {poster}
       </ParallaxLayer>
 
+      {enableScene3D && (
+        <div
+          className={`j-hero-skeleton ${!showSkeleton ? "j-hero-skeleton--hidden" : ""}`}
+          aria-hidden="true"
+        />
+      )}
+
       {show3d ? (
-        <HeroWebGLBackground scene={scene} scrollProgress={heroProgress} />
+        <HeroWebGLBackground
+          scene={scene}
+          scrollProgress={heroProgress}
+          onReady={handleWebGLReady}
+        />
       ) : null}
 
       {overlay}

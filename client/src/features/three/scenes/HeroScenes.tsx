@@ -6,9 +6,10 @@ import { CinematicEffects } from "../CinematicEffects";
 import { HeroCanvas } from "../HeroCanvas";
 import { SceneEnvironment } from "../SceneEnvironment";
 
-interface HomeHeroSceneProps {
+interface HeroSceneProps {
   scrollProgress: number;
   visible: boolean;
+  onReady?: () => void;
 }
 
 function useReducedMotion(): boolean {
@@ -16,7 +17,7 @@ function useReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function HomeHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
+export function HomeHeroScene({ scrollProgress, visible, onReady }: HeroSceneProps) {
   const config = getProjectModelConfig("home");
   const { tier } = useExperienceTier();
   const reducedMotion = useReducedMotion();
@@ -28,6 +29,7 @@ export function HomeHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
       visible={visible}
       tier={tier}
       reducedMotion={reducedMotion}
+      onReady={onReady}
     >
       <SceneEnvironment
         fogColor="#0a0a0a"
@@ -55,7 +57,7 @@ export function HomeHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
   );
 }
 
-export function JuraHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
+export function JuraHeroScene({ scrollProgress, visible, onReady }: HeroSceneProps) {
   const theme = getProjectTheme("jura");
   const config = getProjectModelConfig("jura");
   const { tier } = useExperienceTier();
@@ -68,6 +70,7 @@ export function JuraHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
       visible={visible}
       tier={tier}
       reducedMotion={reducedMotion}
+      onReady={onReady}
     >
       <SceneEnvironment
         fogColor={theme.colors.bg}
@@ -95,7 +98,7 @@ export function JuraHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
   );
 }
 
-export function JamilaHeroScene({ scrollProgress, visible }: HomeHeroSceneProps) {
+export function JamilaHeroScene({ scrollProgress, visible, onReady }: HeroSceneProps) {
   const theme = getProjectTheme("jamila");
   const config = getProjectModelConfig("jamila");
   const { tier } = useExperienceTier();
@@ -108,6 +111,7 @@ export function JamilaHeroScene({ scrollProgress, visible }: HomeHeroSceneProps)
       visible={visible}
       tier={tier}
       reducedMotion={reducedMotion}
+      onReady={onReady}
     >
       <SceneEnvironment
         fogColor={theme.colors.accent}
