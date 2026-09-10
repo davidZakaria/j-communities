@@ -46,9 +46,9 @@ function ScrollCamera({
       delta,
       pointerOffset,
       {
-        damping: 0.88,
-        responsiveness: 0.12,
-        pointerInfluence: 0.35,
+        damping: 0.92,
+        responsiveness: 0.15,
+        pointerInfluence: 0.5,
         reducedMotion,
       },
     );
@@ -99,8 +99,8 @@ export function HeroCanvas({
 
   const pointerOffset = usePointerParallax({
     enabled: enablePointerParallax && visible,
-    sensitivity: 0.6,
-    smoothing: 0.08,
+    sensitivity: 0.85,
+    smoothing: 0.06,
   });
 
   if (!visible) return null;

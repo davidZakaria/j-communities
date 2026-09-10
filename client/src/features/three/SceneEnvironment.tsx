@@ -67,18 +67,18 @@ function getLightingProfile(variant: string, scrollProgress: number): LightingPr
 
     default:
       return {
-        ambientIntensity: 0.5 + breathe,
-        mainLightIntensity: 0.85,
-        mainLightPosition: [5, 7, 4],
-        mainLightColor: "#f5f2ef",
-        fillLightIntensity: 0.25,
-        fillLightPosition: [-4, 3, -2],
-        fillLightColor: "#c8c4c0",
-        rimLightIntensity: 0.35,
-        rimLightPosition: [-2, 5, -5],
-        rimLightColor: "#b8b4b0",
+        ambientIntensity: 0.42 + breathe,
+        mainLightIntensity: 1.0,
+        mainLightPosition: [6, 8, 5],
+        mainLightColor: "#fff8f2",
+        fillLightIntensity: 0.35,
+        fillLightPosition: [-5, 4, -3],
+        fillLightColor: "#d8d4d0",
+        rimLightIntensity: 0.55,
+        rimLightPosition: [-3, 6, -6],
+        rimLightColor: "#e8e4e0",
         enableContactShadows: true,
-        envPreset: "city",
+        envPreset: "sunset",
       };
   }
 }

@@ -420,13 +420,13 @@ function CommunityClusterHome({
     const time = state.clock.elapsedTime;
     const easedProgress = easeOutQuart(scrollProgress);
     const sinProgress = Math.sin(scrollProgress * Math.PI);
-    const breathe = Math.sin(time * 0.4) * 0.008;
+    const breathe = Math.sin(time * 0.5) * 0.015;
 
-    const targetRotation = easedProgress * 0.45 + time * 0.012;
-    const targetY = sinProgress * 0.06 + breathe;
-    const targetTilt = (scrollProgress - 0.5) * 0.025;
+    const targetRotation = easedProgress * 0.7 + time * 0.02;
+    const targetY = sinProgress * 0.12 + breathe;
+    const targetTilt = (scrollProgress - 0.5) * 0.045;
 
-    const lerpFactor = isFullTier ? 1 - Math.pow(0.001, delta) : 0.1;
+    const lerpFactor = isFullTier ? 1 - Math.pow(0.0008, delta) : 0.12;
 
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
@@ -441,7 +441,7 @@ function CommunityClusterHome({
     group.current.rotation.x = THREE.MathUtils.lerp(
       group.current.rotation.x,
       targetTilt,
-      lerpFactor * 0.5,
+      lerpFactor * 0.6,
     );
 
     if (isFullTier) {
@@ -450,8 +450,8 @@ function CommunityClusterHome({
         const config = villas[i];
         if (!config) return;
 
-        const individualOffset = config.baseOffset * Math.sin(time * 0.5 + i * 0.4);
-        const scrollElevation = sinProgress * config.scrollMultiplier * 0.025;
+        const individualOffset = config.baseOffset * Math.sin(time * 0.6 + i * 0.5);
+        const scrollElevation = sinProgress * config.scrollMultiplier * 0.04;
 
         villaGroup.position.y = THREE.MathUtils.lerp(
           villaGroup.position.y,

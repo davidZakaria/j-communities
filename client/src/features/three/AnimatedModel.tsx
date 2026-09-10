@@ -175,10 +175,10 @@ export function AnimatedModel({
     if (enableFloat) {
       return (
         <Float
-          speed={1.2}
-          rotationIntensity={0.1}
-          floatIntensity={0.12}
-          floatingRange={[-0.03, 0.03]}
+          speed={1.4}
+          rotationIntensity={0.15}
+          floatIntensity={0.18}
+          floatingRange={[-0.04, 0.04]}
         >
           {proceduralContent}
         </Float>
