@@ -37,6 +37,7 @@ export function Hero() {
     <HeroExperienceShell
       scene="home"
       className="min-h-[100svh] bg-j-black xl:h-[1080px] xl:min-h-0"
+      enableScene3D={false}
       poster={<LookFeelPhoto which="hero" alt="J Communities — hero" />}
       overlay={
         <div

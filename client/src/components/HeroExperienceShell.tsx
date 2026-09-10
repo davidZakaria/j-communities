@@ -14,6 +14,11 @@ interface HeroExperienceShellProps {
   enableScene3D?: boolean;
 }
 
+function useReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function HeroExperienceShell({
   scene,
   poster,
@@ -25,6 +30,7 @@ export function HeroExperienceShell({
   const sectionRef = useRef<HTMLElement>(null);
   const { registerHero, heroProgress } = useScrollProgress();
   const { enableWebGL, tier } = useExperienceTier();
+  const reducedMotion = useReducedMotion();
   const show3d = enableWebGL && enableScene3D;
   const [webglReady, setWebglReady] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -58,6 +64,7 @@ export function HeroExperienceShell({
   }, [tier, webglReady, enableScene3D]);
 
   const showSkeleton = enableScene3D && !initialLoadComplete;
+  const mediaReady = initialLoadComplete;
 
   return (
     <section
