@@ -35,9 +35,6 @@ export function HeroExperienceShell({
   const [webglReady, setWebglReady] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [mediaReady, setMediaReady] = useState(false);
-  const reducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const handleWebGLReady = useCallback(() => {
     setWebglReady(true);
@@ -64,7 +61,6 @@ export function HeroExperienceShell({
   }, [tier, webglReady, enableScene3D]);
 
   const showSkeleton = enableScene3D && !initialLoadComplete;
-  const mediaReady = initialLoadComplete;
 
   return (
     <section
