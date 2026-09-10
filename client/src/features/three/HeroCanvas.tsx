@@ -106,7 +106,7 @@ export function HeroCanvas({
   if (!visible) return null;
 
   const frameloop = tier === "full" ? "always" : "demand";
-  const dpr: [number, number] = tier === "full" ? [1, 2] : [1, 1.5];
+  const dpr: [number, number] = tier === "full" ? [1, 1.5] : [1, 1];
 
   return (
     <div 

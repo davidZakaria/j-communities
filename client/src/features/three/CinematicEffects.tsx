@@ -53,15 +53,15 @@ function getEffectProfile(variant: string, scrollProgress: number): EffectProfil
 
     default:
       return {
-        bloomIntensity: 0.32 + scrollFactor * 0.12,
-        bloomLuminanceThreshold: 0.72,
-        bloomLuminanceSmoothing: 0.38,
-        vignetteOffset: 0.28,
-        vignetteDarkness: 0.52 + scrollProgress * 0.18,
-        enableDOF: true,
-        dofFocusDistance: 0.012 + scrollProgress * 0.008,
+        bloomIntensity: 0.22 + scrollFactor * 0.08,
+        bloomLuminanceThreshold: 0.78,
+        bloomLuminanceSmoothing: 0.32,
+        vignetteOffset: 0.25,
+        vignetteDarkness: 0.45 + scrollProgress * 0.12,
+        enableDOF: false,
+        dofFocusDistance: 0.012,
         dofFocalLength: 0.038,
-        dofBokehScale: 1.8,
+        dofBokehScale: 1.2,
       };
   }
 }

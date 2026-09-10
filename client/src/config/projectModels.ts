@@ -23,13 +23,13 @@ const defaultOrbit: CameraKeyframe[] = [
 export const projectModels: Record<ProjectThemeId | "home", ProjectModelConfig> = {
   home: {
     glbUrl: "/assets/models/home/hero.glb",
-    animationClips: ["HeroLoop"],
+    animationClips: ["Idle"],
     cameraKeyframes: [
-      { position: [5.5, 3.2, 6.5], target: [-0.4, 0.3, -0.1] },
-      { position: [4.2, 2.4, 5.0], target: [-0.3, 0.2, -0.15] },
-      { position: [3.0, 1.6, 3.5], target: [-0.2, 0.05, -0.2] },
+      { position: [12, 6, 14], target: [0, 1.5, 0] },
+      { position: [9, 4.5, 10], target: [0, 1.2, 0] },
+      { position: [6, 3, 7], target: [0, 0.8, 0] },
     ],
-    useProceduralFallback: true,
+    useProceduralFallback: false,
   },
   jura: {
     glbUrl: "/assets/models/jura/hero.glb",
