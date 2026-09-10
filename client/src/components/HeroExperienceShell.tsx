@@ -27,6 +27,7 @@ export function HeroExperienceShell({
   const { enableWebGL, tier } = useExperienceTier();
   const show3d = enableWebGL && enableScene3D;
   const [webglReady, setWebglReady] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   const handleWebGLReady = useCallback(() => {
     setWebglReady(true);
@@ -37,7 +38,19 @@ export function HeroExperienceShell({
     return () => registerHero(null);
   }, [registerHero]);
 
-  const showSkeleton = show3d && !webglReady;
+  useEffect(() => {
+    if (!enableScene3D) {
+      setInitialLoadComplete(true);
+      return;
+    }
+    if (tier === "static" || tier === "light") {
+      setInitialLoadComplete(true);
+    } else if (webglReady) {
+      setInitialLoadComplete(true);
+    }
+  }, [tier, webglReady, enableScene3D]);
+
+  const showSkeleton = enableScene3D && !initialLoadComplete;
 
   return (
     <section
@@ -49,7 +62,7 @@ export function HeroExperienceShell({
         {poster}
       </ParallaxLayer>
 
-      {show3d && (
+      {enableScene3D && (
         <div
           className={`j-hero-skeleton ${!showSkeleton ? "j-hero-skeleton--hidden" : ""}`}
           aria-hidden="true"

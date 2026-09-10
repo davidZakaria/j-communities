@@ -550,13 +550,21 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: none;
+  max-width: 100%;
 }
 
-@media (max-width: 430px) {
+@media (max-width: 480px) {
   .j-footer-headline-mobile {
-    font-size: clamp(1.35rem, 7vw, 1.65rem);
-    letter-spacing: 0.03em;
-    line-height: 1.3;
+    font-size: clamp(1.1rem, 5.8vw, 1.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 360px) {
+  .j-footer-headline-mobile {
+    font-size: clamp(0.95rem, 5.5vw, 1.1rem);
+    letter-spacing: 0.01em;
   }
 }
 
@@ -564,7 +572,7 @@
 .j-hero-skeleton {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 8;
   background: linear-gradient(
     135deg,
     #0a0a0a 0%,
