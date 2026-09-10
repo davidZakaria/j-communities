@@ -435,6 +435,64 @@
   transform: translateY(1.25rem);
 }
 
+/* Hero media loading states - skeleton and fade-in */
+.j-hero-skeleton {
+  transition: opacity 0.5s ease-out;
+}
+
+.j-hero-skeleton--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.j-hero-skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 80%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: j-skeleton-shimmer 2s infinite linear;
+}
+
+@keyframes j-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.j-hero-media {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.j-hero-media--ready {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .j-hero-skeleton,
+  .j-hero-media {
+    transition: none;
+  }
+  .j-hero-skeleton-shimmer {
+    animation: none;
+    display: none;
+  }
+  .j-hero-media {
+    opacity: 1;
+  }
+  .j-hero-skeleton {
+    display: none;
+  }
+}
+
 .j-hero-canvas {
   pointer-events: none;
   touch-action: pan-y;
@@ -543,4 +601,19 @@
 /* Micro-label caps used in comps */
 .j-label-caps {
   @apply text-[0.625rem] font-medium uppercase tracking-[0.4em] text-j-slate;
+}
+
+/* Mobile-safe text handling for long headings with letter-spacing */
+.j-text-mobile-safe {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .j-headline-mobile-clamp {
+    letter-spacing: 0.04em;
+  }
 }

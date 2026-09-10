@@ -16,7 +16,7 @@ export function Footer() {
       <div className="mb-10 grid w-full grid-cols-12 gap-10 lg:mb-12 lg:gap-12">
         <div className="col-span-12 lg:col-span-4">
           <GrowSection>
-            <p className={`${LF_TYPE.footerJourney}`}>{f.journey}</p>
+            <p className={`${LF_TYPE.footerJourney} break-words hyphens-auto max-w-full`}>{f.journey}</p>
           </GrowSection>
         </div>
         <div className="col-span-12 grid grid-cols-1 gap-10 sm:grid-cols-3 lg:col-span-8">
