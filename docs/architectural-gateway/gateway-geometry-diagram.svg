@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a3a3a"/>
+      <stop offset="100%" style="stop-color:#2d2d2d"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a5a5a"/>
+      <stop offset="100%" style="stop-color:#4a4a4a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#1a1a1a"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
+    Architectural Gateway  Geometry Overview
+  </text>
+  <text x="400" y="65" text-anchor="middle" fill="#888888" font-family="Arial, sans-serif" font-size="14">
+    J Communities Home Hero 3D Model
+  </text>
+  
+  <!-- Ground plane reference -->
+  <rect x="100" y="480" width="600" height="4" fill="#333333"/>
+  <text x="720" y="485" fill="#666666" font-family="Arial, sans-serif" font-size="11">ground</text>
+  
+  <!-- === PLINTH (3 tiers) === -->
+  <!-- Lower plinth (tier 1) -->
+  <rect x="150" y="455" width="500" height="25" fill="#252525" stroke="#333" stroke-width="1"/>
+  
+  <!-- Middle plinth (tier 2) -->
+  <rect x="170" y="430" width="460" height="25" fill="#2d2d2d" stroke="#333" stroke-width="1"/>
+  
+  <!-- Top plinth (tier 3) -->
+  <rect x="190" y="405" width="420" height="25" fill="#3a3a3a" stroke="#444" stroke-width="1"/>
+  
+  <!-- Plinth label -->
+  <line x1="680" y1="430" x2="720" y2="430" stroke="#666" stroke-width="1"/>
+  <text x="725" y="435" fill="#888888" font-family="Arial, sans-serif" font-size="11">stepped plinth</text>
+  <text x="725" y="448" fill="#666666" font-family="Arial, sans-serif" font-size="10">(3 tiers, h=0.75)</text>
+  
+  <!-- === LEFT PILLAR === -->
+  <g id="left-pillar">
+    <!-- Main pillar body -->
+    <rect x="200" y="145" width="70" height="260" fill="url(#stoneGrad)" stroke="#444" stroke-width="1"/>
+    
+    <!-- Recessed panel -->
+    <rect x="250" y="165" width="8" height="220" fill="#3a3a3a" stroke="#4a4a4a" stroke-width="0.5"/>
+    
+    <!-- Metal accent strip -->
+    <rect x="262" y="160" width="3" height="230" fill="url(#metalGrad)"/>
+    
+    <!-- Pillar cap -->
+    <rect x="195" y="135" width="80" height="12" fill="#4a4a4a" stroke="#555" stroke-width="1"/>
+    
+    <!-- Pillar base -->
+    <rect x="196" y="395" width="78" height="12" fill="#262626" stroke="#333" stroke-width="1"/>
+  </g>
+  
+  <!-- === RIGHT PILLAR === -->
+  <g id="right-pillar">
+    <!-- Main pillar body -->
+    <rect x="530" y="145" width="70" height="260" fill="url(#stoneGrad)" stroke="#444" stroke-width="1"/>
+    
+    <!-- Recessed panel -->
+    <rect x="542" y="165" width="8" height="220" fill="#3a3a3a" stroke="#4a4a4a" stroke-width="0.5"/>
+    
+    <!-- Metal accent strip -->
+    <rect x="535" y="160" width="3" height="230" fill="url(#metalGrad)"/>
+    
+    <!-- Pillar cap -->
+    <rect x="525" y="135" width="80" height="12" fill="#4a4a4a" stroke="#555" stroke-width="1"/>
+    
+    <!-- Pillar base -->
+    <rect x="526" y="395" width="78" height="12" fill="#262626" stroke="#333" stroke-width="1"/>
+  </g>
+  
+  <!-- Pillar label -->
+  <line x1="130" y1="270" x2="195" y2="270" stroke="#666" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="50" y="260" fill="#888888" font-family="Arial, sans-serif" font-size="11">portal pillars</text>
+  <text x="50" y="273" fill="#666666" font-family="Arial, sans-serif" font-size="10">(w=0.7, h=4.0)</text>
+  <text x="50" y="286" fill="#666666" font-family="Arial, sans-serif" font-size="10">stone #2d2d2d</text>
+  
+  <!-- === LINTEL / CANOPY === -->
+  <g id="lintel">
+    <!-- Main lintel beam -->
+    <rect x="190" y="100" width="420" height="35" fill="url(#stoneGrad)" stroke="#444" stroke-width="1"/>
+    
+    <!-- Lintel crown cap -->
+    <rect x="185" y="88" width="430" height="12" fill="#4a4a4a" stroke="#555" stroke-width="1"/>
+    
+    <!-- Underside accent beam -->
+    <rect x="275" y="135" width="250" height="5" fill="#4a4a4a"/>
+    
+    <!-- Glass canopy extension -->
+    <rect x="195" y="78" width="410" height="8" fill="#d8d8d8" fill-opacity="0.5" stroke="#aaa" stroke-width="0.5"/>
+  </g>
+  
+  <!-- Lintel label -->
+  <line x1="620" y1="110" x2="680" y2="110" stroke="#666" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="685" y="100" fill="#888888" font-family="Arial, sans-serif" font-size="11">lintel/canopy</text>
+  <text x="685" y="113" fill="#666666" font-family="Arial, sans-serif" font-size="10">(h=0.5)</text>
+  <text x="685" y="126" fill="#666666" font-family="Arial, sans-serif" font-size="10">+ glass accent</text>
+  
+  <!-- === PASSAGE / THRESHOLD === -->
+  <rect x="275" y="402" width="250" height="4" fill="#3a3a3a" stroke="#444" stroke-width="0.5"/>
+  <rect x="285" y="401" width="230" height="2" fill="#4a4a4a"/>
+  
+  <!-- Gateway span indicator -->
+  <line x1="270" y1="380" x2="530" y2="380" stroke="#888" stroke-width="1"/>
+  <line x1="270" y1="375" x2="270" y2="385" stroke="#888" stroke-width="1"/>
+  <line x1="530" y1="375" x2="530" y2="385" stroke="#888" stroke-width="1"/>
+  <text x="400" y="375" text-anchor="middle" fill="#888888" font-family="Arial, sans-serif" font-size="11">gateway span = 3.2</text>
+  
+  <!-- Height indicator -->
+  <line x1="140" y1="100" x2="140" y2="405" stroke="#888" stroke-width="1"/>
+  <line x1="135" y1="100" x2="145" y2="100" stroke="#888" stroke-width="1"/>
+  <line x1="135" y1="405" x2="145" y2="405" stroke="#888" stroke-width="1"/>
+  <text x="135" y="260" text-anchor="end" fill="#888888" font-family="Arial, sans-serif" font-size="11" transform="rotate(-90, 135, 260)">total height ~4.75</text>
+  
+  <!-- === LEGEND === -->
+  <g transform="translate(50, 510)">
+    <text x="0" y="0" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Materials (monochrome editorial palette):</text>
+    
+    <rect x="0" y="15" width="20" height="12" fill="#2d2d2d" stroke="#444"/>
+    <text x="25" y="25" fill="#888888" font-family="Arial, sans-serif" font-size="11">Stone #2d2d2d (pillars, lintel)</text>
+    
+    <rect x="200" y="15" width="20" height="12" fill="#4a4a4a" stroke="#555"/>
+    <text x="225" y="25" fill="#888888" font-family="Arial, sans-serif" font-size="11">Metal #4a4a4a (caps, accents)</text>
+    
+    <rect x="420" y="15" width="20" height="12" fill="#d8d8d8" fill-opacity="0.5" stroke="#aaa"/>
+    <text x="445" y="25" fill="#888888" font-family="Arial, sans-serif" font-size="11">Glass #d8d8d8 @ 45% (canopy)</text>
+    
+    <rect x="0" y="40" width="20" height="12" fill="#252525" stroke="#333"/>
+    <text x="25" y="50" fill="#888888" font-family="Arial, sans-serif" font-size="11">Dark stone #252525 (plinth base)</text>
+    
+    <rect x="200" y="40" width="20" height="12" fill="#3a3a3a" stroke="#444"/>
+    <text x="225" y="50" fill="#888888" font-family="Arial, sans-serif" font-size="11">Light stone #3a3a3a (details)</text>
+  </g>
+  
+  <!-- Motion note -->
+  <text x="400" y="585" text-anchor="middle" fill="#666666" font-family="Arial, sans-serif" font-size="11" font-style="italic">
+    Scroll-driven: gentle rotation (0.4 rad) + float animation + camera orbit reveal
+  </text>
+</svg>
