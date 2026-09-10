@@ -88,6 +88,29 @@
   background-color: var(--project-surface-alt);
 }
 
+/* Jura contrast improvements - ensure readable muted text on dark surfaces */
+.project-theme[data-project-theme="jura"] .project-text-muted {
+  color: var(--project-muted);
+}
+
+/* Card surfaces need slightly lighter muted text for accessibility */
+.project-theme[data-project-theme="jura"] .project-surface .project-text-muted,
+.project-theme[data-project-theme="jura"] .project-surface-alt .project-text-muted {
+  color: #e0d8cc;
+}
+
+/* Form labels and helper text need higher contrast on Jura dark theme */
+.project-theme[data-project-theme="jura"] label.project-text-muted,
+.project-theme[data-project-theme="jura"] .project-body-font.project-text-muted {
+  color: #d9d0c4;
+}
+
+/* Ensure input placeholder text is readable */
+.project-theme[data-project-theme="jura"] input::placeholder,
+.project-theme[data-project-theme="jura"] textarea::placeholder {
+  color: rgba(217, 208, 196, 0.65);
+}
+
 /* Jamila — Yale Blue header + Lemon Glacier logo (CI recommended use) */
 .project-theme[data-project-theme="jamila"] .project-hero-overlay {
   background: var(--project-hero-overlay);
