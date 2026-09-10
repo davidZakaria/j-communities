@@ -141,6 +141,13 @@ function GltfModel({
   );
 }
 
+function getVariantScaleAndPosition(variant: string): { scale: number; position: [number, number, number] } {
+  if (variant === "home") {
+    return { scale: 0.82, position: [-0.35, -0.15, 0] };
+  }
+  return { scale: 1, position: [0, 0, 0] };
+}
+
 export function AnimatedModel({
   glbUrl,
   animationClips,
@@ -151,33 +158,33 @@ export function AnimatedModel({
   tier = "full",
 }: AnimatedModelProps) {
   const enableFloat = tier === "full";
+  const { scale: variantScale, position: variantPosition } = getVariantScaleAndPosition(variant);
 
   if (useProceduralFallback) {
+    const proceduralContent = (
+      <group scale={variantScale} position={variantPosition}>
+        <ProceduralMassing
+          variant={variant}
+          accent={accent}
+          scrollProgress={scrollProgress}
+          tier={tier}
+        />
+      </group>
+    );
+
     if (enableFloat) {
       return (
         <Float
-          speed={1.5}
+          speed={1.4}
           rotationIntensity={0.15}
-          floatIntensity={0.2}
-          floatingRange={[-0.05, 0.05]}
+          floatIntensity={0.18}
+          floatingRange={[-0.04, 0.04]}
         >
-          <ProceduralMassing
-            variant={variant}
-            accent={accent}
-            scrollProgress={scrollProgress}
-            tier={tier}
-          />
+          {proceduralContent}
         </Float>
       );
     }
-    return (
-      <ProceduralMassing
-        variant={variant}
-        accent={accent}
-        scrollProgress={scrollProgress}
-        tier={tier}
-      />
-    );
+    return proceduralContent;
   }
 
   if (enableFloat) {
