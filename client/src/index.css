@@ -528,6 +528,164 @@
   }
 }
 
+/* WebGL scene transitions */
+.j-webgl-transition {
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+.j-webgl-transition--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.j-webgl-transition--entering {
+  opacity: 0;
+}
+
+.j-webgl-transition--visible {
+  opacity: 1;
+}
+
+.j-webgl-transition--exiting {
+  opacity: 0;
+}
+
+.j-webgl-loading {
+  background: transparent;
+}
+
+.j-webgl-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: j-webgl-spin 0.8s linear infinite;
+}
+
+@keyframes j-webgl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Story reveal animations */
+.j-story-reveal {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--j-story-stagger, 0s);
+}
+
+.j-story-reveal--fast {
+  transition-duration: 0.4s;
+}
+
+.j-story-reveal--normal {
+  transition-duration: 0.6s;
+}
+
+.j-story-reveal--slow {
+  transition-duration: 0.9s;
+}
+
+.j-story-reveal--up {
+  transform: translateY(1.5rem);
+}
+
+.j-story-reveal--down {
+  transform: translateY(-1.5rem);
+}
+
+.j-story-reveal--left {
+  transform: translateX(2rem);
+}
+
+.j-story-reveal--right {
+  transform: translateX(-2rem);
+}
+
+.j-story-reveal--scale {
+  transform: scale(0.92);
+}
+
+.j-story-reveal--visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+.j-story-reveal--fading {
+  opacity: 0.4;
+}
+
+/* Story text variants */
+.j-story-text--headline {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.j-story-text--label {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Section atmosphere */
+.j-section-atmosphere {
+  position: relative;
+}
+
+.j-section-atmosphere-overlay {
+  mix-blend-mode: multiply;
+}
+
+.j-section-atmosphere--active .j-section-atmosphere-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Story progress indicator */
+.j-story-progress {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.j-story-progress-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Reduced motion: disable all Phase 2 animations */
+@media (prefers-reduced-motion: reduce) {
+  .j-webgl-transition {
+    transition: none !important;
+  }
+
+  .j-webgl-transition--entering,
+  .j-webgl-transition--visible {
+    opacity: 1;
+  }
+
+  .j-webgl-loading-spinner {
+    animation: none;
+  }
+
+  .j-story-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .j-story-reveal--fading {
+    opacity: 1 !important;
+  }
+
+  .j-section-atmosphere-overlay {
+    transition: none !important;
+    opacity: 0 !important;
+  }
+
+  .j-story-progress {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .j-grow-in {
     opacity: 1;
