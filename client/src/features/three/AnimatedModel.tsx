@@ -143,7 +143,7 @@ function GltfModel({
 
 function getVariantScaleAndPosition(variant: string): { scale: number; position: [number, number, number] } {
   if (variant === "home") {
-    return { scale: 1.0, position: [-1.5, -0.5, 0] };
+    return { scale: 1.2, position: [-1.0, -0.3, 0] };
   }
   return { scale: 1, position: [0, 0, 0] };
 }
