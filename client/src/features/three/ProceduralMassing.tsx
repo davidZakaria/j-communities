@@ -83,6 +83,227 @@ function easeOutQuart(t: number): number {
   return 1 - Math.pow(1 - t, 4);
 }
 
+interface RealisticTreeConfig {
+  pos: [number, number, number];
+  type: "cypress" | "olive" | "palm" | "broadleaf";
+  scale: number;
+  rotation?: number;
+}
+
+interface RealisticVillaConfig {
+  pos: [number, number, number];
+  width: number;
+  depth: number;
+  stories: number;
+  hasBalcony: boolean;
+  balconySide?: "front" | "side" | "both";
+  roofStyle: "flat" | "parapet" | "slight-pitch";
+  windowRows: number;
+  windowCols: number;
+  baseOffset: number;
+  scrollMultiplier: number;
+}
+
+function RealisticCypressTree({ pos, scale, rotation = 0 }: { pos: [number, number, number]; scale: number; rotation?: number }) {
+  const colors = variantColors("home");
+  const height = 0.8 * scale;
+  const baseRadius = 0.08 * scale;
+  
+  return (
+    <group position={pos} rotation-y={rotation}>
+      {/* Trunk - tapered cylinder */}
+      <mesh position={[0, height * 0.15, 0]} castShadow>
+        <cylinderGeometry args={[baseRadius * 0.25, baseRadius * 0.4, height * 0.35, 8]} />
+        <meshStandardMaterial color="#4a3d30" roughness={0.9} metalness={0} />
+      </mesh>
+      {/* Foliage - stacked tapered cones for cypress silhouette */}
+      <mesh position={[0, height * 0.5, 0]} castShadow>
+        <coneGeometry args={[baseRadius * 1.2, height * 0.7, 8]} />
+        <meshStandardMaterial color={colors.foliageDark} roughness={0.92} metalness={0} />
+      </mesh>
+      <mesh position={[0, height * 0.7, 0]} castShadow>
+        <coneGeometry args={[baseRadius * 0.85, height * 0.45, 8]} />
+        <meshStandardMaterial color={colors.foliage} roughness={0.9} metalness={0} />
+      </mesh>
+      <mesh position={[0, height * 0.85, 0]} castShadow>
+        <coneGeometry args={[baseRadius * 0.5, height * 0.25, 6]} />
+        <meshStandardMaterial color={colors.foliageBright} roughness={0.88} metalness={0} />
+      </mesh>
+    </group>
+  );
+}
+
+function RealisticOliveTree({ pos, scale, rotation = 0 }: { pos: [number, number, number]; scale: number; rotation?: number }) {
+  const colors = variantColors("home");
+  const height = 0.5 * scale;
+  
+  return (
+    <group position={pos} rotation-y={rotation}>
+      {/* Gnarled trunk */}
+      <mesh position={[0, height * 0.25, 0]} castShadow>
+        <cylinderGeometry args={[0.04 * scale, 0.06 * scale, height * 0.5, 6]} />
+        <meshStandardMaterial color="#5a4a3a" roughness={0.95} metalness={0} />
+      </mesh>
+      {/* Irregular canopy - multiple offset ellipsoids */}
+      <mesh position={[0.02 * scale, height * 0.6, 0]} castShadow scale={[1.2, 0.7, 1]}>
+        <sphereGeometry args={[0.15 * scale, 10, 8]} />
+        <meshStandardMaterial color="#4a5a42" roughness={0.9} metalness={0} />
+      </mesh>
+      <mesh position={[-0.03 * scale, height * 0.55, 0.02 * scale]} castShadow scale={[1, 0.65, 0.9]}>
+        <sphereGeometry args={[0.12 * scale, 10, 8]} />
+        <meshStandardMaterial color={colors.foliage} roughness={0.92} metalness={0} />
+      </mesh>
+      <mesh position={[0.01 * scale, height * 0.68, -0.02 * scale]} castShadow scale={[0.9, 0.6, 1.1]}>
+        <sphereGeometry args={[0.1 * scale, 8, 6]} />
+        <meshStandardMaterial color="#556b4a" roughness={0.88} metalness={0} />
+      </mesh>
+    </group>
+  );
+}
+
+function RealisticVilla({
+  config,
+  colors,
+  isFullTier,
+  windowEmissive,
+}: {
+  config: RealisticVillaConfig;
+  colors: ReturnType<typeof variantColors>;
+  isFullTier: boolean;
+  windowEmissive: number;
+}) {
+  const storyHeight = 0.28;
+  const totalHeight = config.stories * storyHeight;
+  const wallThickness = 0.03;
+  
+  const windowWidth = 0.08;
+  const windowHeight = 0.12;
+  const windowDepth = 0.02;
+  const windowSpacingX = config.width / (config.windowCols + 1);
+  const windowSpacingY = storyHeight * 0.65;
+  
+  return (
+    <group position={config.pos}>
+      {/* Main building mass */}
+      <mesh position={[0, totalHeight / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[config.width, totalHeight, config.depth]} />
+        <meshStandardMaterial
+          color={colors.stone}
+          roughness={isFullTier ? 0.75 : 0.82}
+          metalness={isFullTier ? 0.02 : 0.01}
+          envMapIntensity={isFullTier ? 0.35 : 0.12}
+        />
+      </mesh>
+      
+      {/* Base/foundation - slightly darker */}
+      <mesh position={[0, 0.03, 0]} castShadow receiveShadow>
+        <boxGeometry args={[config.width + 0.02, 0.06, config.depth + 0.02]} />
+        <meshStandardMaterial color={colors.secondary} roughness={0.85} metalness={0.01} />
+      </mesh>
+      
+      {/* Roof based on style */}
+      {config.roofStyle === "parapet" && (
+        <>
+          {/* Parapet walls */}
+          <mesh position={[0, totalHeight + 0.025, config.depth / 2 + wallThickness / 2]} castShadow>
+            <boxGeometry args={[config.width + wallThickness * 2, 0.05, wallThickness]} />
+            <meshStandardMaterial color={colors.stoneWarm} roughness={0.8} metalness={0.01} />
+          </mesh>
+          <mesh position={[0, totalHeight + 0.025, -config.depth / 2 - wallThickness / 2]} castShadow>
+            <boxGeometry args={[config.width + wallThickness * 2, 0.05, wallThickness]} />
+            <meshStandardMaterial color={colors.stoneWarm} roughness={0.8} metalness={0.01} />
+          </mesh>
+          <mesh position={[config.width / 2 + wallThickness / 2, totalHeight + 0.025, 0]} castShadow>
+            <boxGeometry args={[wallThickness, 0.05, config.depth]} />
+            <meshStandardMaterial color={colors.stoneWarm} roughness={0.8} metalness={0.01} />
+          </mesh>
+          <mesh position={[-config.width / 2 - wallThickness / 2, totalHeight + 0.025, 0]} castShadow>
+            <boxGeometry args={[wallThickness, 0.05, config.depth]} />
+            <meshStandardMaterial color={colors.stoneWarm} roughness={0.8} metalness={0.01} />
+          </mesh>
+          {/* Flat roof surface */}
+          <mesh position={[0, totalHeight + 0.005, 0]} receiveShadow>
+            <boxGeometry args={[config.width, 0.01, config.depth]} />
+            <meshStandardMaterial color={colors.roof} roughness={0.7} metalness={0.02} />
+          </mesh>
+        </>
+      )}
+      
+      {config.roofStyle === "flat" && (
+        <mesh position={[0, totalHeight + 0.015, 0]} castShadow receiveShadow>
+          <boxGeometry args={[config.width + 0.04, 0.03, config.depth + 0.04]} />
+          <meshStandardMaterial color={colors.roof} roughness={0.65} metalness={0.03} />
+        </mesh>
+      )}
+      
+      {/* Windows - recessed for realism */}
+      {Array.from({ length: config.stories }).map((_, story) =>
+        Array.from({ length: config.windowCols }).map((_, col) => {
+          const x = -config.width / 2 + windowSpacingX * (col + 1);
+          const y = story * storyHeight + windowSpacingY;
+          return (
+            <group key={`window-${story}-${col}`}>
+              {/* Window recess */}
+              <mesh position={[x, y, config.depth / 2 + 0.001]}>
+                <boxGeometry args={[windowWidth + 0.02, windowHeight + 0.02, 0.02]} />
+                <meshStandardMaterial color={colors.secondary} roughness={0.85} metalness={0.01} />
+              </mesh>
+              {/* Window glass */}
+              <mesh position={[x, y, config.depth / 2 + 0.012]}>
+                <boxGeometry args={[windowWidth, windowHeight, windowDepth]} />
+                <meshStandardMaterial
+                  color="#3a4550"
+                  roughness={0.15}
+                  metalness={0.1}
+                  emissive={colors.warmGlow}
+                  emissiveIntensity={windowEmissive * 0.7}
+                  transparent
+                  opacity={0.85}
+                />
+              </mesh>
+              {/* Window frame */}
+              <mesh position={[x, y, config.depth / 2 + 0.018]}>
+                <boxGeometry args={[windowWidth + 0.01, windowHeight + 0.01, 0.005]} />
+                <meshStandardMaterial color={colors.woodTrim} roughness={0.6} metalness={0.02} transparent opacity={0.0} />
+              </mesh>
+            </group>
+          );
+        })
+      )}
+      
+      {/* Balcony */}
+      {config.hasBalcony && (config.balconySide === "front" || config.balconySide === "both") && (
+        <group position={[0, totalHeight - storyHeight + 0.05, config.depth / 2 + 0.08]}>
+          {/* Balcony floor */}
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[config.width * 0.6, 0.03, 0.15]} />
+            <meshStandardMaterial color={colors.terrace} roughness={0.72} metalness={0.02} />
+          </mesh>
+          {/* Balcony railing - glass panels */}
+          <mesh position={[0, 0.05, 0.06]}>
+            <boxGeometry args={[config.width * 0.58, 0.08, 0.01]} />
+            <meshStandardMaterial color="#5a6570" roughness={0.1} metalness={0.15} transparent opacity={0.4} />
+          </mesh>
+          {/* Railing posts */}
+          <mesh position={[-config.width * 0.28, 0.045, 0.06]} castShadow>
+            <boxGeometry args={[0.015, 0.09, 0.015]} />
+            <meshStandardMaterial color={colors.glass} roughness={0.35} metalness={0.3} />
+          </mesh>
+          <mesh position={[config.width * 0.28, 0.045, 0.06]} castShadow>
+            <boxGeometry args={[0.015, 0.09, 0.015]} />
+            <meshStandardMaterial color={colors.glass} roughness={0.35} metalness={0.3} />
+          </mesh>
+          {/* Top rail */}
+          <mesh position={[0, 0.09, 0.06]} castShadow>
+            <boxGeometry args={[config.width * 0.6, 0.012, 0.02]} />
+            <meshStandardMaterial color={colors.glass} roughness={0.3} metalness={0.4} />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+}
+
 function CommunityClusterHome({
   scrollProgress,
   tier,
@@ -93,115 +314,105 @@ function CommunityClusterHome({
   accent: string;
 }) {
   const group = useRef<THREE.Group>(null);
-  const residenceRefs = useRef<(THREE.Group | null)[]>([]);
+  const villaRefs = useRef<(THREE.Group | null)[]>([]);
   const isFullTier = tier === "full";
 
   const colors = variantColors("home");
 
-  const residences = useMemo((): ResidenceConfig[] => [
+  const villas = useMemo((): RealisticVillaConfig[] => [
     {
-      bodyPos: [0, 0.38, 0.25],
-      bodySize: [0.95, 0.76, 0.8],
-      roofPos: [0, 0.82, 0.25],
-      roofSize: [1.05, 0.08, 0.9],
-      hasWindow: true,
-      windowPos: [0.48, 0.4, 0.25],
-      windowSize: [0.02, 0.32, 0.3],
+      pos: [0, 0, 0.15],
+      width: 0.55,
+      depth: 0.45,
+      stories: 3,
+      hasBalcony: true,
+      balconySide: "front",
+      roofStyle: "parapet",
+      windowRows: 3,
+      windowCols: 3,
       baseOffset: 0,
       scrollMultiplier: 1.0,
     },
     {
-      bodyPos: [-1.15, 0.32, -0.1],
-      bodySize: [0.75, 0.64, 0.65],
-      roofPos: [-1.15, 0.68, -0.1],
-      roofSize: [0.85, 0.06, 0.75],
-      hasWindow: true,
-      windowPos: [-0.77, 0.34, -0.1],
-      windowSize: [0.02, 0.26, 0.24],
-      baseOffset: 0.06,
+      pos: [-0.65, 0, -0.05],
+      width: 0.45,
+      depth: 0.38,
+      stories: 2,
+      hasBalcony: true,
+      balconySide: "front",
+      roofStyle: "flat",
+      windowRows: 2,
+      windowCols: 2,
+      baseOffset: 0.04,
+      scrollMultiplier: 1.12,
+    },
+    {
+      pos: [0.68, 0, -0.02],
+      width: 0.48,
+      depth: 0.4,
+      stories: 2,
+      hasBalcony: true,
+      balconySide: "both",
+      roofStyle: "parapet",
+      windowRows: 2,
+      windowCols: 3,
+      baseOffset: 0.03,
+      scrollMultiplier: 1.08,
+    },
+    {
+      pos: [-0.32, 0, -0.52],
+      width: 0.38,
+      depth: 0.32,
+      stories: 2,
+      hasBalcony: false,
+      roofStyle: "flat",
+      windowRows: 2,
+      windowCols: 2,
+      baseOffset: 0.05,
       scrollMultiplier: 1.15,
     },
     {
-      bodyPos: [1.2, 0.35, -0.05],
-      bodySize: [0.8, 0.7, 0.7],
-      roofPos: [1.2, 0.74, -0.05],
-      roofSize: [0.9, 0.06, 0.8],
-      hasWindow: true,
-      windowPos: [0.8, 0.36, -0.05],
-      windowSize: [0.02, 0.28, 0.26],
+      pos: [0.35, 0, -0.48],
+      width: 0.4,
+      depth: 0.34,
+      stories: 2,
+      hasBalcony: true,
+      balconySide: "front",
+      roofStyle: "parapet",
+      windowRows: 2,
+      windowCols: 2,
       baseOffset: 0.04,
       scrollMultiplier: 1.1,
     },
-    {
-      bodyPos: [-0.55, 0.28, -0.85],
-      bodySize: [0.6, 0.56, 0.55],
-      roofPos: [-0.55, 0.6, -0.85],
-      roofSize: [0.7, 0.05, 0.65],
-      hasWindow: true,
-      windowPos: [-0.25, 0.3, -0.85],
-      windowSize: [0.02, 0.22, 0.2],
-      baseOffset: 0.08,
-      scrollMultiplier: 1.2,
-    },
-    {
-      bodyPos: [0.65, 0.3, -0.8],
-      bodySize: [0.65, 0.6, 0.58],
-      roofPos: [0.65, 0.64, -0.8],
-      roofSize: [0.75, 0.05, 0.68],
-      hasWindow: true,
-      windowPos: [0.32, 0.32, -0.8],
-      windowSize: [0.02, 0.24, 0.22],
-      baseOffset: 0.06,
-      scrollMultiplier: 1.18,
-    },
   ], []);
 
-  const connections = useMemo((): ConnectionConfig[] => [
-    { pos: [-0.55, 0.08, 0.08], size: [0.35, 0.16, 0.05], type: "wall" },
-    { pos: [0.58, 0.07, 0.1], size: [0.32, 0.14, 0.04], type: "wall" },
-    { pos: [-0.85, 0.06, -0.48], size: [0.04, 0.12, 0.5], type: "wall" },
-    { pos: [0.92, 0.06, -0.42], size: [0.04, 0.12, 0.45], type: "wall" },
+  const trees = useMemo((): RealisticTreeConfig[] => [
+    { pos: [-1.05, 0, 0.25], type: "cypress", scale: 1.1, rotation: 0.1 },
+    { pos: [-0.95, 0, -0.42], type: "cypress", scale: 0.95, rotation: -0.15 },
+    { pos: [1.0, 0, 0.18], type: "cypress", scale: 1.0, rotation: 0.05 },
+    { pos: [0.92, 0, -0.38], type: "cypress", scale: 0.88, rotation: -0.08 },
+    { pos: [-0.02, 0, -0.78], type: "olive", scale: 0.9, rotation: 0.2 },
+    { pos: [0.58, 0, -0.72], type: "olive", scale: 0.8, rotation: -0.1 },
+    { pos: [-0.55, 0, -0.75], type: "olive", scale: 0.85, rotation: 0.15 },
   ], []);
 
-  const lifestyleElements = useMemo((): LifestyleElementConfig[] => [
-    { pos: [-1.7, 0.28, 0.35], size: [0.12, 0.56, 0.12], type: "tree" },
-    { pos: [-1.55, 0.24, -0.65], size: [0.1, 0.48, 0.1], type: "tree" },
-    { pos: [1.75, 0.26, 0.2], size: [0.11, 0.52, 0.11], type: "tree" },
-    { pos: [1.6, 0.22, -0.55], size: [0.09, 0.44, 0.09], type: "tree" },
-    { pos: [-0.05, 0.2, -1.25], size: [0.1, 0.4, 0.1], type: "tree" },
-    { pos: [0.55, 0.18, -1.2], size: [0.08, 0.36, 0.08], type: "tree" },
-    { pos: [-1.4, 0.1, 0.55], size: [0.18, 0.2, 0.16], type: "shrub" },
-    { pos: [1.5, 0.09, 0.45], size: [0.16, 0.18, 0.14], type: "shrub" },
-    { pos: [-0.95, 0.08, -0.95], size: [0.2, 0.16, 0.18], type: "shrub" },
-    { pos: [1.0, 0.08, -1.0], size: [0.18, 0.16, 0.16], type: "shrub" },
-    { pos: [-0.3, 0.1, 0.7], size: [0.22, 0.2, 0.18], type: "shrub" },
-    { pos: [0.35, 0.1, 0.65], size: [0.2, 0.2, 0.16], type: "shrub" },
-    { pos: [0, 0.12, -0.35], size: [0.28, 0.24, 0.24], type: "shrub" },
-    { pos: [-0.35, 0.1, -0.45], size: [0.2, 0.2, 0.18], type: "shrub" },
-    { pos: [0.3, 0.1, -0.4], size: [0.18, 0.2, 0.16], type: "shrub" },
-    { pos: [0, 0.025, -0.35], size: [0.55, 0.05, 0.4], type: "pool" },
-    { pos: [-0.45, 0.05, 0.45], size: [0.3, 0.1, 0.22], type: "seating" },
-    { pos: [0.5, 0.05, 0.42], size: [0.28, 0.1, 0.2], type: "seating" },
-    { pos: [-0.15, 0.04, 0.55], size: [0.22, 0.08, 0.18], type: "seating" },
-    { pos: [0, 0.86, 0.6], size: [0.4, 0.04, 0.18], type: "terrace" },
-    { pos: [1.2, 0.78, 0.28], size: [0.32, 0.04, 0.22], type: "terrace" },
-    { pos: [-1.15, 0.72, 0.22], size: [0.28, 0.04, 0.2], type: "terrace" },
-    { pos: [0, 0.015, 1.15], size: [3.8, 0.03, 0.12], type: "greenEdge" },
-    { pos: [-1.85, 0.015, -0.15], size: [0.1, 0.03, 2.5], type: "greenEdge" },
-    { pos: [1.9, 0.015, -0.15], size: [0.1, 0.03, 2.5], type: "greenEdge" },
-    { pos: [0, 0.015, -1.35], size: [3.5, 0.03, 0.1], type: "greenEdge" },
-    { pos: [0, 0.025, 0.15], size: [0.22, 0.05, 0.9], type: "path" },
-    { pos: [-0.5, 0.025, -0.15], size: [0.7, 0.05, 0.18], type: "path" },
-    { pos: [0.45, 0.025, -0.1], size: [0.65, 0.05, 0.18], type: "path" },
-    { pos: [-0.25, 0.025, 0.55], size: [0.5, 0.05, 0.15], type: "path" },
-    { pos: [0.3, 0.025, 0.5], size: [0.45, 0.05, 0.15], type: "path" },
-    { pos: [-0.65, 0.03, 0.12], size: [0.07, 0.06, 0.07], type: "steppingStone" },
-    { pos: [-0.5, 0.03, -0.05], size: [0.06, 0.06, 0.06], type: "steppingStone" },
-    { pos: [0.6, 0.03, 0.15], size: [0.07, 0.06, 0.07], type: "steppingStone" },
-    { pos: [0.48, 0.03, -0.02], size: [0.06, 0.06, 0.06], type: "steppingStone" },
-    { pos: [-0.12, 0.03, -0.65], size: [0.06, 0.06, 0.06], type: "steppingStone" },
-    { pos: [0.15, 0.03, -0.6], size: [0.06, 0.06, 0.06], type: "steppingStone" },
-  ], []);
+  const landscapeFeatures = useMemo(() => ({
+    paths: [
+      { pos: [0, 0.012, 0.42] as [number, number, number], size: [0.18, 0.025, 0.55] as [number, number, number] },
+      { pos: [-0.28, 0.012, 0.05] as [number, number, number], size: [0.4, 0.025, 0.14] as [number, number, number] },
+      { pos: [0.32, 0.012, 0.08] as [number, number, number], size: [0.38, 0.025, 0.14] as [number, number, number] },
+    ],
+    hedges: [
+      { pos: [-0.82, 0.04, 0.08] as [number, number, number], size: [0.08, 0.08, 0.35] as [number, number, number] },
+      { pos: [0.85, 0.04, 0.1] as [number, number, number], size: [0.08, 0.08, 0.32] as [number, number, number] },
+      { pos: [0, 0.035, -0.25] as [number, number, number], size: [0.5, 0.07, 0.06] as [number, number, number] },
+    ],
+    poolArea: {
+      pos: [0, 0.015, -0.18] as [number, number, number],
+      poolSize: [0.32, 0.03, 0.2] as [number, number, number],
+      deckSize: [0.45, 0.015, 0.28] as [number, number, number],
+    },
+  }), []);
 
   useFrame((state, delta) => {
     if (!group.current) return;
@@ -209,11 +420,11 @@ function CommunityClusterHome({
     const time = state.clock.elapsedTime;
     const easedProgress = easeOutQuart(scrollProgress);
     const sinProgress = Math.sin(scrollProgress * Math.PI);
-    const breathe = Math.sin(time * 0.5) * 0.012;
+    const breathe = Math.sin(time * 0.4) * 0.008;
 
-    const targetRotation = easedProgress * 0.55 + time * 0.018;
-    const targetY = sinProgress * 0.1 + breathe;
-    const targetTilt = (scrollProgress - 0.5) * 0.035;
+    const targetRotation = easedProgress * 0.45 + time * 0.012;
+    const targetY = sinProgress * 0.06 + breathe;
+    const targetTilt = (scrollProgress - 0.5) * 0.025;
 
     const lerpFactor = isFullTier ? 1 - Math.pow(0.001, delta) : 0.1;
 
@@ -234,286 +445,142 @@ function CommunityClusterHome({
     );
 
     if (isFullTier) {
-      residenceRefs.current.forEach((residenceGroup, i) => {
-        if (!residenceGroup) return;
-        const config = residences[i];
+      villaRefs.current.forEach((villaGroup, i) => {
+        if (!villaGroup) return;
+        const config = villas[i];
         if (!config) return;
 
-        const individualOffset = config.baseOffset * Math.sin(time * 0.7 + i * 0.6);
-        const scrollElevation = sinProgress * config.scrollMultiplier * 0.05;
+        const individualOffset = config.baseOffset * Math.sin(time * 0.5 + i * 0.4);
+        const scrollElevation = sinProgress * config.scrollMultiplier * 0.025;
 
-        residenceGroup.position.y = THREE.MathUtils.lerp(
-          residenceGroup.position.y,
+        villaGroup.position.y = THREE.MathUtils.lerp(
+          villaGroup.position.y,
           individualOffset + scrollElevation,
           lerpFactor,
         );
 
-        const scaleBreath = 1 + Math.sin(time * 0.8 + i * 0.35) * 0.006;
-        residenceGroup.scale.setScalar(
-          THREE.MathUtils.lerp(residenceGroup.scale.x, scaleBreath, lerpFactor)
+        const scaleBreath = 1 + Math.sin(time * 0.6 + i * 0.25) * 0.003;
+        villaGroup.scale.setScalar(
+          THREE.MathUtils.lerp(villaGroup.scale.x, scaleBreath, lerpFactor)
         );
       });
     }
   });
 
-  const groundOpacity = isFullTier ? 0.82 + scrollProgress * 0.1 : 0.72;
-  const windowEmissive = isFullTier ? 0.35 + scrollProgress * 0.45 : 0.2;
-  const waterEmissive = isFullTier ? 0.12 + scrollProgress * 0.15 : 0.08;
+  const groundOpacity = isFullTier ? 0.75 + scrollProgress * 0.08 : 0.68;
+  const windowEmissive = isFullTier ? 0.25 + scrollProgress * 0.35 : 0.15;
+  const waterEmissive = isFullTier ? 0.08 + scrollProgress * 0.1 : 0.05;
 
   return (
     <group ref={group}>
-      {/* Main ground plinth - warm earth tone */}
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0, -0.1]} receiveShadow>
-        <planeGeometry args={[4.2, 3.0]} />
+      {/* Main ground - subtle warm earth */}
+      <mesh rotation-x={-Math.PI / 2} position={[0, 0, -0.15]} receiveShadow>
+        <planeGeometry args={[2.8, 2.2]} />
         <meshStandardMaterial
           color={colors.ground}
-          roughness={0.78}
-          metalness={0.02}
+          roughness={0.82}
+          metalness={0.01}
           transparent
           opacity={groundOpacity}
         />
       </mesh>
 
-      {/* Elevated courtyard - tighter, warmer */}
-      <mesh position={[0, 0.02, -0.15]} receiveShadow>
-        <boxGeometry args={[2.6, 0.04, 2.0]} />
+      {/* Paved courtyard area */}
+      <mesh position={[0, 0.008, -0.05]} receiveShadow>
+        <boxGeometry args={[1.6, 0.016, 1.2]} />
         <meshStandardMaterial
           color={colors.courtyard}
-          roughness={0.75}
-          metalness={0.02}
+          roughness={0.78}
+          metalness={0.01}
         />
       </mesh>
 
-      {/* Green edges around plinth */}
-      {lifestyleElements
-        .filter((e) => e.type === "greenEdge")
-        .map((e, i) => (
-          <mesh key={`green-edge-${i}`} position={e.pos} receiveShadow>
-            <boxGeometry args={e.size} />
-            <meshStandardMaterial
-              color={colors.foliageDark}
-              roughness={0.85}
-              metalness={0.01}
-            />
-          </mesh>
-        ))}
-
-      {/* Main paths - warm stone */}
-      {lifestyleElements
-        .filter((e) => e.type === "path")
-        .map((e, i) => (
-          <mesh key={`path-${i}`} position={e.pos} receiveShadow>
-            <boxGeometry args={e.size} />
-            <meshStandardMaterial
-              color={colors.pathLight}
-              roughness={0.8}
-              metalness={0.01}
-            />
-          </mesh>
-        ))}
-
-      {/* Stepping stones */}
-      {lifestyleElements
-        .filter((e) => e.type === "steppingStone")
-        .map((e, i) => (
-          <mesh key={`stone-${i}`} position={e.pos} receiveShadow>
-            <boxGeometry args={e.size} />
-            <meshStandardMaterial
-              color={colors.path}
-              roughness={0.7}
-              metalness={0.02}
-            />
-          </mesh>
-        ))}
-
-      {/* Pool / water feature */}
-      {lifestyleElements
-        .filter((e) => e.type === "pool")
-        .map((e, i) => (
-          <mesh key={`pool-${i}`} position={e.pos} receiveShadow>
-            <boxGeometry args={e.size} />
-            <meshStandardMaterial
-              color={colors.water}
-              roughness={0.2}
-              metalness={0.1}
-              emissive={colors.waterGlow}
-              emissiveIntensity={waterEmissive}
-            />
-          </mesh>
-        ))}
-
-      {/* Outdoor seating */}
-      {lifestyleElements
-        .filter((e) => e.type === "seating")
-        .map((e, i) => (
-          <mesh key={`seat-${i}`} position={e.pos} castShadow receiveShadow>
-            <boxGeometry args={e.size} />
-            <meshStandardMaterial
-              color={colors.seating}
-              roughness={0.65}
-              metalness={0.03}
-            />
-          </mesh>
-        ))}
-
-      {/* Residences - warm stone materials */}
-      {residences.map((r, i) => (
-        <group
-          key={`residence-${i}`}
-          ref={(el) => {
-            residenceRefs.current[i] = el;
-          }}
-        >
-          {/* House body - warm stone */}
-          <mesh position={r.bodyPos} castShadow receiveShadow>
-            <boxGeometry args={r.bodySize} />
-            <meshStandardMaterial
-              color={i % 2 === 0 ? colors.stone : colors.stoneWarm}
-              roughness={isFullTier ? 0.7 : 0.78}
-              metalness={isFullTier ? 0.03 : 0.01}
-              envMapIntensity={isFullTier ? 0.4 : 0.15}
-            />
-          </mesh>
-
-          {/* Wood trim accent */}
-          <mesh
-            position={[r.bodyPos[0], r.bodyPos[1] - r.bodySize[1] / 2 + 0.03, r.bodyPos[2] + r.bodySize[2] / 2 + 0.01]}
-            castShadow
-          >
-            <boxGeometry args={[r.bodySize[0] * 0.9, 0.06, 0.02]} />
-            <meshStandardMaterial
-              color={colors.woodTrim}
-              roughness={0.6}
-              metalness={0.02}
-            />
-          </mesh>
-
-          {/* Warm roof */}
-          <mesh position={r.roofPos} castShadow receiveShadow>
-            <boxGeometry args={r.roofSize} />
-            <meshStandardMaterial
-              color={i % 2 === 0 ? colors.roof : colors.roofWarm}
-              roughness={0.6}
-              metalness={isFullTier ? 0.05 : 0.02}
-              envMapIntensity={isFullTier ? 0.3 : 0.1}
-            />
-          </mesh>
-
-          {/* Terrace on select homes */}
-          {lifestyleElements
-            .filter((e) => e.type === "terrace")
-            .filter((_, ti) => ti === i && i < 3)
-            .map((e, ti) => (
-              <mesh key={`terrace-${i}-${ti}`} position={e.pos} castShadow>
-                <boxGeometry args={e.size} />
-                <meshStandardMaterial
-                  color={colors.terrace}
-                  roughness={0.7}
-                  metalness={0.02}
-                />
-              </mesh>
-            ))}
-
-          {/* Window - warm glow */}
-          {r.hasWindow && r.windowPos && r.windowSize && (
-            <mesh position={r.windowPos}>
-              <boxGeometry args={r.windowSize} />
-              <meshStandardMaterial
-                color={colors.glass}
-                roughness={0.25}
-                metalness={0.08}
-                emissive={colors.warmGlow}
-                emissiveIntensity={windowEmissive}
-                transparent
-                opacity={0.9}
-              />
-            </mesh>
-          )}
-        </group>
+      {/* Stone pathways */}
+      {landscapeFeatures.paths.map((p, i) => (
+        <mesh key={`path-${i}`} position={p.pos} receiveShadow>
+          <boxGeometry args={p.size} />
+          <meshStandardMaterial color={colors.pathLight} roughness={0.75} metalness={0.01} />
+        </mesh>
       ))}
 
-      {/* Low walls */}
-      {connections.map((c, i) => (
-        <mesh key={`wall-${i}`} position={c.pos} castShadow receiveShadow>
-          <boxGeometry args={c.size} />
+      {/* Pool deck */}
+      <mesh position={landscapeFeatures.poolArea.pos} receiveShadow>
+        <boxGeometry args={landscapeFeatures.poolArea.deckSize} />
+        <meshStandardMaterial color={colors.terrace} roughness={0.7} metalness={0.02} />
+      </mesh>
+
+      {/* Pool water */}
+      <mesh position={[landscapeFeatures.poolArea.pos[0], landscapeFeatures.poolArea.pos[1] + 0.008, landscapeFeatures.poolArea.pos[2]]} receiveShadow>
+        <boxGeometry args={landscapeFeatures.poolArea.poolSize} />
+        <meshStandardMaterial
+          color={colors.water}
+          roughness={0.12}
+          metalness={0.08}
+          emissive={colors.waterGlow}
+          emissiveIntensity={waterEmissive}
+        />
+      </mesh>
+
+      {/* Hedges - low rectangular green masses */}
+      {landscapeFeatures.hedges.map((h, i) => (
+        <mesh key={`hedge-${i}`} position={h.pos} castShadow receiveShadow>
+          <boxGeometry args={h.size} />
           <meshStandardMaterial
-            color={colors.stone}
-            roughness={0.72}
-            metalness={0.02}
+            color={i % 2 === 0 ? colors.foliage : colors.foliageDark}
+            roughness={0.9}
+            metalness={0}
           />
         </mesh>
       ))}
 
-      {/* Trees - trunks + canopy */}
-      {lifestyleElements
-        .filter((e) => e.type === "tree")
-        .map((e, i) => (
-          <group key={`tree-${i}`}>
-            {/* Trunk */}
-            <mesh position={[e.pos[0], e.pos[1] * 0.4, e.pos[2]]} castShadow>
-              <cylinderGeometry args={[e.size[0] * 0.3, e.size[0] * 0.4, e.size[1] * 0.5, 6]} />
-              <meshStandardMaterial
-                color={colors.woodTrim}
-                roughness={0.8}
-                metalness={0.01}
-              />
-            </mesh>
-            {/* Canopy */}
-            <mesh position={[e.pos[0], e.pos[1] + e.size[1] * 0.35, e.pos[2]]} castShadow>
-              <sphereGeometry args={[e.size[0] * 1.8, 8, 6]} />
-              <meshStandardMaterial
-                color={i % 2 === 0 ? colors.foliage : colors.foliageBright}
-                roughness={0.85}
-                metalness={0.01}
-              />
-            </mesh>
-          </group>
-        ))}
+      {/* Villas */}
+      {villas.map((villa, i) => (
+        <group
+          key={`villa-${i}`}
+          ref={(el) => {
+            villaRefs.current[i] = el;
+          }}
+        >
+          <RealisticVilla
+            config={villa}
+            colors={colors}
+            isFullTier={isFullTier}
+            windowEmissive={windowEmissive}
+          />
+        </group>
+      ))}
 
-      {/* Shrubs / planters */}
-      {lifestyleElements
-        .filter((e) => e.type === "shrub")
-        .map((e, i) => (
-          <mesh key={`shrub-${i}`} position={e.pos} castShadow receiveShadow>
-            <sphereGeometry args={[Math.max(e.size[0], e.size[2]) * 0.6, 6, 5]} />
-            <meshStandardMaterial
-              color={i % 3 === 0 ? colors.foliageBright : i % 3 === 1 ? colors.foliage : colors.foliageDark}
-              roughness={0.88}
-              metalness={0.01}
-            />
-          </mesh>
-        ))}
+      {/* Trees */}
+      {trees.map((tree, i) => (
+        tree.type === "cypress" ? (
+          <RealisticCypressTree key={`tree-${i}`} pos={tree.pos} scale={tree.scale} rotation={tree.rotation} />
+        ) : (
+          <RealisticOliveTree key={`tree-${i}`} pos={tree.pos} scale={tree.scale} rotation={tree.rotation} />
+        )
+      ))}
 
-      {/* Warm ambient lighting */}
+      {/* Subtle ambient lighting */}
       {isFullTier && (
         <>
           <pointLight
-            position={[0, 2.0, 0.2]}
-            intensity={1.0 + scrollProgress * 0.4}
-            color="#f5e8d8"
-            distance={6}
-            decay={2}
-          />
-          <pointLight
-            position={[-1.2, 1.2, -0.3]}
-            intensity={0.5 + scrollProgress * 0.2}
-            color="#e8dcd0"
+            position={[0, 1.5, 0.1]}
+            intensity={0.7 + scrollProgress * 0.25}
+            color="#f8f0e8"
             distance={4}
             decay={2}
           />
           <pointLight
-            position={[1.2, 1.2, -0.3]}
-            intensity={0.5 + scrollProgress * 0.2}
-            color="#e8dcd0"
-            distance={4}
+            position={[-0.7, 0.8, -0.2]}
+            intensity={0.35 + scrollProgress * 0.12}
+            color="#f0e8e0"
+            distance={2.5}
             decay={2}
           />
-          {/* Warm courtyard accent */}
           <pointLight
-            position={[0, 0.5, -0.3]}
-            intensity={0.3 + scrollProgress * 0.15}
-            color="#d4c8b8"
-            distance={3}
+            position={[0.7, 0.8, -0.2]}
+            intensity={0.35 + scrollProgress * 0.12}
+            color="#f0e8e0"
+            distance={2.5}
             decay={2}
           />
         </>

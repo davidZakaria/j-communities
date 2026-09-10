@@ -109,7 +109,13 @@ export function HeroCanvas({
   const dpr: [number, number] = tier === "full" ? [1, 2] : [1, 1.5];
 
   return (
-    <div className="j-hero-canvas pointer-events-none absolute inset-0 z-[5]">
+    <div 
+      className="j-hero-canvas pointer-events-none absolute inset-0 z-[5]"
+      style={{
+        maskImage: "linear-gradient(to right, black 0%, black 50%, rgba(0,0,0,0.4) 72%, transparent 92%)",
+        WebkitMaskImage: "linear-gradient(to right, black 0%, black 50%, rgba(0,0,0,0.4) 72%, transparent 92%)",
+      }}
+    >
       <Canvas
         dpr={dpr}
         frameloop={frameloop}
