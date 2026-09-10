@@ -555,16 +555,16 @@
 
 @media (max-width: 480px) {
   .j-footer-headline-mobile {
-    font-size: clamp(1.1rem, 5.8vw, 1.5rem);
-    letter-spacing: 0.02em;
+    font-size: clamp(1.1rem, 5.8vw, 1.5rem) !important;
+    letter-spacing: 0.02em !important;
     line-height: 1.35;
   }
 }
 
 @media (max-width: 360px) {
   .j-footer-headline-mobile {
-    font-size: clamp(0.95rem, 5.5vw, 1.1rem);
-    letter-spacing: 0.01em;
+    font-size: clamp(0.95rem, 5.5vw, 1.1rem) !important;
+    letter-spacing: 0.01em !important;
   }
 }
 
