@@ -29,7 +29,7 @@ export const projectModels: Record<ProjectThemeId | "home", ProjectModelConfig> 
       { position: [9, 4.5, 10], target: [0, 1.2, 0] },
       { position: [6, 3, 7], target: [0, 0.8, 0] },
     ],
-    useProceduralFallback: false,
+    useProceduralFallback: true,
   },
   jura: {
     glbUrl: "/assets/models/jura/hero.glb",
