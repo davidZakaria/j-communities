@@ -1,10 +1,15 @@
+import { useMemo } from "react";
 import { getProjectModelConfig } from "../../../config/projectModels";
 import { getProjectTheme } from "../../../config/projectThemes";
+import { getStoryConfig } from "../../../config/storyBeats";
 import { useExperienceTier } from "../../motion/ExperienceTierContext";
 import { AnimatedModel } from "../AnimatedModel";
 import { CinematicEffects } from "../CinematicEffects";
 import { HeroCanvas } from "../HeroCanvas";
-import { SceneEnvironment } from "../SceneEnvironment";
+import { HeroParticles } from "../HeroParticles";
+import { SceneAtmosphere } from "../SceneAtmosphere";
+import { DynamicSceneEnvironment, SceneEnvironment } from "../SceneEnvironment";
+import { lerpStoryBeats } from "../scrollCameraRig";
 
 interface HeroSceneProps {
   scrollProgress: number;
@@ -63,23 +68,31 @@ export function JuraHeroScene({ scrollProgress, visible, onReady }: HeroScenePro
   const config = getProjectModelConfig("jura");
   const { tier } = useExperienceTier();
   const reducedMotion = useReducedMotion();
+  const storyConfig = getStoryConfig("jura");
+
+  const { atmosphere } = useMemo(
+    () => lerpStoryBeats(storyConfig.beats, scrollProgress, storyConfig.transitionEasing),
+    [storyConfig, scrollProgress],
+  );
+
+  const cameraKeyframes = useMemo(
+    () => storyConfig.beats.map((beat) => beat.camera),
+    [storyConfig],
+  );
+
+  const isFullTier = tier === "full";
 
   return (
     <HeroCanvas
       scrollProgress={scrollProgress}
-      cameraKeyframes={config.cameraKeyframes}
+      cameraKeyframes={cameraKeyframes}
       visible={visible}
       tier={tier}
       reducedMotion={reducedMotion}
       onReady={onReady}
       variant="jura"
     >
-      <SceneEnvironment
-        fogColor={theme.colors.bg}
-        variant="jura"
-        tier={tier}
-        scrollProgress={scrollProgress}
-      >
+      <DynamicSceneEnvironment atmosphere={atmosphere} variant="jura" tier={tier}>
         <AnimatedModel
           glbUrl={config.glbUrl}
           animationClips={config.animationClips}
@@ -89,7 +102,23 @@ export function JuraHeroScene({ scrollProgress, visible, onReady }: HeroScenePro
           scrollProgress={scrollProgress}
           tier={tier}
         />
-      </SceneEnvironment>
+        {isFullTier && (
+          <>
+            <HeroParticles
+              variant="jura"
+              scrollProgress={scrollProgress}
+              intensity={atmosphere.particleIntensity}
+              primaryColor={storyConfig.particleColor}
+              secondaryColor={storyConfig.particleColorAlt}
+            />
+            <SceneAtmosphere
+              glowColor={storyConfig.glowColor}
+              glowIntensity={atmosphere.glowIntensity}
+              scrollProgress={scrollProgress}
+            />
+          </>
+        )}
+      </DynamicSceneEnvironment>
       <CinematicEffects
         tier={tier}
         reducedMotion={reducedMotion}
@@ -105,25 +134,31 @@ export function JamilaHeroScene({ scrollProgress, visible, onReady }: HeroSceneP
   const config = getProjectModelConfig("jamila");
   const { tier } = useExperienceTier();
   const reducedMotion = useReducedMotion();
+  const storyConfig = getStoryConfig("jamila");
+
+  const { atmosphere } = useMemo(
+    () => lerpStoryBeats(storyConfig.beats, scrollProgress, storyConfig.transitionEasing),
+    [storyConfig, scrollProgress],
+  );
+
+  const cameraKeyframes = useMemo(
+    () => storyConfig.beats.map((beat) => beat.camera),
+    [storyConfig],
+  );
+
+  const isFullTier = tier === "full";
 
   return (
     <HeroCanvas
       scrollProgress={scrollProgress}
-      cameraKeyframes={config.cameraKeyframes}
+      cameraKeyframes={cameraKeyframes}
       visible={visible}
       tier={tier}
       reducedMotion={reducedMotion}
       onReady={onReady}
       variant="jamila"
     >
-      <SceneEnvironment
-        fogColor={theme.colors.accent}
-        fogNear={6}
-        fogFar={28}
-        variant="jamila"
-        tier={tier}
-        scrollProgress={scrollProgress}
-      >
+      <DynamicSceneEnvironment atmosphere={atmosphere} variant="jamila" tier={tier}>
         <AnimatedModel
           glbUrl={config.glbUrl}
           animationClips={config.animationClips}
@@ -133,7 +168,23 @@ export function JamilaHeroScene({ scrollProgress, visible, onReady }: HeroSceneP
           scrollProgress={scrollProgress}
           tier={tier}
         />
-      </SceneEnvironment>
+        {isFullTier && (
+          <>
+            <HeroParticles
+              variant="jamila"
+              scrollProgress={scrollProgress}
+              intensity={atmosphere.particleIntensity}
+              primaryColor={storyConfig.particleColor}
+              secondaryColor={storyConfig.particleColorAlt}
+            />
+            <SceneAtmosphere
+              glowColor={storyConfig.glowColor}
+              glowIntensity={atmosphere.glowIntensity}
+              scrollProgress={scrollProgress}
+            />
+          </>
+        )}
+      </DynamicSceneEnvironment>
       <CinematicEffects
         tier={tier}
         reducedMotion={reducedMotion}
