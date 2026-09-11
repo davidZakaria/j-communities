@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState, type ComponentType } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ComponentType } from "react";
 import { useExperienceTier } from "../motion/ExperienceTierContext";
 
 type SceneProps = { scrollProgress: number; visible: boolean; onReady?: () => void };
@@ -21,22 +21,72 @@ interface HeroWebGLBackgroundProps {
   onReady?: () => void;
 }
 
+type TransitionState = "entering" | "visible" | "exiting" | "hidden";
+
 export function HeroWebGLBackground({ scene, scrollProgress, onReady }: HeroWebGLBackgroundProps) {
   const { enableWebGL } = useExperienceTier();
   const [mounted, setMounted] = useState(false);
+  const [transitionState, setTransitionState] = useState<TransitionState>("hidden");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    if (enableWebGL) setMounted(true);
-    else setMounted(false);
-  }, [enableWebGL]);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
 
-  if (!mounted || !enableWebGL) return null;
+    if (enableWebGL) {
+      setMounted(true);
+      setTransitionState("entering");
+      timeoutRef.current = setTimeout(() => {
+        setTransitionState("visible");
+        onReady?.();
+      }, 50);
+    } else {
+      setTransitionState("exiting");
+      timeoutRef.current = setTimeout(() => {
+        setMounted(false);
+        setTransitionState("hidden");
+      }, 600);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [enableWebGL, onReady]);
+
+  if (!mounted) return null;
 
   const Scene = lazyScenes[scene];
 
+  const transitionClass =
+    transitionState === "entering"
+      ? "j-webgl-transition--entering"
+      : transitionState === "visible"
+        ? "j-webgl-transition--visible"
+        : transitionState === "exiting"
+          ? "j-webgl-transition--exiting"
+          : "j-webgl-transition--hidden";
+
   return (
-    <Suspense fallback={null}>
-      <Scene scrollProgress={scrollProgress} visible={enableWebGL} onReady={onReady} />
-    </Suspense>
+    <div
+      ref={containerRef}
+      className={`j-webgl-transition ${transitionClass}`}
+      style={{ position: "absolute", inset: 0, zIndex: 5 }}
+    >
+      <Suspense fallback={<WebGLLoadingFallback />}>
+        <Scene scrollProgress={scrollProgress} visible={enableWebGL} onReady={onReady} />
+      </Suspense>
+    </div>
+  );
+}
+
+function WebGLLoadingFallback() {
+  return (
+    <div className="j-webgl-loading absolute inset-0 flex items-center justify-center">
+      <div className="j-webgl-loading-spinner" />
+    </div>
   );
 }
