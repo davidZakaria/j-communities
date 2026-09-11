@@ -30,6 +30,7 @@ export function HomeHeroScene({ scrollProgress, visible, onReady }: HeroScenePro
       tier={tier}
       reducedMotion={reducedMotion}
       onReady={onReady}
+      variant="home"
     >
       <SceneEnvironment
         fogColor="#0a0a0a"
@@ -71,6 +72,7 @@ export function JuraHeroScene({ scrollProgress, visible, onReady }: HeroScenePro
       tier={tier}
       reducedMotion={reducedMotion}
       onReady={onReady}
+      variant="jura"
     >
       <SceneEnvironment
         fogColor={theme.colors.bg}
@@ -112,6 +114,7 @@ export function JamilaHeroScene({ scrollProgress, visible, onReady }: HeroSceneP
       tier={tier}
       reducedMotion={reducedMotion}
       onReady={onReady}
+      variant="jamila"
     >
       <SceneEnvironment
         fogColor={theme.colors.accent}

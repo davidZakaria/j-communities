@@ -16,6 +16,7 @@ interface ScrollCameraProps {
   pointerOffset: { x: number; y: number };
   reducedMotion: boolean;
   enableDamping: boolean;
+  variant?: "home" | "jura" | "jamila";
 }
 
 function ScrollCamera({
@@ -24,10 +25,13 @@ function ScrollCamera({
   pointerOffset,
   reducedMotion,
   enableDamping,
+  variant = "home",
 }: ScrollCameraProps) {
   const { camera } = useThree();
   const cam = camera as PerspectiveCamera;
   const stateRef = useRef<DampedCameraState>(createDampedCameraState());
+
+  const isHome = variant === "home";
 
   useFrame((_, delta) => {
     if (!enableDamping) {
@@ -46,9 +50,9 @@ function ScrollCamera({
       delta,
       pointerOffset,
       {
-        damping: 0.92,
-        responsiveness: 0.15,
-        pointerInfluence: 0.5,
+        damping: isHome ? 0.96 : 0.93,
+        responsiveness: isHome ? 0.08 : 0.12,
+        pointerInfluence: isHome ? 0.15 : 0.35,
         reducedMotion,
       },
     );
@@ -81,7 +85,7 @@ interface HeroCanvasProps {
   tier?: "full" | "light" | "static";
   reducedMotion?: boolean;
   onReady?: () => void;
-
+  variant?: "home" | "jura" | "jamila";
 }
 
 export function HeroCanvas({
@@ -92,21 +96,22 @@ export function HeroCanvas({
   tier = "full",
   reducedMotion = false,
   onReady,
-
+  variant = "home",
 }: HeroCanvasProps) {
+  const isHome = variant === "home";
   const enableDamping = tier === "full" && !reducedMotion;
-  const enablePointerParallax = tier === "full" && !reducedMotion;
+  const enablePointerParallax = tier === "full" && !reducedMotion && !isHome;
 
   const pointerOffset = usePointerParallax({
     enabled: enablePointerParallax && visible,
-    sensitivity: 0.85,
-    smoothing: 0.06,
+    sensitivity: isHome ? 0.25 : 0.5,
+    smoothing: isHome ? 0.03 : 0.05,
   });
 
   if (!visible) return null;
 
   const frameloop = tier === "full" ? "always" : "demand";
-  const dpr: [number, number] = tier === "full" ? [1, 2] : [1, 1.5];
+  const dpr: [number, number] = isHome ? [1, 1] : tier === "full" ? [1, 1.5] : [1, 1.25];
 
   return (
     <div 
@@ -120,7 +125,7 @@ export function HeroCanvas({
         dpr={dpr}
         frameloop={frameloop}
         gl={{
-          antialias: tier === "full",
+          antialias: tier === "full" && !isHome,
           alpha: true,
           powerPreference: tier === "full" ? "high-performance" : "default",
           stencil: false,
@@ -139,6 +144,7 @@ export function HeroCanvas({
             pointerOffset={pointerOffset}
             reducedMotion={reducedMotion}
             enableDamping={enableDamping}
+            variant={variant}
           />
           {children}
           <ReadyNotifier onReady={onReady} />

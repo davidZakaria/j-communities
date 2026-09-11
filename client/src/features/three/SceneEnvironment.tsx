@@ -67,17 +67,17 @@ function getLightingProfile(variant: string, scrollProgress: number): LightingPr
 
     default:
       return {
-        ambientIntensity: 0.42 + breathe,
-        mainLightIntensity: 1.0,
-        mainLightPosition: [6, 8, 5],
-        mainLightColor: "#fff8f2",
-        fillLightIntensity: 0.35,
+        ambientIntensity: 0.55,
+        mainLightIntensity: 0.7,
+        mainLightPosition: [5, 7, 4],
+        mainLightColor: "#ffffff",
+        fillLightIntensity: 0,
         fillLightPosition: [-5, 4, -3],
         fillLightColor: "#d8d4d0",
-        rimLightIntensity: 0.55,
+        rimLightIntensity: 0,
         rimLightPosition: [-3, 6, -6],
         rimLightColor: "#e8e4e0",
-        enableContactShadows: true,
+        enableContactShadows: false,
         envPreset: "sunset",
       };
   }
@@ -122,6 +122,7 @@ export function SceneEnvironment({
   );
 
   const isFullTier = tier === "full";
+  const isHome = variant === "home";
 
   return (
     <>
@@ -138,30 +139,34 @@ export function SceneEnvironment({
         position={profile.mainLightPosition}
         intensity={profile.mainLightIntensity}
         color={profile.mainLightColor}
-        castShadow={isFullTier}
+        castShadow={isFullTier && !isHome}
         shadow-mapSize={isFullTier ? [1024, 1024] : [512, 512]}
         shadow-bias={-0.0001}
       />
 
-      {isFullTier && (
+      {isFullTier && !isHome && (
         <>
-          <pointLight
-            position={profile.fillLightPosition}
-            intensity={profile.fillLightIntensity}
-            color={profile.fillLightColor}
-            distance={15}
-            decay={2}
-          />
+          {profile.fillLightIntensity > 0 && (
+            <pointLight
+              position={profile.fillLightPosition}
+              intensity={profile.fillLightIntensity}
+              color={profile.fillLightColor}
+              distance={15}
+              decay={2}
+            />
+          )}
 
-          <spotLight
-            position={profile.rimLightPosition}
-            intensity={profile.rimLightIntensity}
-            color={profile.rimLightColor}
-            angle={0.5}
-            penumbra={0.8}
-            distance={20}
-            decay={2}
-          />
+          {profile.rimLightIntensity > 0 && (
+            <spotLight
+              position={profile.rimLightPosition}
+              intensity={profile.rimLightIntensity}
+              color={profile.rimLightColor}
+              angle={0.5}
+              penumbra={0.8}
+              distance={20}
+              decay={2}
+            />
+          )}
 
           <Environment preset={profile.envPreset} background={false} />
 
