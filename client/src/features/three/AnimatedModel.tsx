@@ -157,7 +157,8 @@ export function AnimatedModel({
   scrollProgress,
   tier = "full",
 }: AnimatedModelProps) {
-  const enableFloat = tier === "full";
+  const isHome = variant === "home";
+  const enableFloat = tier === "full" && !isHome;
   const { scale: variantScale, position: variantPosition } = getVariantScaleAndPosition(variant);
 
   if (useProceduralFallback) {

@@ -72,7 +72,7 @@ export function CinematicEffects({
   variant,
   scrollProgress,
 }: CinematicEffectsProps) {
-  if (tier !== "full" || reducedMotion) {
+  if (tier !== "full" || reducedMotion || variant === "home") {
     return null;
   }
 
